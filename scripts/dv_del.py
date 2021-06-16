@@ -12,11 +12,11 @@ def delstudy(dvurl, key, pid):
     Deletes datavesrse study
 
     dvurl : str
-        Dataverse base URL
+        Dataverse installation base URL
     key : str
-        Dataverse API key
+        Dataverse user API key
     pid : str
-        Dataverse study persistent identifier
+        Dataverse collection study persistent identifier
     '''
     try:
         deler = requests.delete(f'{dvurl}/api/datasets/:persistentId/versions/:draft',
@@ -43,11 +43,11 @@ def getsize(dvurl, pid, key):
     '''
     Returns size of Dataverse study. Mostly here for debugging.
     dvurl : str
-        Dataverse base URL
+        Dataverse installation base URL
     pid : str
-        Dataverse study persistent identifier
+        Dataverse collection study persistent identifier
     key : str
-        Dataverse API key
+        Dataverse user API key
     '''
     try:
         sizer = requests.get(f'{dvurl}/api/datasets/:persistentId/storagesize',
@@ -67,10 +67,12 @@ def main():
     '''
     Command line bulk deleter
     '''
-    parser = argparse.ArgumentParser(description='Delete draft studies from dataverse')
-    parser.add_argument('-k', '--key', help='Dataverse API key', required=True, dest='key')
+    parser = argparse.ArgumentParser(description='Delete draft studies from a Dataverse collection')
+    parser.add_argument('-k', '--key', help='Dataverse user API key', required=True, dest='key')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-d', '--dataverse', help='Dataverse from which to delete all draft records',
+    group.add_argument('-d', '--dataverse', 
+                       help=('Dataverse collection short name from which '
+                             'to delete all draft records. eg. "ldc"'),
                        dest='dataverse')
     group.add_argument('-p', '--persistentId',
                        help='Handle or DOI to delete in format hdl:11272.1/FK2/12345',
@@ -78,7 +80,7 @@ def main():
     parser.add_argument('-i', '--interactive',
                         help="Confirm each study deletion",
                         action='store_true', dest='conf')
-    parser.add_argument('-u', '--url', help='URL to base Dataverse instance',
+    parser.add_argument('-u', '--url', help='URL to base Dataverse installation',
                         default='https://soroban.library.ubc.ca', dest='dvurl')
     args = parser.parse_args()
     #print(args)
@@ -90,7 +92,7 @@ def main():
                             headers={'X-Dataverse-key': args.key}, timeout=10).json()
         pids = [f'{x["protocol"]}:{x["authority"]}/{x["identifier"]}' for x in info['data']]
         if not pids:
-            print(f'Dataverse {args.dataverse} empty')
+            print(f'Dataverse collection {args.dataverse} empty')
         for pid in pids:
             try:
                 if args.conf:

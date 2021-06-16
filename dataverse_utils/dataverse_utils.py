@@ -3,13 +3,16 @@ A collection of Dataverse utilities for file and metadata
 manipulation
 '''
 
+
 import csv
 import io
+#Dataverse/Glassfish can sometimes partially crash and the 
+#API doesn't return JSON correctly, so:
+import json #for errors only
 import logging
 import mimetypes
 import os
 import time
-
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import requests
 
@@ -38,8 +41,10 @@ def _make_info(dv_url, study, apikey) -> tuple:
 
     study : str
         Study handle or file ID
+
     dv_url : str
         URL to base dataverse instance
+
     apikey : Dataverse API key
     '''
     if dv_url.endswith('/'):
@@ -48,106 +53,83 @@ def _make_info(dv_url, study, apikey) -> tuple:
     params = {'persistentId': study}
     return (dv_url, headers, params)
 
-def make_tsv(start_dir, def_tag='Data'):
+def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True):
     '''
     Recurses the tree for files and produces tsv output with
     with headers 'file', 'description', 'tags'.
 
     The 'description' is the filename without an extension.
-    
+
     Returns tsv as string
+    
     ------------------------------------------
     Parameters:
+
     start_dir : str
         Path to start directory
+
+    in_list : list
+        Input file list. Defaults to recursive walk of current directory.
+
     def_tag : str
         Default Dataverse tag (eg, Data, Documentation, etc)
         Separate tags with an easily splitable character:
         eg. ('Data, 2016')
+
+    inc_header : bool
+        Include header row
     '''
     if start_dir.endswith(os.sep):
         #start_dir += os.sep
-        start_dir = start_dir[:-1] 
-    basic = [f'{x[0]}{os.sep}{y}'
-             for x in os.walk(start_dir)
-             for y in x[2]
-             if not y.startswith('.')]
+        start_dir = start_dir[:-1]
+    if not in_list:
+        in_list = [f'{x[0]}{os.sep}{y}'
+                   for x in os.walk(start_dir)
+                   for y in x[2]
+                   if not y.startswith('.')]
 
     headers = ['file', 'description', 'tags']
     outf = io.StringIO()
     tsv_writer = csv.writer(outf, delimiter='\t',
                             quoting=csv.QUOTE_NONNUMERIC,
                             )
-    tsv_writer.writerow(headers)
-    for row in basic:
+    if inc_header:
+        tsv_writer.writerow(headers)
+    for row in in_list:
         desc = os.path.splitext(os.path.basename(row))[0]
         tsv_writer.writerow([row, desc, def_tag])
     outf.seek(0)
     outfile = outf.read()
     outf.close()
+
     return outfile
 
-def dump_tsv(start_dir, filename, def_tag='Data'):
+def dump_tsv(start_dir, filename, in_list=None,
+             def_tag='Data', inc_header=True):
     '''
     Dumps output of make_tsv manifest to a file.
 
-     ------------------------------------------
+    ------------------------------------------
     Parameters:
+
     start_dir : str
         Path to start directory
+
+    in_list : list
+        List of files for which to create manifest entries. Will
+        default to recursive directory crawl
+
     def_tag : str
         Default Dataverse tag (eg, Data, Documentation, etc)
         Separate tags with an easily splitable character:
         eg. ('Data, 2016')
 
+    inc_header : bool
+        Include header for tsv.
     '''
-    dumper = make_tsv(start_dir, def_tag)
+    dumper = make_tsv(start_dir, in_list, def_tag, inc_header)
     with open(filename, 'w') as tsvfile:
         tsvfile.write(dumper)
-
-#def make_tsv_manifest(fname, def_tag='Data', outfile=None):
-#    '''
-#    Create a TSV file for editing in a spreadsheet application,
-#    with headers 'file', 'description', 'tags'.
-#
-#    Normally you would use the output of:
-#
-#    find . -name "*" -type f > fname
-#
-#    as the input file.
-#
-#    By default, the new manifest overwrites the old.
-#
-#    The 'description' is the filename without an extension.
-#
-#    ------------------------------------------
-#    Parameters:
-#
-#    fname : str
-#        Input text file
-#    def_tag : str
-#        Default Dataverse tag (eg, Data, Documentation, etc)
-#    outfile : str
-#        output TSV file. Default overwrites input file
-#    '''
-#    if not outfile:
-#        outfile = fname
-#
-#    with open(fname) as fil:
-#        basic = fil.read()
-#
-#    basic = basic.split('\n')
-#    basic = [x for x in basic if x]
-#
-#    headers = ['file', 'description', 'tags']
-#    with open(outfile, 'w') as outf:
-#        tsv_writer = csv.writer(outf, delimiter='\t',
-#                                quoting=csv.QUOTE_NONNUMERIC,
-#                                )
-#        tsv_writer.writerow(headers)
-#        for row in basic:
-#            desc = os.path.splitext(os.path.basename(row))[0]
-#            tsv_writer.writerow([row, desc, def_tag])
 
 def file_path(fpath, trunc):
     '''
@@ -163,6 +145,7 @@ def file_path(fpath, trunc):
 
     fpath : str
         file location (ie, complete path)
+
     trunc : str
         rightmost portion of path to remove
     '''
@@ -181,8 +164,10 @@ def check_lock(dv_url, study, apikey) -> bool:
 
     dvurl : str
         URL of Dataverse installation
+
     study: str
         Persistent ID of study
+
     apikey : str
         API key for user
     '''
@@ -204,18 +189,23 @@ def force_notab_unlock(study, dv_url, fid, apikey, try_uningest=True) -> int:
     to prevent tabular file processing. Required if mime and filename
     spoofing is not sufficient.
 
-    Returns 0  if unlocked, file id if locked (and then unlocked).
+    Returns 0 if unlocked, file id if locked (and then unlocked).
+
     ----------------------------------------
     Parameters:
 
     study : str
         Persistent indentifer of study
+
     dv_url : str
         URL to base Dataverse installation
+
     fid : str
         File ID for file object
+        
     apikey : str
         API key for user
+
     try_uningest : bool
         Try to uningest the file that was locked.
         Default: True
@@ -235,15 +225,19 @@ def uningest_file(dv_url, fid, apikey, study='n/a'):
     '''
     Tries to uningest a file that has been ingested.
     Requires superuser API key.
+
     ----------------------------------------
     Parameters:
 
     dv_url : str
         URL to base Dataverse installation
+
     fid : int or str
         File ID of file to uningest
+
     apikey : str
         API key for superuser
+
     study : str
         Optional handle parameter for log messages
     '''
@@ -265,43 +259,55 @@ def uningest_file(dv_url, fid, apikey, study='n/a'):
 def upload_file(fpath, hdl, **kwargs):
     '''
     Uploads file to Dataverse study and sets file metdata and tags.
+
     ----------------------------------------
     Parameters:
 
     fpath : str
         file location (ie, complete path)
+
     hdl : str
         Dataverse persistent ID for study (handle or DOI)
+
     kwargs : dict
+        
         other parameters. Acceptable keywords and contents are:
+
         dv : str
             REQUIRED
             url to base Dataverse installation
             eg: 'https://abacus.library.ubc.ca'
+
         apikey : str
             REQUIRED
             API key for user
+
         descr : str
             OPTIONAL
             file description
+
         md5 : str
             OPTIONAL
             md5sum for file checking
+
         tags : list
             OPTIONAL
             list of text file tags. Eg ['Data', 'June 2020']
+
         dirlabel : str
             OPTIONAL
             Unix style relative pathname for Dataverse
             file path: eg: path/to/file/
+
         nowait : bool
             OPTIONAL
             Force a file unlock and uningest instead of waiting for processing
             to finish
     '''
-    #TODO why are SPSS files getting processed anyway?
+    #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
     #Does the file need to be renamed post hoc?
+    #I don't think this can be fixed. Goddamitsomuch.
     if kwargs['dv'].endswith(os.sep):
         dvurl = kwargs['dv'][:-1]
     else:
@@ -338,8 +344,17 @@ def upload_file(fpath, hdl, **kwargs):
     upload = requests.post(f"{dvurl}/api/datasets/:persistentId/add",
                            params=params, headers=headers, data=multi,
                            timeout=1000)#timeout hardcoded. Bad idea?
-
-    print(upload.json())
+    try:
+        print(upload.json())
+    except json.decoder.JSONDecodeError:
+        #This can happend when Glassfish crashes
+        LOGGER.critical(upload.text)
+        print(upload.text)
+        err =('It''s possible Glassfish may have crashed. '
+              'Check server logs for anomalies')
+        LOGGER.exception(error)
+        print(err)
+        raise
     #SPSS files still process despite spoof, so there's
     #a forcible unlock check
     fid = upload.json()['data']['files'][0]['dataFile']['id']
@@ -367,20 +382,24 @@ def upload_from_tsv(fil, hdl, **kwargs):
 
     'tags' field will be split on commas.
 
-
     ----------------------------------------
     Parameters:
 
     fil : filelike object
         Open file object or io.IOStream()
+
     hdl : str
         Dataverse persistent ID for study (handle or DOI)
+
     kwargs : dict
+
         other parameters. Acceptable keywords and contents are:
+
         dv : str
             REQUIRED
             url to base Dataverse installation
             eg: 'https://abacus.library.ubc.ca'
+
         apikey : str
             REQUIRED
             API key for user

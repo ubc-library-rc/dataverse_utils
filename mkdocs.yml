@@ -2,12 +2,18 @@ site_name: 'dataverse_utils'
 docs_dir: 'docs'
 nav:
   - Overview: index.md
+  - API reference: api_ref.md
+  - Scripts: scripts.md
+  - Credits: credits.md
 
 markdown_extensions:
   - smarty
   - toc:
       permalink: True
-  - codehilite
+  - codehilite:
+      guess_lang: False
+      linenums: False 
+      use_pygments: False
   - attr_list
 
 theme: readthedocs

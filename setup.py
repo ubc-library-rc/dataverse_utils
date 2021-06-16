@@ -1,6 +1,7 @@
 '''
 dataverse_utils setup file. Very basic
 '''
+import ast
 import glob
 import os
 import setuptools

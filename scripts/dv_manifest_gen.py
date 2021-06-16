@@ -1,0 +1,106 @@
+'''
+Creates a file manifest in tab separated value format
+which can be used with other dataverse_util library utilities
+and functions to upload files complete with metadata.
+'''
+
+import argparse
+import os
+import pathlib
+#pathlib new for Python 3.5
+#https://docs.python.org/3/library/pathlib.html
+import sys
+
+import dataverse_utils as du
+
+VERSION = (0, 1, 0)
+__version__ = '.'.join([str(x) for x in VERSION])
+
+def parse() -> argparse.ArgumentParser():
+    '''
+    Parses the arguments from the command line.
+
+    Returns argparse.ArgumentParser
+    '''
+    description = ('Creates a file manifest in tab separated value format '
+                   'which can then be edited and used for file uploads to '
+                   'a Dataverse collection. Files can be edited to add file descriptions '
+                   'and comma-separated tags that will be automatically '
+                   'attached to metadata using products using the dataverse_utils '
+                   'library. '
+                   'Will dump to stdout unless -f or --filename is used. '
+                   'Using the command and a dash (ie, "dv_manifest_gen.py -" '
+                   'produces full paths for some reason.')
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('files', help='Files to add to manifest',
+                        nargs='*', default='*')
+    parser.add_argument('-f', '--filename',
+                        help='Save to file instead of outputting to stdout',
+                        default=None)
+    parser.add_argument('-t', '--tag',
+                        help=('Default tag(s). Separate with comma and '
+                              'use quotes if there are spaces. '
+                              'eg. "Data, June 2021". '
+                              'Defaults to "Data"'),
+                        default='Data')
+    parser.add_argument('-x', '--no-header',
+                        help=('Don\'t include header in output. Useful if '
+                              'creating a complex tsv using redirects (ie, ">>").'),
+                        action='store_false',
+                        dest='inc_header')
+    parser.add_argument('-r', '--recursive',
+                        help=('Recursive listing.'),
+                        action='store_true')
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+__version__,
+                        help='Show version number and exit')
+    return parser
+
+def main() -> None:
+    '''
+    The main function call
+    '''
+    parser = parse()
+    args = parser.parse_args()
+    f_list = []
+    #if isinstance(args.files, list):
+    #    for fil in args.files:
+    #        f_list += glob.glob(fil)# flist.extend() could be less intensive
+    #else:
+    #    f_list = glob.glob(args.files, recursive=True)
+
+    #f_list = {x for x in f_list if os.path.isfile(x)}#set comprehension!
+    finder = pathlib.Path('.')
+    if isinstance(args.files, list):
+        if args.recursive:
+            for fil in args.files:
+                f_list += finder.rglob(fil)
+        else:
+            for fil in args.files:
+                f_list += finder.glob(fil)
+
+    else:
+        if args.recursive:
+            f_list = finder.rglob(args.files)
+        else:
+            f_list = finder.glob(args.files)
+
+    #Set comprehension strips out duplicates
+    f_list = {str(x) for x in f_list if x.is_file() and not x.name.startswith('.')}
+
+    if not f_list:
+        print('Nothing matching these criteria. No manifest generated')
+        sys.exit()
+
+    if args.filename:
+        du.dump_tsv(os.getcwd(), filename=args.filename,
+                    in_list=f_list,
+                    def_tag=args.tag,
+                    inc_header=args.inc_header)
+    else:
+        print(du.make_tsv(os.getcwd(), in_list=f_list,
+                          def_tag=args.tag,
+                          inc_header=args.inc_header))
+
+if __name__ == '__main__':
+    main()
