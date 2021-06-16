@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>API reference - dataverse_utils</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "API reference";
+    var mkdocs_page_input_path = "api_ref.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> dataverse_utils</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">API reference</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utils">dataverse_utils</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsdataverse_utils">dataverse_utils.dataverse_utils</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dvgeneraluploaderror-objects">DvGeneralUploadError Objects</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#md5error-objects">Md5Error Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#make_tsv">make_tsv</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dump_tsv">dump_tsv</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#file_path">file_path</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#check_lock">check_lock</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#force_notab_unlock">force_notab_unlock</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#uningest_file">uningest_file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#upload_file">upload_file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#upload_from_tsv">upload_from_tsv</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsldc">dataverse_utils.ldc</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#ldc-objects">Ldc Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#ldcjson">ldcJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#make_ldc_json">make_ldc_json</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#name_parser">name_parser</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#make_dryad_json">make_dryad_json</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#find_block_index">find_block_index</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#make_dv_json">make_dv_json</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#upload_metadata">upload_metadata</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Scripts</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">dataverse_utils</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>API reference</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
+<p><a name="dataverse_utils"></a></p>
+<h2 id="dataverse_utils">dataverse_utils<a class="headerlink" href="#dataverse_utils" title="Permanent link">&para;</a></h2>
+<p>Generalized dataverse utilities</p>
+<p><a name="dataverse_utils.dataverse_utils"></a></p>
+<h2 id="dataverse_utilsdataverse_utils">dataverse_utils.dataverse_utils<a class="headerlink" href="#dataverse_utilsdataverse_utils" title="Permanent link">&para;</a></h2>
+<p>A collection of Dataverse utilities for file and metadata
+manipulation</p>
+<p><a name="dataverse_utils.dataverse_utils.DvGeneralUploadError"></a></p>
+<h3 id="dvgeneraluploaderror-objects">DvGeneralUploadError Objects<a class="headerlink" href="#dvgeneraluploaderror-objects" title="Permanent link">&para;</a></h3>
+<pre class="codehilite"><code class="language-python">class DvGeneralUploadError(Exception)</code></pre>
+
+
+<p>Raised on non-200 URL response</p>
+<p><a name="dataverse_utils.dataverse_utils.Md5Error"></a></p>
+<h3 id="md5error-objects">Md5Error Objects<a class="headerlink" href="#md5error-objects" title="Permanent link">&para;</a></h3>
+<pre class="codehilite"><code class="language-python">class Md5Error(Exception)</code></pre>
+
+
+<p>Raised on md5 mismatch</p>
+<p><a name="dataverse_utils.dataverse_utils.make_tsv"></a></p>
+<h5 id="make_tsv">make_tsv<a class="headerlink" href="#make_tsv" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True)</code></pre>
+
+
+<p>Recurses the tree for files and produces tsv output with
+with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.</p>
+<p>The &lsquo;description&rsquo; is the filename without an extension.</p>
+<p>Returns tsv as string</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>start_dir : str
+  Path to start directory</p>
+<p>in_list : list
+  Input file list. Defaults to recursive walk of current directory.</p>
+<p>def_tag : str
+  Default Dataverse tag (eg, Data, Documentation, etc)
+  Separate tags with an easily splitable character:
+  eg. (&lsquo;Data, 2016&rsquo;)</p>
+<p>inc_header : bool
+  Include header row</p>
+<p><a name="dataverse_utils.dataverse_utils.dump_tsv"></a></p>
+<h5 id="dump_tsv">dump_tsv<a class="headerlink" href="#dump_tsv" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">dump_tsv(start_dir, filename, in_list=None, def_tag='Data', inc_header=True)</code></pre>
+
+
+<p>Dumps output of make_tsv manifest to a file.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>start_dir : str
+  Path to start directory</p>
+<p>in_list : list
+  List of files for which to create manifest entries. Will
+  default to recursive directory crawl</p>
+<p>def_tag : str
+  Default Dataverse tag (eg, Data, Documentation, etc)
+  Separate tags with an easily splitable character:
+  eg. (&lsquo;Data, 2016&rsquo;)</p>
+<p>inc_header : bool
+  Include header for tsv.</p>
+<p><a name="dataverse_utils.dataverse_utils.file_path"></a></p>
+<h5 id="file_path">file_path<a class="headerlink" href="#file_path" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">file_path(fpath, trunc)</code></pre>
+
+
+<p>Create relative file path from full path string</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>file_path(&lsquo;/tmp/Data/2011/excelfile.xlsx&rsquo;, &lsquo;/tmp/&rsquo;)
+&lsquo;Data/2011&rsquo;
+file_path(&lsquo;/tmp/Data/2011/excelfile.xlsx&rsquo;, &lsquo;/tmp&rsquo;)
+&lsquo;Data/2011&rsquo;</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>fpath : str
+  file location (ie, complete path)</p>
+<p>trunc : str
+  rightmost portion of path to remove</p>
+<p><a name="dataverse_utils.dataverse_utils.check_lock"></a></p>
+<h5 id="check_lock">check_lock<a class="headerlink" href="#check_lock" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">check_lock(dv_url, study, apikey) -&gt; bool</code></pre>
+
+
+<p>Checks study lock status; returns True if locked.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dvurl : str
+  URL of Dataverse installation</p>
+<ul>
+<li><code>study</code> - str
+  Persistent ID of study</li>
+</ul>
+<p>apikey : str
+  API key for user</p>
+<p><a name="dataverse_utils.dataverse_utils.force_notab_unlock"></a></p>
+<h5 id="force_notab_unlock">force_notab_unlock<a class="headerlink" href="#force_notab_unlock" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">force_notab_unlock(study, dv_url, fid, apikey, try_uningest=True) -&gt; int</code></pre>
+
+
+<p>Forcibly unlocks and uningests
+to prevent tabular file processing. Required if mime and filename
+spoofing is not sufficient.</p>
+<p>Returns 0 if unlocked, file id if locked (and then unlocked).</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>study : str
+  Persistent indentifer of study</p>
+<p>dv_url : str
+  URL to base Dataverse installation</p>
+<p>fid : str
+  File ID for file object</p>
+<p>apikey : str
+  API key for user</p>
+<p>try_uningest : bool
+  Try to uningest the file that was locked.
+- <code>Default</code> - True</p>
+<p><a name="dataverse_utils.dataverse_utils.uningest_file"></a></p>
+<h5 id="uningest_file">uningest_file<a class="headerlink" href="#uningest_file" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">uningest_file(dv_url, fid, apikey, study='n/a')</code></pre>
+
+
+<p>Tries to uningest a file that has been ingested.
+Requires superuser API key.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dv_url : str
+  URL to base Dataverse installation</p>
+<p>fid : int or str
+  File ID of file to uningest</p>
+<p>apikey : str
+  API key for superuser</p>
+<p>study : str
+  Optional handle parameter for log messages</p>
+<p><a name="dataverse_utils.dataverse_utils.upload_file"></a></p>
+<h5 id="upload_file">upload_file<a class="headerlink" href="#upload_file" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">upload_file(fpath, hdl, **kwargs)</code></pre>
+
+
+<p>Uploads file to Dataverse study and sets file metdata and tags.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>fpath : str
+  file location (ie, complete path)</p>
+<p>hdl : str
+  Dataverse persistent ID for study (handle or DOI)</p>
+<p>kwargs : dict</p>
+<p>other parameters. Acceptable keywords and contents are:</p>
+<p>dv : str
+  REQUIRED
+  url to base Dataverse installation
+- <code>eg</code> - &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
+<p>apikey : str
+  REQUIRED
+  API key for user</p>
+<p>descr : str
+  OPTIONAL
+  file description</p>
+<p>md5 : str
+  OPTIONAL
+  md5sum for file checking</p>
+<p>tags : list
+  OPTIONAL
+  list of text file tags. Eg [&lsquo;Data&rsquo;, &lsquo;June 2020&rsquo;]</p>
+<p>dirlabel : str
+  OPTIONAL
+  Unix style relative pathname for Dataverse
+  file path: eg: path/to/file/</p>
+<p>nowait : bool
+  OPTIONAL
+  Force a file unlock and uningest instead of waiting for processing
+  to finish</p>
+<p><a name="dataverse_utils.dataverse_utils.upload_from_tsv"></a></p>
+<h5 id="upload_from_tsv">upload_from_tsv<a class="headerlink" href="#upload_from_tsv" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">upload_from_tsv(fil, hdl, **kwargs)</code></pre>
+
+
+<p>Utility for bulk uploading. Assumes fil is formatted
+as tsv with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.</p>
+<p>&lsquo;tags&rsquo; field will be split on commas.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>fil : filelike object
+  Open file object or io.IOStream()</p>
+<p>hdl : str
+  Dataverse persistent ID for study (handle or DOI)</p>
+<p>kwargs : dict</p>
+<p>other parameters. Acceptable keywords and contents are:</p>
+<p>dv : str
+  REQUIRED
+  url to base Dataverse installation
+- <code>eg</code> - &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
+<p>apikey : str
+  REQUIRED
+  API key for user</p>
+<p><a name="dataverse_utils.ldc"></a></p>
+<h2 id="dataverse_utilsldc">dataverse_utils.ldc<a class="headerlink" href="#dataverse_utilsldc" title="Permanent link">&para;</a></h2>
+<p>Creates dataverse JSON from Linguistic Data Consortium
+website page.</p>
+<p><a name="dataverse_utils.ldc.Ldc"></a></p>
+<h3 id="ldc-objects">Ldc Objects<a class="headerlink" href="#ldc-objects" title="Permanent link">&para;</a></h3>
+<pre class="codehilite"><code class="language-python">class Ldc(ds.Serializer)</code></pre>
+
+
+<p>An LDC item (eg, LDC2021T01)</p>
+<p><a name="dataverse_utils.ldc.Ldc.ldcJson"></a></p>
+<h5 id="ldcjson">ldcJson<a class="headerlink" href="#ldcjson" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @property
+ | ldcJson()</code></pre>
+
+
+<p>Returns a JSON based on the LDC web page scraping</p>
+<p><a name="dataverse_utils.ldc.Ldc.make_ldc_json"></a></p>
+<h5 id="make_ldc_json">make_ldc_json<a class="headerlink" href="#make_ldc_json" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | make_ldc_json()</code></pre>
+
+
+<p>Returns a dict with keys created from an LDC catalogue web
+page.</p>
+<p>intext : str
+    HTML page source from LDC catalogue page.</p>
+<p><a name="dataverse_utils.ldc.Ldc.name_parser"></a></p>
+<h5 id="name_parser">name_parser<a class="headerlink" href="#name_parser" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @staticmethod
+ | name_parser(name)</code></pre>
+
+
+<p>name : str
+    A name</p>
+<p><a name="dataverse_utils.ldc.Ldc.make_dryad_json"></a></p>
+<h5 id="make_dryad_json">make_dryad_json<a class="headerlink" href="#make_dryad_json" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | make_dryad_json(ldc=None)</code></pre>
+
+
+<p>Creates a Dryad-style dict from an LDC dictionary</p>
+<p>ldc : dict
+    Dictionary containing LDC data</p>
+<p><a name="dataverse_utils.ldc.Ldc.find_block_index"></a></p>
+<h5 id="find_block_index">find_block_index<a class="headerlink" href="#find_block_index" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @staticmethod
+ | find_block_index(dvjson, key)</code></pre>
+
+
+<p>Finds the index number of an item in Dataverse&rsquo;s idiotic JSON</p>
+<p><a name="dataverse_utils.ldc.Ldc.make_dv_json"></a></p>
+<h5 id="make_dv_json">make_dv_json<a class="headerlink" href="#make_dv_json" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | make_dv_json(ldc=None)</code></pre>
+
+
+<p>ldc : dict
+    LDC dictionary. Defaults to self.ldcJson</p>
+<p><a name="dataverse_utils.ldc.Ldc.upload_metadata"></a></p>
+<h5 id="upload_metadata">upload_metadata<a class="headerlink" href="#upload_metadata" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | upload_metadata(**kwargs) -&gt; dict</code></pre>
+
+
+<p>uploads metadata to dataverse
+kwargs:
+url : base url to Dataverse
+key : api key
+dv : dataverse to which it is being uploaded</p>
+<p>Returns json from connection attempt.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../scripts/" class="btn btn-neutral float-right" title="Scripts">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../scripts/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
