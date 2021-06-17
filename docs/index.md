@@ -8,19 +8,10 @@ That being said, the effort is being made to make this a useful library. Source 
 
 Any installation will require the use of the command line/command prompt.
 
-The easiest installation is with `git` and `pip`:
+The easiest installation is with `pip`:
 
 ```
-git clone https://github.com/ubc-library-rc/dataverse_utils.git
-cd dataverse_utils 
-pip install .
-```
-
-If you don't have git installed, got to <https://github.com/ubc-library-rc/dataverse_utils>, select the **Code** button and download a zip file. Once it's unzipped,
-
-```
-cd dataverse_utils 
-pip install .
+pip install git+https://github.com/ubc-library-rc/dataverse_utils
 ```
 
 Other methods of installing Python packages can be found at <https://packaging.python.org/tutorials/installing-packages/>.

@@ -4,6 +4,7 @@ nav:
   - Overview: index.md
   - API reference: api_ref.md
   - Scripts: scripts.md
+  - FAQ: faq.md
   - Credits: credits.md
 
 markdown_extensions:

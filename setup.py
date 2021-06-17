@@ -7,12 +7,12 @@ import os
 import setuptools
 
 #This is where to put the primary version string
-init = os.path.join(os.path.dirname(__file__), 
+INIT = os.path.join(os.path.dirname(__file__),
                     'dataverse_utils', '__init__.py')
 
 #Don't make a VERSION_CONTROL variable
-version_line = list(
-    filter(lambda l: l.startswith('VERSION'), open(init)))[0].strip()
+VERSION_LINE = list(
+    filter(lambda l: l.startswith('VERSION'), open(INIT)))[0].strip()
 
 def get_version(version_tuple):
     '''Get version from module'''
@@ -23,7 +23,7 @@ def get_version(version_tuple):
     return '.'.join(map(str, version_tuple))
 
 #literal_eval turns '(3,2,3)' into a tuple, and is safer than eval
-PKG_VERSION = get_version(ast.literal_eval(version_line.split('=')[-1].strip()))
+PKG_VERSION = get_version(ast.literal_eval(VERSION_LINE.split('=')[-1].strip()))
 
 def readme():
     '''
@@ -40,11 +40,14 @@ CONFIG = {
     'long_description': readme(),
     'long_description_content_type' : 'text/markdown',
     'author': 'Paul Lesack',
-    'url': 'https://github.com/ubc-library-rc',
-    'download_url': 'https://github.com/ubc-library-rc',
+    'url': 'https://github.com/ubc-library-rc/dataverse_utils',
+    'download_url': 'https://github.com/ubc-library-rc/dataverse_utils',
     'author_email': 'paul.lesack@ubc.ca',
     'version' : PKG_VERSION,
-    'install_requires': ['requests', 'requests_toolbelt', ''],
+    'install_requires': ['requests', 'requests_toolbelt',
+                         ('dryad2dataverse @ git+https://github.com/'
+                           'ubc-library-rc/dryad2dataverse.git'),
+                         'beautifulsoup4', 'Markdown'],
     'packages':setuptools.find_packages(),
     'include_package_data' : True,
     'package_data' : {'': ['data/*']},
