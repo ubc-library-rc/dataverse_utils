@@ -8,4 +8,4 @@ The defaults are mostly to work the University of British Columbia Library's ins
 
 For more details, please see the `docs` directory, beginning with [index.md](docs/index.md)
 
-The primary repository for this software is at <https://github.com/ubc-library-rc/dataverse_utils>, and user-friendly documentation is available at <https://ubc-library.rc.github.io/dataverse_utils>.
+The primary repository for this software is at <https://github.com/ubc-library-rc/dataverse_utils>, and user-friendly documentation is available at <https://ubc-library-rc.github.io/dataverse_utils>.
