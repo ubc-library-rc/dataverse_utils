@@ -6,7 +6,7 @@ manipulation
 
 import csv
 import io
-#Dataverse/Glassfish can sometimes partially crash and the 
+#Dataverse/Glassfish can sometimes partially crash and the
 #API doesn't return JSON correctly, so:
 import json #for errors only
 import logging
@@ -53,7 +53,7 @@ def _make_info(dv_url, study, apikey) -> tuple:
     params = {'persistentId': study}
     return (dv_url, headers, params)
 
-def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True):
+def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
     '''
     Recurses the tree for files and produces tsv output with
     with headers 'file', 'description', 'tags'.
@@ -61,7 +61,7 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True):
     The 'description' is the filename without an extension.
 
     Returns tsv as string
-    
+
     ------------------------------------------
     Parameters:
 
@@ -131,7 +131,7 @@ def dump_tsv(start_dir, filename, in_list=None,
     with open(filename, 'w') as tsvfile:
         tsvfile.write(dumper)
 
-def file_path(fpath, trunc):
+def file_path(fpath, trunc='') -> str:
     '''
     Create relative file path from full path string
 
@@ -144,16 +144,26 @@ def file_path(fpath, trunc):
     Parameters:
 
     fpath : str
-        file location (ie, complete path)
+        File location (ie, complete path)
 
     trunc : str
-        rightmost portion of path to remove
+        Leftmost portion of path to remove
     '''
-    if not trunc.endswith(os.sep):
+    if trunc and not trunc.endswith(os.sep):
         trunc += os.sep
 
     path = os.path.dirname(fpath)
-    return path[path.find(trunc)+len(trunc):]
+    try:
+        if fpath.find(trunc) == -1:
+            dirlabel = os.path.relpath(os.path.split(path)[0])
+        dirlabel = os.path.relpath(path[path.find(trunc)+len(trunc):])
+
+        if dirlabel == '.':
+            dirlabel = ''
+        return dirlabel
+
+    except ValueError:
+        return ''
 
 def check_lock(dv_url, study, apikey) -> bool:
     '''
@@ -202,7 +212,7 @@ def force_notab_unlock(study, dv_url, fid, apikey, try_uningest=True) -> int:
 
     fid : str
         File ID for file object
-        
+
     apikey : str
         API key for user
 
@@ -270,7 +280,7 @@ def upload_file(fpath, hdl, **kwargs):
         Dataverse persistent ID for study (handle or DOI)
 
     kwargs : dict
-        
+
         other parameters. Acceptable keywords and contents are:
 
         dv : str
@@ -303,6 +313,10 @@ def upload_file(fpath, hdl, **kwargs):
             OPTIONAL
             Force a file unlock and uningest instead of waiting for processing
             to finish
+
+        trunc : str
+            OPTIONAL
+            Leftmost portion of path to remove
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -350,9 +364,9 @@ def upload_file(fpath, hdl, **kwargs):
         #This can happend when Glassfish crashes
         LOGGER.critical(upload.text)
         print(upload.text)
-        err =('It''s possible Glassfish may have crashed. '
-              'Check server logs for anomalies')
-        LOGGER.exception(error)
+        err = ('It''s possible Glassfish may have crashed. '
+               'Check server logs for anomalies')
+        LOGGER.exception(err)
         print(err)
         raise
     #SPSS files still process despite spoof, so there's
@@ -366,9 +380,9 @@ def upload_file(fpath, hdl, **kwargs):
             time.sleep(10)
 
     if upload.status_code != 200:
-        reason = (upload.status_code, upload.reason)
-        LOGGER.critical('Upload failure: %s', reason)
-        raise DvGeneralUploadError(f'\nReason: {reason}\n{upload.text}')
+        LOGGER.critical('Upload failure: %s', (upload.status_code, upload.reason))
+        raise DvGeneralUploadError(f'\nReason: {(upload.status_code, upload.reason)}'
+                                   f'\n{upload.text}')
 
     if kwargs.get('md5'):
         if upload.json()['data']['files'][0]['dataFile']['md5'] != kwargs.get('md5'):
@@ -391,6 +405,13 @@ def upload_from_tsv(fil, hdl, **kwargs):
     hdl : str
         Dataverse persistent ID for study (handle or DOI)
 
+    trunc : str
+       Leftmost portion of Dataverse study file path to remove.
+       eg: trunc ='/home/user/' if the tsv field is
+       '/home/user/Data/ASCII'
+       would set the path for that line of the tsv to 'Data/ASCII'.
+       Defaults to None.
+
     kwargs : dict
 
         other parameters. Acceptable keywords and contents are:
@@ -408,7 +429,8 @@ def upload_from_tsv(fil, hdl, **kwargs):
     for num, row in enumerate(reader):
         if num == 0:
             continue
-        dirlabel = file_path(row[0], './')
+        #dirlabel = file_path(row[0], './')
+        dirlabel = file_path(row[0], kwargs.get('trunc', ''))
         tags = row[-1].split(',')
         tags = [x.strip() for x in tags]
         descr = row[1]

@@ -9,11 +9,13 @@ import os
 import pathlib
 #pathlib new for Python 3.5
 #https://docs.python.org/3/library/pathlib.html
+import re
 import sys
+
 
 import dataverse_utils as du
 
-VERSION = (0, 1, 0)
+VERSION = (0, 2, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -32,8 +34,11 @@ def parse() -> argparse.ArgumentParser():
                    'Using the command and a dash (ie, "dv_manifest_gen.py -" '
                    'produces full paths for some reason.')
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('files', help='Files to add to manifest',
-                        nargs='*', default='*')
+    parser.add_argument('files', help=('Files to add to manifest. Leaving it '
+                                       'blank will add all files in the current '
+                                       'directory. If using -r will recursively '
+                                       'show all.'),
+                        nargs='*', default=None)
     parser.add_argument('-f', '--filename',
                         help='Save to file instead of outputting to stdout',
                         default=None)
@@ -51,6 +56,9 @@ def parse() -> argparse.ArgumentParser():
     parser.add_argument('-r', '--recursive',
                         help=('Recursive listing.'),
                         action='store_true')
+    parser.add_argument('-a', '--show-hidden',
+                        help=('Include hidden files.'),
+                        action='store_true')
     parser.add_argument('--version', action='version',
                         version='%(prog)s '+__version__,
                         help='Show version number and exit')
@@ -63,35 +71,27 @@ def main() -> None:
     parser = parse()
     args = parser.parse_args()
     f_list = []
-    #if isinstance(args.files, list):
-    #    for fil in args.files:
-    #        f_list += glob.glob(fil)# flist.extend() could be less intensive
-    #else:
-    #    f_list = glob.glob(args.files, recursive=True)
-
-    #f_list = {x for x in f_list if os.path.isfile(x)}#set comprehension!
-    finder = pathlib.Path('.')
-    if isinstance(args.files, list):
-        if args.recursive:
-            for fil in args.files:
-                f_list += finder.rglob(fil)
+    
+    if not args.files:
+        args.files = [str(x) for x in pathlib.Path('./').glob('*')]
+    if args.show_hidden:
+        args.files +=  [str(x) for x in pathlib.Path('./').glob('.*')]
+    for fil in args.files:
+        finder = pathlib.Path(fil).expanduser()
+        if args.recursive and finder.is_dir():
+            #f_list += [x for x in finder.parent.rglob('*')]
+            f_list += [x for x in finder.rglob('*')]
         else:
-            for fil in args.files:
-                f_list += finder.glob(fil)
-
-    else:
-        if args.recursive:
-            f_list = finder.rglob(args.files)
-        else:
-            f_list = finder.glob(args.files)
-
+            f_list += [x for x in finder.parent.glob(finder.name)]
     #Set comprehension strips out duplicates
-    f_list = {str(x) for x in f_list if x.is_file() and not x.name.startswith('.')}
-
+    #Strip out hidden files and directories
+    if args.show_hidden:
+        f_list = {str(x) for x in f_list if x.is_file()}
+    else:
+        f_list = {str(x) for x in f_list if x.is_file() and not re.search('^\.[Aa9-Zz9]*',str(x))}
     if not f_list:
         print('Nothing matching these criteria. No manifest generated')
         sys.exit()
-
     if args.filename:
         du.dump_tsv(os.getcwd(), filename=args.filename,
                     in_list=f_list,
