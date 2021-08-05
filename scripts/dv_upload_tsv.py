@@ -1,6 +1,6 @@
-#! python
+#!python
 '''
-Uploads data sets to a dataverse installation from the 
+Uploads data sets to a dataverse installation from the
 contents of a TSV (tab separated value)
 file. Metadata, file tags, paths, etc are all read
 from the TSV.
@@ -10,7 +10,7 @@ import argparse
 
 import dataverse_utils as du
 
-VERSION = (0, 2, 0)
+VERSION = (0, 2, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():

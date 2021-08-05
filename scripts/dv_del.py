@@ -1,4 +1,4 @@
-#! python
+#!python
 '''Dataverse Bulk Deleter
 Deletes unpublished studies at the command line
 '''
@@ -7,6 +7,8 @@ import argparse
 #import json
 import sys
 import requests
+VERSION = (0, 2, 0)
+__version__ = '.'.join([str(x) for x in VERSION])
 
 def delstudy(dvurl, key, pid):
     '''
@@ -71,7 +73,7 @@ def main():
     parser = argparse.ArgumentParser(description='Delete draft studies from a Dataverse collection')
     parser.add_argument('-k', '--key', help='Dataverse user API key', required=True, dest='key')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-d', '--dataverse', 
+    group.add_argument('-d', '--dataverse',
                        help=('Dataverse collection short name from which '
                              'to delete all draft records. eg. "ldc"'),
                        dest='dataverse')
@@ -83,6 +85,9 @@ def main():
                         action='store_true', dest='conf')
     parser.add_argument('-u', '--url', help='URL to base Dataverse installation',
                         default='https://soroban.library.ubc.ca', dest='dvurl')
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s '+__version__,
+                        help='Show version number and exit')
     args = parser.parse_args()
     #print(args)
     args.dvurl = args.dvurl.strip('/')
@@ -101,9 +106,8 @@ def main():
                         print(delstudy(args.dvurl, args.key, pid))
                         continue
 
-                    else:
-                        print(f'Skipping {pid}')
-                        continue
+                    print(f'Skipping {pid}')
+                    continue
 
                 print(delstudy(args.dvurl, args.key, pid))
                 #time.sleep(getsize(pid, args.key)[1])#Will this stop the server crash?

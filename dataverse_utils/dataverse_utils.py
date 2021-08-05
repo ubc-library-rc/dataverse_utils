@@ -364,7 +364,7 @@ def upload_file(fpath, hdl, **kwargs):
         #This can happend when Glassfish crashes
         LOGGER.critical(upload.text)
         print(upload.text)
-        err = ('It''s possible Glassfish may have crashed. '
+        err = ('It\'s possible Glassfish may have crashed. '
                'Check server logs for anomalies')
         LOGGER.exception(err)
         print(err)

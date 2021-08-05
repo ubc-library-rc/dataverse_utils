@@ -1,4 +1,4 @@
-#! python
+#!python
 '''
 Auto download/upload LDC metadata and files.
 
@@ -8,9 +8,9 @@ python3 uploadme.py LDC20201S01 . . . LDC2021T21 apikey
 import argparse
 import sys
 import dataverse_utils as du
-import dataverse_utils.ldc as ldc
+from dataverse_utils import ldc
 
-VERSION = (0, 1, 1)
+VERSION = (0, 1, 2)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():

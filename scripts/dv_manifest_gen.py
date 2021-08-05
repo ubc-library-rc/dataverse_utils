@@ -1,4 +1,4 @@
-#! python
+#!python
 '''
 Creates a file manifest in tab separated value format
 which can be used with other dataverse_util library utilities
@@ -16,7 +16,7 @@ import sys
 
 import dataverse_utils as du
 
-VERSION = (0, 2, 0)
+VERSION = (0, 2, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -72,7 +72,7 @@ def main() -> None:
     parser = parse()
     args = parser.parse_args()
     f_list = []
-    
+
     if not args.files:
         args.files = [str(x) for x in pathlib.Path('./').glob('*')]
     if args.show_hidden:
@@ -80,16 +80,15 @@ def main() -> None:
     for fil in args.files:
         finder = pathlib.Path(fil).expanduser()
         if args.recursive and finder.is_dir():
-            #f_list += [x for x in finder.parent.rglob('*')]
-            f_list += [x for x in finder.rglob('*')]
+            f_list += list(finder.rglob('*'))
         else:
-            f_list += [x for x in finder.parent.glob(finder.name)]
+            f_list += list(finder.parent.glob(finder.name))
     #Set comprehension strips out duplicates
     #Strip out hidden files and directories
     if args.show_hidden:
         f_list = {str(x) for x in f_list if x.is_file()}
     else:
-        f_list = {str(x) for x in f_list if x.is_file() and not re.search('^\.[Aa9-Zz9]*',str(x))}
+        f_list = {str(x) for x in f_list if x.is_file() and not re.search(r'^\.[Aa9-Zz9]*', str(x))}
     if not f_list:
         print('Nothing matching these criteria. No manifest generated')
         sys.exit()

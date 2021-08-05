@@ -1,4 +1,4 @@
-#! python
+#!python
 '''
 Bulk release script for Dataverse.
 
@@ -19,7 +19,7 @@ RETRY_STRATEGY = Retry(total=10,
                                          'POST', 'PUT'],
                        backoff_factor=1)
 
-VERSION = (0, 1, 0)
+VERSION = (0, 1, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def argp():
@@ -28,7 +28,8 @@ def argp():
 
     Returns arparse.ArgumentParser
     '''
-    description = ('Bulk file releaser for unpublished Dataverse studies. Either releases individual '
+    description = ('Bulk file releaser for unpublished Dataverse studies. '
+                   'Either releases individual '
                    'studies or all unreleased studies in a single Dataverse collection.')
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-u', '--url', default='https://abacus.library.ubc.ca',
@@ -45,7 +46,8 @@ def argp():
                         help='Only output a list of studies to be released',
                         action='store_true', dest='dryrun')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-d', '--dv', help='Short name of Dataverse collection to process (eg: statcan)')
+    group.add_argument('-d', '--dv', help=('Short name of Dataverse collection '
+                                           'to process (eg: statcan)'))
     group.add_argument('-p', '--pid',
                        help=('Handles or DOIs to release in format hdl:11272.1/FK2/12345 '
                              'or doi:10.80240/FK2/NWRABI. Multiple values OK'),
@@ -63,7 +65,7 @@ class Dverse():
         '''
         Intializes Dataverse installation object.
 
-        :param dvurl: str. URL to base Dataverse installation 
+        :param dvurl: str. URL to base Dataverse installation
             (eg. 'https://abacus.library.ubc.ca')
         :param apikey: str. API key for Dataverse user
         :param dv: str. Short name of target Dataverse collection (eg. 'statcan')
@@ -114,7 +116,7 @@ class Study():
     def __init__(self, **kwargs):
         '''
         :kwarg dvurl: str. Base URL for Dataverse instance
-        :kwarg apikey: str. API key for Dataverse user 
+        :kwarg apikey: str. API key for Dataverse user
         :kwarg pid: str. Persistent identifier for study
         :kwarg stime: int. Time between file lock checks. Default 10
         :kwarg verbose: Verbose output. Default False
