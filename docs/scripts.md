@@ -8,13 +8,13 @@ code {
 
 These scripts are available at the command line/command prompt and don't require any Python knowledge except how to install a Python library via pip, as outlined in the [overview](index.md) document.
 
-Once installed via pip, the scripts _should_ be available via the command line and will not require calling Python explicitly. That is, they can be called from the command line directly. For example:
+Once installed via pip, the scripts [_should_](#footnote) be available via the command line and will not require calling Python explicitly. That is, they can be called from the command line directly. For example:
 
 `dv_tsv_manifest.py`
 
 is all you will need to type.
 
-Note that these programs have been primarily tested on Linux and MacOS, with Windows a distant third. Windows is notable for its unusual file  handling, so, as the MIT licenses stipulates, there is no warranty as to the suitability for a particular purpose.
+Note that these programs have been primarily tested on Linux and MacOS, with [Windows a distant third](#footnote). Windows is notable for its unusual file  handling, so, as the MIT licenses stipulates, there is no warranty as to the suitability for a particular purpose.
 
 Of course, they *should* work.
 
@@ -167,5 +167,10 @@ optional arguments:
   -v, --verbose         Verbose output
   --version             Show version number and exit
 ```
+
+<a name='footnote' />
+## Notes for Windows users
+
+Command line scripts for Python don't necessarily behave the way they do in Linux/Mac, depending on *how* you access them. For detailed information on Windows systems, please see the [Windows testing document](windows.md)
 
 

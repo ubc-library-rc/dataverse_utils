@@ -1,3 +1,4 @@
+#! python
 '''
 Auto download/upload LDC metadata and files.
 

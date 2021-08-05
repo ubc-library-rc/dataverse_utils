@@ -1,3 +1,4 @@
+#! python
 '''
 Uploads data sets to a dataverse installation from the 
 contents of a TSV (tab separated value)

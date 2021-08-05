@@ -1,3 +1,4 @@
+#! python
 '''
 Creates a file manifest in tab separated value format
 which can be used with other dataverse_util library utilities

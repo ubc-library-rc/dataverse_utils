@@ -1,3 +1,4 @@
+#! python
 '''
 Bulk release script for Dataverse.
 
