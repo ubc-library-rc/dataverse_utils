@@ -89,7 +89,7 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
                    if not y.startswith('.')]
 
     headers = ['file', 'description', 'tags']
-    outf = io.StringIO()
+    outf = io.StringIO(newline='')
     tsv_writer = csv.writer(outf, delimiter='\t',
                             quoting=csv.QUOTE_NONNUMERIC,
                             )
@@ -128,7 +128,7 @@ def dump_tsv(start_dir, filename, in_list=None,
         Include header for tsv.
     '''
     dumper = make_tsv(start_dir, in_list, def_tag, inc_header)
-    with open(filename, 'w') as tsvfile:
+    with open(filename, 'w', newline='') as tsvfile:
         tsvfile.write(dumper)
 
 def file_path(fpath, trunc='') -> str:

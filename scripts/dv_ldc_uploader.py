@@ -100,7 +100,7 @@ def main() -> None:
                           args.dvs, args.verbose)
         if args.verbose:
             print(f'Uploading files to {pid}')
-        with open(args.tsv) as fil:
+        with open(args.tsv, newline='') as fil:
             du.upload_from_tsv(fil, hdl=pid,
                                dv=args.dvs, apikey=args.key)
 

@@ -89,9 +89,7 @@ def main():
                         version='%(prog)s '+__version__,
                         help='Show version number and exit')
     args = parser.parse_args()
-    #print(args)
     args.dvurl = args.dvurl.strip('/')
-    #if args.dvurl.endswith('/'): args.dvurl = args.dvurl[:-1]
 
     if args.dataverse:
         info = requests.get(f'{args.dvurl}/dataverses/{args.dataverse}/contents',

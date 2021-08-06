@@ -59,7 +59,7 @@ def main() -> None:
     parser = parse()
     args = parser.parse_args()
     print(args)
-    with open(args.tsv) as fil:
+    with open(args.tsv, newline='') as fil:
         du.upload_from_tsv(fil, hdl=args.pid,
                            dv=args.url, apikey=args.key,
                            trunc=args.truncate)
