@@ -24,6 +24,17 @@ class Ldc(ds.Serializer):
     An LDC item (eg, LDC2021T01)
     '''
     def __init__(self, ldc):
+        '''
+        Returns a dict with keys created from an LDC catalogue web
+        page.
+
+        ----------------------------------------
+        Parameters:
+
+        ldc : str
+           Linguistic Consortium Catalogue Number (eg. 'LDC2015T05'.
+           This is what forms the last part of the LDC catalogue URL.
+        '''
         self.ldc = ldc.strip().upper()
         self.ldcHtml = None
         self._ldcJson = None
@@ -44,12 +55,18 @@ class Ldc(ds.Serializer):
 
     @property
     def dryadJson(self):
+        '''
+        LDC metadata in Dryad JSON format
+        '''
         if not self._dryadJson:
             self._dryadJson = self.make_dryad_json()
         return self._dryadJson
 
     @property
     def dvJson(self):
+        '''
+        LDC metadata in Dataverse JSON format
+        '''
         #return False
         if not self._dvJson:
             self._dvJson = self.make_dv_json()
@@ -57,14 +74,23 @@ class Ldc(ds.Serializer):
 
     @property
     def embargo(self):
+        '''
+        Boolean indicating embargo status
+        '''
         return False
 
     @property
     def fileJson(self, timeout=45):
+        '''
+        Returns False: No attached files possible at LDC
+        '''
         return False
 
     @property
     def files(self):
+        '''
+        Returns None. No files possible
+        '''
         return None
 
     @property
@@ -77,6 +103,9 @@ class Ldc(ds.Serializer):
         return self.ldc
 
     def fetch_record(self, url=None, timeout=45):
+        '''
+        Downloads record from LDC website
+        '''
         interim = self.session.get(f'https://catalog.ldc.upenn.edu/{self.ldc}')
         interim.raise_for_status()
         self.ldcHtml = interim.text
@@ -85,9 +114,6 @@ class Ldc(ds.Serializer):
         '''
         Returns a dict with keys created from an LDC catalogue web
         page.
-
-        intext : str
-            HTML page source from LDC catalogue page.
         '''
         if not self.ldcHtml:
             self.fetch_record()
@@ -125,6 +151,11 @@ class Ldc(ds.Serializer):
     @staticmethod
     def name_parser(name):
         '''
+        Returns lastName/firstName JSON snippet from name
+
+        ----------------------------------------
+        Parameters:
+
         name : str
             A name
         '''
@@ -135,8 +166,11 @@ class Ldc(ds.Serializer):
         '''
         Creates a Dryad-style dict from an LDC dictionary
 
+        ----------------------------------------
+        Parameters:
+
         ldc : dict
-            Dictionary containing LDC data
+            Dictionary containing LDC data. Defaults to self.ldcJson
         '''
         if not ldc:
             ldc = self.ldcJson
@@ -167,6 +201,11 @@ class Ldc(ds.Serializer):
         Creates a generalizes HTML notes field from a bunch of
         LDC fields that don't fit into dataverse
 
+        ----------------------------------------
+        Parameters:
+
+        ldc : dict
+            Dictionary containing LDC data. Defaults to self.ldcJson
         '''
         if not ldc:
             ldc = self.ldcJson
@@ -193,7 +232,16 @@ class Ldc(ds.Serializer):
     @staticmethod
     def find_block_index(dvjson, key):
         '''
-        Finds the index number of an item in Dataverse's idiotic JSON
+        Finds the index number of an item in Dataverse's idiotic JSON list
+
+        ----------------------------------------
+        Parameters:
+
+        dvjson : dict
+            Dataverse JSON
+
+        key : str
+           key for which to find list index
         '''
         for num, item in enumerate(dvjson['datasetVersion']['metadataBlocks']['citation']['fields']):
             if item['typeName'] == key:
@@ -202,6 +250,11 @@ class Ldc(ds.Serializer):
 
     def make_dv_json(self, ldc=None):
         '''
+        Returns complete Dataverse JSON
+
+        ----------------------------------------
+        Parameters:
+
         ldc : dict
             LDC dictionary. Defaults to self.ldcJson
         '''
@@ -298,13 +351,23 @@ class Ldc(ds.Serializer):
 
     def upload_metadata(self, **kwargs) -> dict:
         '''
-        uploads metadata to dataverse
-        kwargs:
-        url : base url to Dataverse
-        key : api key
-        dv : dataverse to which it is being uploaded
+        Uploads metadata to dataverse
 
         Returns json from connection attempt.
+        ----------------------------------------
+        Parameters:
+
+        kwargs:
+
+        url : str
+            base url to Dataverse
+
+        key : str
+            api key
+
+        dv : str
+            Dataverse to which it is being uploaded
+
         '''
         url = kwargs['url'].strip('/')
         key = kwargs['key']

@@ -1,17 +1,20 @@
 # API Reference
 
 <a name="dataverse_utils"></a>
+
 ## dataverse\_utils
 
 Generalized dataverse utilities
 
 <a name="dataverse_utils.dataverse_utils"></a>
+
 ## dataverse\_utils.dataverse\_utils
 
 A collection of Dataverse utilities for file and metadata
 manipulation
 
 <a name="dataverse_utils.dataverse_utils.DvGeneralUploadError"></a>
+
 ### DvGeneralUploadError Objects
 
 ```python
@@ -21,6 +24,7 @@ class DvGeneralUploadError(Exception)
 Raised on non-200 URL response
 
 <a name="dataverse_utils.dataverse_utils.Md5Error"></a>
+
 ### Md5Error Objects
 
 ```python
@@ -30,10 +34,11 @@ class Md5Error(Exception)
 Raised on md5 mismatch
 
 <a name="dataverse_utils.dataverse_utils.make_tsv"></a>
+
 ##### make\_tsv
 
 ```python
-make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True)
+make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str
 ```
 
 Recurses the tree for files and produces tsv output with
@@ -41,7 +46,7 @@ with headers 'file', 'description', 'tags'.
 
 The 'description' is the filename without an extension.
 
-Returns tsv as string
+Returns tsv as string.
 
 ------------------------------------------
 
@@ -63,6 +68,7 @@ Returns tsv as string
   Include header row
 
 <a name="dataverse_utils.dataverse_utils.dump_tsv"></a>
+
 ##### dump\_tsv
 
 ```python
@@ -92,10 +98,11 @@ Dumps output of make_tsv manifest to a file.
   Include header for tsv.
 
 <a name="dataverse_utils.dataverse_utils.file_path"></a>
+
 ##### file\_path
 
 ```python
-file_path(fpath, trunc)
+file_path(fpath, trunc='') -> str
 ```
 
 Create relative file path from full path string
@@ -111,12 +118,13 @@ Create relative file path from full path string
 
   
   fpath : str
-  file location (ie, complete path)
+  File location (ie, complete path)
   
   trunc : str
-  rightmost portion of path to remove
+  Leftmost portion of path to remove
 
 <a name="dataverse_utils.dataverse_utils.check_lock"></a>
+
 ##### check\_lock
 
 ```python
@@ -140,6 +148,7 @@ Checks study lock status; returns True if locked.
   API key for user
 
 <a name="dataverse_utils.dataverse_utils.force_notab_unlock"></a>
+
 ##### force\_notab\_unlock
 
 ```python
@@ -174,6 +183,7 @@ Returns 0 if unlocked, file id if locked (and then unlocked).
 - `Default` - True
 
 <a name="dataverse_utils.dataverse_utils.uningest_file"></a>
+
 ##### uningest\_file
 
 ```python
@@ -201,13 +211,14 @@ Requires superuser API key.
   Optional handle parameter for log messages
 
 <a name="dataverse_utils.dataverse_utils.upload_file"></a>
+
 ##### upload\_file
 
 ```python
 upload_file(fpath, hdl, **kwargs)
 ```
 
-Uploads file to Dataverse study and sets file metdata and tags.
+Uploads file to Dataverse study and sets file metadata and tags.
 
 ----------------------------------------
 
@@ -254,8 +265,13 @@ Uploads file to Dataverse study and sets file metdata and tags.
   OPTIONAL
   Force a file unlock and uningest instead of waiting for processing
   to finish
+  
+  trunc : str
+  OPTIONAL
+  Leftmost portion of path to remove
 
 <a name="dataverse_utils.dataverse_utils.upload_from_tsv"></a>
+
 ##### upload\_from\_tsv
 
 ```python
@@ -278,6 +294,13 @@ as tsv with headers 'file', 'description', 'tags'.
   hdl : str
   Dataverse persistent ID for study (handle or DOI)
   
+  trunc : str
+  Leftmost portion of Dataverse study file path to remove.
+- `eg` - trunc ='/home/user/' if the tsv field is
+  '/home/user/Data/ASCII'
+  would set the path for that line of the tsv to 'Data/ASCII'.
+  Defaults to None.
+  
   kwargs : dict
   
   other parameters. Acceptable keywords and contents are:
@@ -292,12 +315,14 @@ as tsv with headers 'file', 'description', 'tags'.
   API key for user
 
 <a name="dataverse_utils.ldc"></a>
+
 ## dataverse\_utils.ldc
 
 Creates dataverse JSON from Linguistic Data Consortium
 website page.
 
 <a name="dataverse_utils.ldc.Ldc"></a>
+
 ### Ldc Objects
 
 ```python
@@ -306,7 +331,28 @@ class Ldc(ds.Serializer)
 
 An LDC item (eg, LDC2021T01)
 
+<a name="dataverse_utils.ldc.Ldc.__init__"></a>
+
+##### \_\_init\_\_
+
+```python
+ | __init__(ldc)
+```
+
+Returns a dict with keys created from an LDC catalogue web
+page.
+
+----------------------------------------
+
+**Arguments**:
+
+  
+  ldc : str
+  Linguistic Consortium Catalogue Number (eg. 'LDC2015T05'.
+  This is what forms the last part of the LDC catalogue URL.
+
 <a name="dataverse_utils.ldc.Ldc.ldcJson"></a>
+
 ##### ldcJson
 
 ```python
@@ -316,7 +362,73 @@ An LDC item (eg, LDC2021T01)
 
 Returns a JSON based on the LDC web page scraping
 
+<a name="dataverse_utils.ldc.Ldc.dryadJson"></a>
+
+##### dryadJson
+
+```python
+ | @property
+ | dryadJson()
+```
+
+LDC metadata in Dryad JSON format
+
+<a name="dataverse_utils.ldc.Ldc.dvJson"></a>
+
+##### dvJson
+
+```python
+ | @property
+ | dvJson()
+```
+
+LDC metadata in Dataverse JSON format
+
+<a name="dataverse_utils.ldc.Ldc.embargo"></a>
+
+##### embargo
+
+```python
+ | @property
+ | embargo()
+```
+
+Boolean indicating embargo status
+
+<a name="dataverse_utils.ldc.Ldc.fileJson"></a>
+
+##### fileJson
+
+```python
+ | @property
+ | fileJson(timeout=45)
+```
+
+Returns False: No attached files possible at LDC
+
+<a name="dataverse_utils.ldc.Ldc.files"></a>
+
+##### files
+
+```python
+ | @property
+ | files()
+```
+
+Returns None. No files possible
+
+<a name="dataverse_utils.ldc.Ldc.fetch_record"></a>
+
+##### fetch\_record
+
+```python
+ | fetch_record(url=None, timeout=45)
+```
+
+Downloads record from LDC website
+
 <a name="dataverse_utils.ldc.Ldc.make_ldc_json"></a>
+
 ##### make\_ldc\_json
 
 ```python
@@ -326,10 +438,8 @@ Returns a JSON based on the LDC web page scraping
 Returns a dict with keys created from an LDC catalogue web
 page.
 
-intext : str
-    HTML page source from LDC catalogue page.
-
 <a name="dataverse_utils.ldc.Ldc.name_parser"></a>
+
 ##### name\_parser
 
 ```python
@@ -337,10 +447,18 @@ intext : str
  | name_parser(name)
 ```
 
-name : str
-    A name
+Returns lastName/firstName JSON snippet from name
+
+----------------------------------------
+
+**Arguments**:
+
+  
+  name : str
+  A name
 
 <a name="dataverse_utils.ldc.Ldc.make_dryad_json"></a>
+
 ##### make\_dryad\_json
 
 ```python
@@ -349,10 +467,16 @@ name : str
 
 Creates a Dryad-style dict from an LDC dictionary
 
-ldc : dict
-    Dictionary containing LDC data
+----------------------------------------
+
+**Arguments**:
+
+  
+  ldc : dict
+  Dictionary containing LDC data. Defaults to self.ldcJson
 
 <a name="dataverse_utils.ldc.Ldc.find_block_index"></a>
+
 ##### find\_block\_index
 
 ```python
@@ -360,30 +484,61 @@ ldc : dict
  | find_block_index(dvjson, key)
 ```
 
-Finds the index number of an item in Dataverse's idiotic JSON
+Finds the index number of an item in Dataverse's idiotic JSON list
+
+----------------------------------------
+
+**Arguments**:
+
+  
+  dvjson : dict
+  Dataverse JSON
+  
+  key : str
+  key for which to find list index
 
 <a name="dataverse_utils.ldc.Ldc.make_dv_json"></a>
+
 ##### make\_dv\_json
 
 ```python
  | make_dv_json(ldc=None)
 ```
 
-ldc : dict
-    LDC dictionary. Defaults to self.ldcJson
+Returns complete Dataverse JSON
+
+----------------------------------------
+
+**Arguments**:
+
+  
+  ldc : dict
+  LDC dictionary. Defaults to self.ldcJson
 
 <a name="dataverse_utils.ldc.Ldc.upload_metadata"></a>
+
 ##### upload\_metadata
 
 ```python
  | upload_metadata(**kwargs) -> dict
 ```
 
-uploads metadata to dataverse
-kwargs:
-url : base url to Dataverse
-key : api key
-dv : dataverse to which it is being uploaded
+Uploads metadata to dataverse
 
 Returns json from connection attempt.
+----------------------------------------
+
+**Arguments**:
+
+  
+  kwargs:
+  
+  url : str
+  base url to Dataverse
+  
+  key : str
+  api key
+  
+  dv : str
+  Dataverse to which it is being uploaded
 

@@ -60,7 +60,7 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
 
     The 'description' is the filename without an extension.
 
-    Returns tsv as string
+    Returns tsv as string. 
 
     ------------------------------------------
     Parameters:
@@ -268,7 +268,7 @@ def uningest_file(dv_url, fid, apikey, study='n/a'):
 
 def upload_file(fpath, hdl, **kwargs):
     '''
-    Uploads file to Dataverse study and sets file metdata and tags.
+    Uploads file to Dataverse study and sets file metadata and tags.
 
     ----------------------------------------
     Parameters:

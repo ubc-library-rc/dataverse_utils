@@ -2,7 +2,13 @@
 
 "Frequently" may be relative.
 
-## 1. I am using Windows [7-10]. I've installed via pip using a virtual environment, but they don't use my virtual environment's Python.
+## 1. I'm using Windows and the scripts don't seem to be working/recognized by [choice of command line interface here]
+
+There are (at least) four different ways to get some sort of command line access. The traditional command line, PowerShell, via SSH and Git bash. That's not even including the linux subsystem.
+
+The document on [Windows script troubles](windows.md) gives common solutions.
+
+## 2. I am using Windows [7-10]. I've installed via pip using a virtual environment, but they don't use my virtual environment's Python.
 
 What seems like a simple problem is surprisingly complex, as outlined here: <https://matthew-brett.github.io/pydagogue/installing_scripts.html>.
 

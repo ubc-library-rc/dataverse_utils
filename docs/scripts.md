@@ -30,7 +30,7 @@ Note the `-i` switch which can ask for manual confirmation of deletions.
 **Usage**
 
 ```nohighlight
-usage: dv_del.py [-h] -k KEY [-d DATAVERSE | -p PID] [-i] [-u DVURL]
+usage: dv_del.py [-h] -k KEY [-d DATAVERSE | -p PID] [-i] [-u DVURL] [--version]
 
 Delete draft studies from a Dataverse collection
 
@@ -44,6 +44,7 @@ optional arguments:
   -i, --interactive     Confirm each study deletion
   -u DVURL, --url DVURL
                         URL to base Dataverse installation
+  --version             Show version number and exit
 ```
 
 ##  dv_manifest_gen.py
@@ -59,14 +60,14 @@ Using stdout and a redirect will also save time. First dump a file as normal. Ad
 **Usage**
 
 ```nohighlight
-usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [--version] [files [files ...]]
+usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-a] [--version] [files [files ...]]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
 command and a dash (ie, "dv_manifest_gen.py -" produces full paths for some reason.
 
 positional arguments:
-  files                 Files to add to manifest
+  files                 Files to add to manifest. Leaving it blank will add all files in the current directory. If using -r will recursively show all.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -75,6 +76,7 @@ optional arguments:
   -t TAG, --tag TAG     Default tag(s). Separate with comma and use quotes if there are spaces. eg. "Data, June 2021". Defaults to "Data"
   -x, --no-header       Don't include header in output. Useful if creating a complex tsv using redirects (ie, ">>").
   -r, --recursive       Recursive listing.
+  -a, --show-hidden     Include hidden files.
   --version             Show version number and exit
 ```
 
@@ -89,20 +91,24 @@ File paths are automatically generated from the "file" column. Because of this, 
 **Usage**
 
 ```nohighlight
-usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [--version] [tsv]
+usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [-t TRUNCATE] [--version] [tsv]
 
 Uploads data sets to an *existing* Dataverse study from the contents of a TSV (tab separated value) file. Metadata, file tags, paths, etc are all read from the TSV. JSON output from the
 Dataverse API is printed to stdout during the process.
 
 positional arguments:
-  tsv                TSV file to upload
+  tsv                   TSV file to upload
 
 optional arguments:
-  -h, --help         show this help message and exit
-  -p PID, --pid PID  Dataverse study persistent identifier (DOI/handle)
-  -k KEY, --key KEY  API key
-  -u URL, --url URL  Dataverse installation base URL. Defaults to "https://abacus.library.ubc.ca"
-  --version          Show version number and exit
+  -h, --help            show this help message and exit
+  -p PID, --pid PID     Dataverse study persistent identifier (DOI/handle)
+  -k KEY, --key KEY     API key
+  -u URL, --url URL     Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
+  -t TRUNCATE, --truncate TRUNCATE
+                        Left truncate file path. As Dataverse studies can retain directory structure, you can set an arbitrary starting point by removing the leftmost portion. Eg: if the
+                        TSV has a file path of /home/user/Data/file.txt, setting --truncate to "/home/user" would have file.txt in the Data directory in the Dataverse study. The file is
+                        still loaded from the path in the spreadsheet. Defaults to no truncation.
+  --version             Show version number and exit
 ```
 
 ## dv_release.py
