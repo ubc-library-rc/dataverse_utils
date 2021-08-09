@@ -86,7 +86,21 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#ldc-objects">Ldc Objects</a>
         <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__init__">__init__</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#ldcjson">ldcJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dryadjson">dryadJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dvjson">dvJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#embargo">embargo</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#filejson">fileJson</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#files">files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fetch_record">fetch_record</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#make_ldc_json">make_ldc_json</a>
     </li>
@@ -103,6 +117,8 @@
         </ul>
     </li>
         </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#returns-json-from-connection-attempt">Returns json from connection attempt.</a>
     </li>
     </ul>
                     </li>
@@ -173,13 +189,13 @@ manipulation</p>
 <p>Raised on md5 mismatch</p>
 <p><a name="dataverse_utils.dataverse_utils.make_tsv"></a></p>
 <h5 id="make_tsv">make_tsv<a class="headerlink" href="#make_tsv" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python">make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True)</code></pre>
+<pre class="codehilite"><code class="language-python">make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -&gt; str</code></pre>
 
 
 <p>Recurses the tree for files and produces tsv output with
 with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.</p>
 <p>The &lsquo;description&rsquo; is the filename without an extension.</p>
-<p>Returns tsv as string</p>
+<p>Returns tsv as string.</p>
 <hr />
 <p><strong>Arguments</strong>:</p>
 <p>start_dir : str
@@ -213,7 +229,7 @@ with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.<
   Include header for tsv.</p>
 <p><a name="dataverse_utils.dataverse_utils.file_path"></a></p>
 <h5 id="file_path">file_path<a class="headerlink" href="#file_path" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python">file_path(fpath, trunc)</code></pre>
+<pre class="codehilite"><code class="language-python">file_path(fpath, trunc='') -&gt; str</code></pre>
 
 
 <p>Create relative file path from full path string</p>
@@ -230,9 +246,9 @@ file_path(&lsquo;/tmp/Data/2011/excelfile.xlsx&rsquo;, &lsquo;/tmp&rsquo;)
 <hr />
 <p><strong>Arguments</strong>:</p>
 <p>fpath : str
-  file location (ie, complete path)</p>
+  File location (ie, complete path)</p>
 <p>trunc : str
-  rightmost portion of path to remove</p>
+  Leftmost portion of path to remove</p>
 <p><a name="dataverse_utils.dataverse_utils.check_lock"></a></p>
 <h5 id="check_lock">check_lock<a class="headerlink" href="#check_lock" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python">check_lock(dv_url, study, apikey) -&gt; bool</code></pre>
@@ -293,7 +309,7 @@ Requires superuser API key.</p>
 <pre class="codehilite"><code class="language-python">upload_file(fpath, hdl, **kwargs)</code></pre>
 
 
-<p>Uploads file to Dataverse study and sets file metdata and tags.</p>
+<p>Uploads file to Dataverse study and sets file metadata and tags.</p>
 <hr />
 <p><strong>Arguments</strong>:</p>
 <p>fpath : str
@@ -326,6 +342,9 @@ Requires superuser API key.</p>
   OPTIONAL
   Force a file unlock and uningest instead of waiting for processing
   to finish</p>
+<p>trunc : str
+  OPTIONAL
+  Leftmost portion of path to remove</p>
 <p><a name="dataverse_utils.dataverse_utils.upload_from_tsv"></a></p>
 <h5 id="upload_from_tsv">upload_from_tsv<a class="headerlink" href="#upload_from_tsv" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python">upload_from_tsv(fil, hdl, **kwargs)</code></pre>
@@ -340,6 +359,12 @@ as tsv with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&r
   Open file object or io.IOStream()</p>
 <p>hdl : str
   Dataverse persistent ID for study (handle or DOI)</p>
+<p>trunc : str
+  Leftmost portion of Dataverse study file path to remove.
+- <code>eg</code> - trunc =&rsquo;/home/user/&rsquo; if the tsv field is
+  &lsquo;/home/user/Data/ASCII&rsquo;
+  would set the path for that line of the tsv to &lsquo;Data/ASCII&rsquo;.
+  Defaults to None.</p>
 <p>kwargs : dict</p>
 <p>other parameters. Acceptable keywords and contents are:</p>
 <p>dv : str
@@ -359,6 +384,18 @@ website page.</p>
 
 
 <p>An LDC item (eg, LDC2021T01)</p>
+<p><a name="dataverse_utils.ldc.Ldc.__init__"></a></p>
+<h5 id="__init__">__init__<a class="headerlink" href="#__init__" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | __init__(ldc)</code></pre>
+
+
+<p>Returns a dict with keys created from an LDC catalogue web
+page.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>ldc : str
+  Linguistic Consortium Catalogue Number (eg. &lsquo;LDC2015T05&rsquo;.
+  This is what forms the last part of the LDC catalogue URL.</p>
 <p><a name="dataverse_utils.ldc.Ldc.ldcJson"></a></p>
 <h5 id="ldcjson">ldcJson<a class="headerlink" href="#ldcjson" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | @property
@@ -366,6 +403,47 @@ website page.</p>
 
 
 <p>Returns a JSON based on the LDC web page scraping</p>
+<p><a name="dataverse_utils.ldc.Ldc.dryadJson"></a></p>
+<h5 id="dryadjson">dryadJson<a class="headerlink" href="#dryadjson" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @property
+ | dryadJson()</code></pre>
+
+
+<p>LDC metadata in Dryad JSON format</p>
+<p><a name="dataverse_utils.ldc.Ldc.dvJson"></a></p>
+<h5 id="dvjson">dvJson<a class="headerlink" href="#dvjson" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @property
+ | dvJson()</code></pre>
+
+
+<p>LDC metadata in Dataverse JSON format</p>
+<p><a name="dataverse_utils.ldc.Ldc.embargo"></a></p>
+<h5 id="embargo">embargo<a class="headerlink" href="#embargo" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @property
+ | embargo()</code></pre>
+
+
+<p>Boolean indicating embargo status</p>
+<p><a name="dataverse_utils.ldc.Ldc.fileJson"></a></p>
+<h5 id="filejson">fileJson<a class="headerlink" href="#filejson" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @property
+ | fileJson(timeout=45)</code></pre>
+
+
+<p>Returns False: No attached files possible at LDC</p>
+<p><a name="dataverse_utils.ldc.Ldc.files"></a></p>
+<h5 id="files">files<a class="headerlink" href="#files" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | @property
+ | files()</code></pre>
+
+
+<p>Returns None. No files possible</p>
+<p><a name="dataverse_utils.ldc.Ldc.fetch_record"></a></p>
+<h5 id="fetch_record">fetch_record<a class="headerlink" href="#fetch_record" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python"> | fetch_record(url=None, timeout=45)</code></pre>
+
+
+<p>Downloads record from LDC website</p>
 <p><a name="dataverse_utils.ldc.Ldc.make_ldc_json"></a></p>
 <h5 id="make_ldc_json">make_ldc_json<a class="headerlink" href="#make_ldc_json" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | make_ldc_json()</code></pre>
@@ -373,49 +451,65 @@ website page.</p>
 
 <p>Returns a dict with keys created from an LDC catalogue web
 page.</p>
-<p>intext : str
-    HTML page source from LDC catalogue page.</p>
 <p><a name="dataverse_utils.ldc.Ldc.name_parser"></a></p>
 <h5 id="name_parser">name_parser<a class="headerlink" href="#name_parser" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | @staticmethod
  | name_parser(name)</code></pre>
 
 
+<p>Returns lastName/firstName JSON snippet from name</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
 <p>name : str
-    A name</p>
+  A name</p>
 <p><a name="dataverse_utils.ldc.Ldc.make_dryad_json"></a></p>
 <h5 id="make_dryad_json">make_dryad_json<a class="headerlink" href="#make_dryad_json" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | make_dryad_json(ldc=None)</code></pre>
 
 
 <p>Creates a Dryad-style dict from an LDC dictionary</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
 <p>ldc : dict
-    Dictionary containing LDC data</p>
+  Dictionary containing LDC data. Defaults to self.ldcJson</p>
 <p><a name="dataverse_utils.ldc.Ldc.find_block_index"></a></p>
 <h5 id="find_block_index">find_block_index<a class="headerlink" href="#find_block_index" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | @staticmethod
  | find_block_index(dvjson, key)</code></pre>
 
 
-<p>Finds the index number of an item in Dataverse&rsquo;s idiotic JSON</p>
+<p>Finds the index number of an item in Dataverse&rsquo;s idiotic JSON list</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>dvjson : dict
+  Dataverse JSON</p>
+<p>key : str
+  key for which to find list index</p>
 <p><a name="dataverse_utils.ldc.Ldc.make_dv_json"></a></p>
 <h5 id="make_dv_json">make_dv_json<a class="headerlink" href="#make_dv_json" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | make_dv_json(ldc=None)</code></pre>
 
 
+<p>Returns complete Dataverse JSON</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
 <p>ldc : dict
-    LDC dictionary. Defaults to self.ldcJson</p>
+  LDC dictionary. Defaults to self.ldcJson</p>
 <p><a name="dataverse_utils.ldc.Ldc.upload_metadata"></a></p>
 <h5 id="upload_metadata">upload_metadata<a class="headerlink" href="#upload_metadata" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python"> | upload_metadata(**kwargs) -&gt; dict</code></pre>
 
 
-<p>uploads metadata to dataverse
-kwargs:
-url : base url to Dataverse
-key : api key
-dv : dataverse to which it is being uploaded</p>
-<p>Returns json from connection attempt.</p>
+<p>Uploads metadata to dataverse</p>
+<h2 id="returns-json-from-connection-attempt">Returns json from connection attempt.<a class="headerlink" href="#returns-json-from-connection-attempt" title="Permanent link">&para;</a></h2>
+<p><strong>Arguments</strong>:</p>
+<p>kwargs:</p>
+<p>url : str
+  base url to Dataverse</p>
+<p>key : str
+  api key</p>
+<p>dv : str
+  Dataverse to which it is being uploaded</p>
               
             </div>
           </div>

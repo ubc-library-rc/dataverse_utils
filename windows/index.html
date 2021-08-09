@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Running the dataverse_utils scripts under Windows - dataverse_utils</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Running the dataverse_utils scripts under Windows";
+    var mkdocs_page_input_path = "windows.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> dataverse_utils</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../api_ref/">API reference</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Scripts</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">dataverse_utils</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Running the dataverse_utils scripts under Windows</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="running-the-dataverse_utils-scripts-under-windows">Running the dataverse_utils scripts under Windows<a class="headerlink" href="#running-the-dataverse_utils-scripts-under-windows" title="Permanent link">&para;</a></h1>
+<p>On Mac and Linux, running the scripts supplied with <code>dataverse_utils</code> is straightforward. They&rsquo;re available at the command line, which means that you can simply run them by (for example):</p>
+<p><code>$ dv_manifest_gen.py</code> followed by switches and variables as normal.</p>
+<p>Doing this results in output to the terminal window. <strong>This is not necessarily the case in Windows</strong>.</p>
+<p>This test case uses a new installation of <a href="https://python.org">https://python.org</a> Python, v.3.9.6, installed in Windows using the GUI, so it&rsquo;s as basic a Windows installation as you can get.</p>
+<p>In this instance, <code>dataverse_utils</code> were installed using pip from the PowerShell, ie <code>pip install git+https://github.com/ubc-library-rc/dataverse_utils</code>. However, pip should be pip regardless of which console you use to install.</p>
+<p>Here&rsquo;s a handy guide to show the results of how/if the command line scripts run. This example uses <code>dv_manifest.gen.py</code>, but appears to be generally applicable to any scripts configured with setuptools.setup()  (ie, <code>setuptools.setup(scripts=[whatever]</code>). If this means nothing to you because you&rsquo;re not distributing your own Python packages,, just skip to the table below.</p>
+<h2 id="windows-terminal-type">Windows Terminal type<a class="headerlink" href="#windows-terminal-type" title="Permanent link">&para;</a></h2>
+<h3 id="powershell">PowerShell<a class="headerlink" href="#powershell" title="Permanent link">&para;</a></h3>
+<p>Note that on these tests the user <strong>is not an administrator</strong>. Administrator results, in all likelihood, will be completely different, ideally better.</p>
+<p><strong>Problem</strong></p>
+<p>Attempting to run the script results in a window popping up for a nanosecond and no output.</p>
+<p><strong>Solution</strong></p>
+<p>This may not occur if the PowerShell is run as an administrator. What is happening here is that the script <em>is</em> running, but it&rsquo;s showing up in a separate window.  Output can be created as normal, if you use the correct switches. Unfortunately, you won&rsquo;t be able to see what they are, because the popup window disappears, which is not helpful. There are three potential fixes.</p>
+<ol>
+<li>
+<p>If you can run PowerShell as an administrator, that <em>may</em> solve the problem.</p>
+</li>
+<li>
+<p>Edit the PATHEXT environment variable to include the .py extension. Note that if the <strong>user</strong> PATHEXT is edited, the system will ignore the system PATHEXT, meaning that things like .exe files won&rsquo;t run unless the full name is typed (eg. &lsquo;notepad.exe&rsquo;). So, if editing the user PATHEXT, make sure to include the system PATHEXT and append <code>;.PY</code> to the string.</p>
+</li>
+<li>
+<p>Edit the PATHEXT for PowerShell itself, rather than on a system wide level. Editing $PROFILE to include the .py extension should allow the Python script to run within PowerShell. For instructions, see <a href="https://docs.microsoft.com/en-ca/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.1">https://docs.microsoft.com/en-ca/powershell/module/microsoft.powershell.core/about/about_profiles?view=powershell-7.1</a>.</p>
+<ol>
+<li>
+<p>Create a profile as per <strong>How to create a profile</strong></p>
+</li>
+<li>
+<p>Within that profile, <code>$env:PATHEXT += ";.py"</code></p>
+</li>
+</ol>
+<p>Depending on the nature of your Windows installation, this may be disabled by the security policy, in which case you can also try the method above.</p>
+</li>
+</ol>
+<h3 id="command-prompt">Command prompt<a class="headerlink" href="#command-prompt" title="Permanent link">&para;</a></h3>
+<p>This is the traditional Windows command prompt (ie, <code>cmd.exe</code>).</p>
+<p>The scripts <em>should</em> just work after being installed with pip, as this installation is the default. For example, run with:</p>
+<p><code>C:\&gt;dv_manifest_gen.py [arguments]</code></p>
+<p>Obviously it don&rsquo;t type the <code>C:\&gt;</code> part.</p>
+<h3 id="ssh-session">SSH session<a class="headerlink" href="#ssh-session" title="Permanent link">&para;</a></h3>
+<p>If using the built-in Windows SSH server, scripts should simply run as per the <em>command prompt</em> above. Windows SSH sessions default to using the Windows command prompt, not bash. Bash sessions under SSH should function if Bash is configured as below.</p>
+<h3 id="git-bash">Git Bash<a class="headerlink" href="#git-bash" title="Permanent link">&para;</a></h3>
+<p><em>Git Bash</em> is part of the git suite available here: <a href="https://git-scm.com/downloads">https://git-scm.com/downloads</a>. There are a few notable wrinkles with for use with Python.</p>
+<p><strong>During installation of Git</strong></p>
+<ol>
+<li>
+<p>After v2.32.0.2 (and possibly earlier), you will have the option during the installation to &ldquo;Enable experimental support for pseudo consoles&rdquo;. Doing this will allow you run Python directly from the bash shell like you would normally, and the scripts should function as per the <em>command prompt</em> above. </p>
+<p>As a bonus,  enabling this feature seems to fix errors with pipes which formerly resulted in the <code>stdout is not a tty</code> error when piping shell output (for instance, to <code>grep</code>). </p>
+</li>
+<li>
+<p>If you have <em>not</em> checked this box, you will need to add an alias to your <code>.bashrc</code> and/or <code>.bash_profile</code>:</p>
+<p><code>alias python='winpty python'</code>
+<code>alias pip='winpty pip'</code></p>
+<p>Either that, or you will need to start Python with <code>winpty python</code>, which is annoying. Similarly <code>winpty pip</code>. </p>
+</li>
+</ol>
+<p>Even if you have not enabled pseudo-console support and didn&rsquo;t complete use option 2, the scripts <em>should</em> still function normally though. Having scripts work but Python not work is not optimal and confusing, so a solution is there even though it technically isn&rsquo;t required.</p>
+<p>There are many options for Git Bash installation; testing has not covered all possible permutations of installation options.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
