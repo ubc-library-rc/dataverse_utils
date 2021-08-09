@@ -14,7 +14,7 @@ Once installed via pip, the scripts [_should_](#footnote) be available via the c
 
 is all you will need to type.
 
-Note that these programs have been primarily tested on Linux and MacOS, with [Windows a distant third](#footnote). Windows is notable for its unusual file  handling, so, as the MIT licenses stipulates, there is no warranty as to the suitability for a particular purpose.
+Note that these programs have been primarily tested on Linux and MacOS, with [Windows a tertiary priority](#footnote). Windows is notable for its unusual file  handling, so, as the MIT licenses stipulates, there is no warranty as to the suitability for a particular purpose.
 
 Of course, they *should* work.
 
@@ -177,6 +177,6 @@ optional arguments:
 <a name='footnote' />
 ## Notes for Windows users
 
-Command line scripts for Python don't necessarily behave the way they do in Linux/Mac, depending on *how* you access them. For detailed information on Windows systems, please see the [Windows testing document](windows.md)
+Command line scripts for Python may not necessarily behave the way they do in Linux/Mac, depending on *how* you access them. For detailed information on Windows systems, please see the [Windows testing document](windows.md)
 
 

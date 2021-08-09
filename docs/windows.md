@@ -16,7 +16,7 @@ Here's a handy guide to show the results of how/if the command line scripts run.
 
 ### PowerShell
 
-Note that on these tests the user **is not an administrator**. Administrator results, in all likelihood, will be completely different.
+Note that on these tests the user **is not an administrator**. Administrator results, in all likelihood, will be completely different, ideally better.
 
 **Problem**
 
@@ -42,7 +42,7 @@ This may not occur if the PowerShell is run as an administrator. What is happeni
 
 This is the traditional Windows command prompt (ie, `cmd.exe`).
 
-The scripts *should* just work after being installed with pip. For example, run with:
+The scripts *should* just work after being installed with pip, as this installation is the default. For example, run with:
 
 `C:\>dv_manifest_gen.py [arguments]`
 
@@ -50,7 +50,7 @@ Obviously it don't type the `C:\>` part.
 
 ### SSH session
 
-If using the built-in Windows SSH server, scripts should simply run as per the *command prompt* above. I didn't see that coming.
+If using the built-in Windows SSH server, scripts should simply run as per the *command prompt* above. Windows SSH sessions default to using the Windows command prompt, not bash. Bash sessions under SSH should function if Bash is configured as below.
 
 ### Git Bash
 
@@ -58,7 +58,7 @@ If using the built-in Windows SSH server, scripts should simply run as per the *
 
 **During installation of Git**
 
-1. After v2.32.0.2 (and possibly earlier), you will have the option during the installation to "Enable experimental support for pseudo consoles". Doing this will allow you run Python directly from the bash shell like you would noraally, and the scripts should function as per the *command prompt* above. 
+1. After v2.32.0.2 (and possibly earlier), you will have the option during the installation to "Enable experimental support for pseudo consoles". Doing this will allow you run Python directly from the bash shell like you would normally, and the scripts should function as per the *command prompt* above. 
 
 	As a bonus,  enabling this feature seems to fix errors with pipes which formerly resulted in the `stdout is not a tty` error when piping shell output (for instance, to `grep`). 
 
@@ -70,3 +70,5 @@ If using the built-in Windows SSH server, scripts should simply run as per the *
 	Either that, or you will need to start Python with `winpty python`, which is annoying. Similarly `winpty pip`. 
 
 Even if you have not enabled pseudo-console support and didn't complete use option 2, the scripts *should* still function normally though. Having scripts work but Python not work is not optimal and confusing, so a solution is there even though it technically isn't required.
+
+There are many options for Git Bash installation; testing has not covered all possible permutations of installation options.

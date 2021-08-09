@@ -16,7 +16,7 @@ pip install git+https://github.com/ubc-library-rc/dataverse_utils
 
 Other methods of installing Python packages can be found at <https://packaging.python.org/tutorials/installing-packages/>.
 
-If you have [mkdocs](https://www.mkdocs.org) installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the library by running `mkdocs serve`.
+If you have [mkdocs](https://www.mkdocs.org) installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the  *Github repo* by running `mkdocs serve`.
 
 ## The components
 
@@ -28,7 +28,7 @@ There are five (5) scripts currently available.
 
 * **dv_ldc_uploader.py**: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files.
 
-* **dv_manifest_gen.py**: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation.
+* **dv_manifest_gen.py**: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.
 
 * **dv_release.py**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
 
