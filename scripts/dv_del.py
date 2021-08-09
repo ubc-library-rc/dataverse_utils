@@ -12,7 +12,7 @@ __version__ = '.'.join([str(x) for x in VERSION])
 
 def delstudy(dvurl, key, pid):
     '''
-    Deletes datavesrse study
+    Deletes Dataverse study
 
     dvurl : str
         Dataverse installation base URL
