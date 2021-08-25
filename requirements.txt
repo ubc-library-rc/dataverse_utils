@@ -1,7 +1,6 @@
 beautifulsoup4==4.9.3
 certifi==2021.5.30
 chardet==4.0.0
-dataverse-utils==0.1.0
 git+git://github.com/ubc-library-rc/dryad2dataverse@master#egg=dryad2dataverse
 idna==2.10
 importlib-metadata==4.5.0
