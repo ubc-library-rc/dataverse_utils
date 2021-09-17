@@ -60,7 +60,7 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
 
     The 'description' is the filename without an extension.
 
-    Returns tsv as string. 
+    Returns tsv as string.
 
     ------------------------------------------
     Parameters:

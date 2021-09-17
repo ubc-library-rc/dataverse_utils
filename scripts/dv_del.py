@@ -121,7 +121,6 @@ def main():
                 print(f'Aborting delete of {args.pid}')
 
         else:
-            print(f'Autodelete of individual {args.pid} here')
             print(delstudy(args.dvurl, args.key, args.pid))
 
 if __name__ == '__main__':

@@ -47,7 +47,7 @@ CONFIG = {
     'install_requires': ['requests', 'requests_toolbelt',
                          ('dryad2dataverse @ git+https://github.com/'
                            'ubc-library-rc/dryad2dataverse.git'),
-                         'beautifulsoup4', 'Markdown'],
+                         'beautifulsoup4', 'Markdown', 'markdownify'],
     'packages':setuptools.find_packages(),
     'include_package_data' : True,
     'package_data' : {'': ['data/*']},

@@ -10,7 +10,7 @@ import sys
 import dataverse_utils as du
 from dataverse_utils import ldc
 
-VERSION = (0, 1, 2)
+VERSION = (0, 1, 3)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -79,7 +79,7 @@ def upload_meta(ldccat: str, url: str, key: str, dvs: str, verbose: bool = False
     stud = ldc.Ldc(ldccat)
     stud.fetch_record()
     if verbose:
-        print(f'Uploading {stud} metadata')
+        print(f'Uploading {stud.ldc} metadata')
     info = stud.upload_metadata(url=url, key=key, dv=dvs)
     return info['data']['persistentId']
 
@@ -91,7 +91,7 @@ def main() -> None:
     args = parser.parse_args()
     ldc.ds.constants.DV_CONTACT_EMAIL = args.email
     ldc.ds.constants.DV_CONTACT_NAME = args.cname
-
+    #print(args)
     if args.tsv:
         if len(args.studies) > 1:
             print('Error: Only one LDC study may be processed with the -t/--tsv option')
@@ -102,7 +102,8 @@ def main() -> None:
             print(f'Uploading files to {pid}')
         with open(args.tsv, newline='') as fil:
             du.upload_from_tsv(fil, hdl=pid,
-                               dv=args.dvs, apikey=args.key)
+                               dv=args.url, apikey=args.key,
+                               trunc='')
 
         sys.exit()
 

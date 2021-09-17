@@ -4,9 +4,11 @@ website page.
 
 '''
 import os
+#import re
 import time
 
 import markdown
+import markdownify
 import requests
 from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup as bs
@@ -118,7 +120,11 @@ class Ldc(ds.Serializer):
         if not self.ldcHtml:
             self.fetch_record()
         soup = bs(self.ldcHtml, 'html.parser')
-        data = [x.text.strip() for x in soup.find_all('td')]
+        #Should data just look in the *first* table? Specifically tbody?
+        #Is it always the first? I assume yes.
+        tbody = soup.find('tbody')#new
+        data = [x.text.strip() for x in tbody.find_all('td')]#new
+        #data = [x.text.strip() for x in soup.find_all('td')]#original
         LDC_dict = {data[x][:data[x].find('\n')].strip(): data[x+1].strip() for x in range(0, len(data), 2)}
         #Related Works appears to have an extra 'Hide' at the end
         if LDC_dict.get('Related Works:'):
@@ -127,25 +133,36 @@ class Ldc(ds.Serializer):
         LDC_dict['Linguistic Data Consortium'] = LDC_dict['LDC Catalog No.']
         del LDC_dict['LDC Catalog No.']#This key must be renamed for consistency
         LDC_dict['Author(s)'] = [x.strip() for x in LDC_dict['Author(s)'].split(',')]
+        #Other metadata probably has HTML in it, so we keep as much as possible
         other_meta = soup.find_all('div')
         alldesc = [x for x in other_meta if x.attrs.get('itemprop') == 'description']
+        #sections use h3, so split on these
         alldesc = str(alldesc).split('<h3>')
         for i in range(1, len(alldesc)):
             alldesc[i] = '<h3>' + alldesc[i]
+        #first one is not actually useful, so discard it
         alldesc.pop(0)
-        subdict = {}
-        for i in alldesc:
-            subsoup = bs(i, 'html.parser')
-            key = subsoup.h3.text.strip()
-            text = '\n'.join([str(x).strip() for x in subsoup.find_all('p')])
-            if text:
-                subdict[key] = text
-            text = '\n'.join([x.text.strip() for x in subsoup.find_all('span')])
-            if text:
-                subdict[key] = subdict.get(key, '') + '<p>\n' + text + '\n</p>'
 
-        LDC_dict.update(subdict)
-        #self.ldcJson = LDC_dict
+
+        #So far, so good. At this point the relative links need fixing
+        #and tables need to be converted to pre.
+        for desc in alldesc:
+            #It's already strings; replace relative links first
+            desc = desc.replace('../../../', 'https://catalog.ldc.upenn.edu/')
+            subsoup = bs(desc, 'html.parser')
+            key = subsoup.h3.text.strip()
+            #don't need the h3 tags anymore
+            subsoup.find('h3').extract()
+            # Convert tables to <pre>
+            for tab in subsoup.find_all('table'):
+                content = str(tab)
+                #convert to markdown
+                content = markdownify.markdownify(content)
+                tab.name = 'pre'
+                tab.string = content #There is not much documentation on the difference between tab.string and tab.content
+            #That was relatively easy
+            LDC_dict[key] = str(subsoup)
+
         return LDC_dict
 
     @staticmethod
@@ -328,7 +345,9 @@ class Ldc(ds.Serializer):
 
         #The first keyword field is hardcoded in by dryad2dataverse.serializer
         #So I think it needs to be deleted
-        keyword_field = [(x, y) for x, y in enumerate(dvjson['datasetVersion']['metadataBlocks']['citation']['fields']) if y.get('typeName') == 'otherId'][0] #ibid
+        keyword_field = [(x, y) for x, y in
+                         enumerate(dvjson['datasetVersion']['metadataBlocks']['citation']['fields'])
+                         if y.get('typeName') == 'otherId'][0] #ibid
         del dvjson['datasetVersion']['metadataBlocks']['citation']['fields'][keyword_field[0]]
 
         #Notes
