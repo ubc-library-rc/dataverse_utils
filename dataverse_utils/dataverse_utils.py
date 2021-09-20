@@ -73,7 +73,7 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
 
     def_tag : str
         Default Dataverse tag (eg, Data, Documentation, etc)
-        Separate tags with an easily splitable character:
+        Separate tags with a comma:
         eg. ('Data, 2016')
 
     inc_header : bool
@@ -87,7 +87,10 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
                    for x in os.walk(start_dir)
                    for y in x[2]
                    if not y.startswith('.')]
-
+    if isinstance(in_list, set):
+        in_list=list(in_list)
+    in_list.sort()
+    def_tag = ", ".join([x.strip() for x in def_tag.split(',')])
     headers = ['file', 'description', 'tags']
     outf = io.StringIO(newline='')
     tsv_writer = csv.writer(outf, delimiter='\t',
