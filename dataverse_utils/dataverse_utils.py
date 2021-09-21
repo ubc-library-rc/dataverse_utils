@@ -320,6 +320,10 @@ def upload_file(fpath, hdl, **kwargs):
         trunc : str
             OPTIONAL
             Leftmost portion of path to remove
+
+        rest : bool
+            OPTIONAL
+            Restrict file. Defaults to false unless True supplied
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -391,6 +395,61 @@ def upload_file(fpath, hdl, **kwargs):
         if upload.json()['data']['files'][0]['dataFile']['md5'] != kwargs.get('md5'):
             LOGGER.warning('md5sum mismatch on %s', fpath)
             raise Md5Error('md5sum mismatch')
+
+    restrict_file(fid=fid, dv=dvurl, apikey=kwargs.get('apikey'),
+                  rest=kwargs.get('rest', False))
+
+def restrict_file(**kwargs):
+    '''
+    Restrict file in Dataverse study.
+
+    ----------------------------------------
+    Parameters:
+
+
+    kwargs : dict
+
+        other parameters. Acceptable keywords and contents are:
+
+        **One of pid or fid is required**
+        pid : str
+            file persistent ID
+
+        fid : str
+            file database ID
+
+        dv : str
+            REQUIRED
+            url to base Dataverse installation
+            eg: 'https://abacus.library.ubc.ca'
+
+        apikey : str
+            REQUIRED
+            API key for user
+
+        rest : bool
+            On True, restrict. Default True
+    '''
+    headers = {'X-Dataverse-key': kwargs['apikey']}
+    #Requires a true/false *string* for the API.
+    if kwargs.get('rest', True):
+        rest = 'true'
+    else:
+        rest= 'false'
+    if kwargs.get('pid'):
+        params={'persistentId':kwargs['pid']}
+        rest = requests.put(f'{kwargs["dv"]}/api/files/:persistentId/restrict',
+                            headers=headers,
+                            params=params,
+                            data=rest)
+    elif kwargs.get('fid'):
+        rest = requests.put(f'{kwargs["dv"]}/api/files/{kwargs["fid"]}/restrict',
+                            headers=headers, data=rest)
+    else:
+        LOGGER.error('No file ID/PID supplied for file restriction')
+        raise KeyError('One of persistentId (pid) or database ID'
+                       '(fid) is required for file restriction')
+
 
 def upload_from_tsv(fil, hdl, **kwargs):
     '''
