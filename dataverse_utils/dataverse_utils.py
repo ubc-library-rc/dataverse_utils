@@ -486,7 +486,9 @@ def upload_from_tsv(fil, hdl, **kwargs):
         apikey : str
             REQUIRED
             API key for user
-    '''
+
+        rest : bool
+            On True, restrict access. Default False '''
     reader = csv.reader(fil, delimiter='\t', quotechar='"')
     for num, row in enumerate(reader):
         if num == 0:
@@ -501,7 +503,8 @@ def upload_from_tsv(fil, hdl, **kwargs):
                   'descr' : descr,
                   'dirlabel' : dirlabel,
                   'apikey' : kwargs.get('apikey'),
-                  'md5' : kwargs.get('md5', '')}
+                  'md5' : kwargs.get('md5', ''),
+                  'rest': kwargs.get('rest', False)}
         upload_file(row[0], hdl, **params)
 
 if __name__ == '__main__':

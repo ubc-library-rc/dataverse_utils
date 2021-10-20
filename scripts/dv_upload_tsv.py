@@ -10,7 +10,7 @@ import argparse
 
 import dataverse_utils as du
 
-VERSION = (0, 2, 1)
+VERSION = (0, 3, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -36,6 +36,8 @@ def parse() -> argparse.ArgumentParser():
     parser.add_argument('-u', '--url', default='https://abacus.library.ubc.ca',
                         help=('Dataverse installation base url. '
                               'defaults to "https://abacus.library.ubc.ca"'))
+    parser.add_argument('-r', '--restrict', action='store_true', dest='rest',
+                        help=('Restrict files after upload.'))
     parser.add_argument('-t', '--truncate', default='',
                         help=('Left truncate file path. As Dataverse studies '
                               'can retain directory structure, you can set '
@@ -62,7 +64,7 @@ def main() -> None:
     with open(args.tsv, newline='') as fil:
         du.upload_from_tsv(fil, hdl=args.pid,
                            dv=args.url, apikey=args.key,
-                           trunc=args.truncate)
+                           trunc=args.truncate, rest=args.rest)
 
 if __name__ == '__main__':
     main()
