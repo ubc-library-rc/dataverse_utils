@@ -91,7 +91,7 @@ File paths are automatically generated from the "file" column. Because of this, 
 **Usage**
 
 ```nohighlight
-usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [-t TRUNCATE] [--version] [tsv]
+usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [-r] [-t TRUNCATE] [--version] [tsv]
 
 Uploads data sets to an *existing* Dataverse study from the contents of a TSV (tab separated value) file. Metadata, file tags, paths, etc are all read from the TSV. JSON output from the
 Dataverse API is printed to stdout during the process.
@@ -104,6 +104,7 @@ optional arguments:
   -p PID, --pid PID     Dataverse study persistent identifier (DOI/handle)
   -k KEY, --key KEY     API key
   -u URL, --url URL     Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
+  -r, --restrict        Restrict files after upload.
   -t TRUNCATE, --truncate TRUNCATE
                         Left truncate file path. As Dataverse studies can retain directory structure, you can set an arbitrary starting point by removing the leftmost portion. Eg: if the
                         TSV has a file path of /home/user/Data/file.txt, setting --truncate to "/home/user" would have file.txt in the Data directory in the Dataverse study. The file is

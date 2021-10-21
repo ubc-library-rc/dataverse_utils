@@ -61,7 +61,7 @@ Returns tsv as string.
   
   def_tag : str
   Default Dataverse tag (eg, Data, Documentation, etc)
-  Separate tags with an easily splitable character:
+  Separate tags with a comma:
   eg. ('Data, 2016')
   
   inc_header : bool
@@ -269,6 +269,49 @@ Uploads file to Dataverse study and sets file metadata and tags.
   trunc : str
   OPTIONAL
   Leftmost portion of path to remove
+  
+  rest : bool
+  OPTIONAL
+  Restrict file. Defaults to false unless True supplied
+
+<a name="dataverse_utils.dataverse_utils.restrict_file"></a>
+
+##### restrict\_file
+
+```python
+restrict_file(**kwargs)
+```
+
+Restrict file in Dataverse study.
+
+----------------------------------------
+
+**Arguments**:
+
+  
+  
+  kwargs : dict
+  
+  other parameters. Acceptable keywords and contents are:
+  
+  **One of pid or fid is required**
+  pid : str
+  file persistent ID
+  
+  fid : str
+  file database ID
+  
+  dv : str
+  REQUIRED
+  url to base Dataverse installation
+- `eg` - 'https://abacus.library.ubc.ca'
+  
+  apikey : str
+  REQUIRED
+  API key for user
+  
+  rest : bool
+  On True, restrict. Default True
 
 <a name="dataverse_utils.dataverse_utils.upload_from_tsv"></a>
 
@@ -313,6 +356,9 @@ as tsv with headers 'file', 'description', 'tags'.
   apikey : str
   REQUIRED
   API key for user
+  
+  rest : bool
+  On True, restrict access. Default False
 
 <a name="dataverse_utils.ldc"></a>
 
@@ -526,6 +572,7 @@ Returns complete Dataverse JSON
 Uploads metadata to dataverse
 
 Returns json from connection attempt.
+
 ----------------------------------------
 
 **Arguments**:

@@ -373,6 +373,7 @@ class Ldc(ds.Serializer):
         Uploads metadata to dataverse
 
         Returns json from connection attempt.
+        
         ----------------------------------------
         Parameters:
 
