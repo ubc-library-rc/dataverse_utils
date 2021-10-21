@@ -179,7 +179,7 @@ optional arguments:
 <p>For the best metadata, you should probably edit it manually to add correct descriptive metadata, notably the &ldquo;Description&rdquo; and &ldquo;Tags&rdquo;. Tags are split separated by commas, so it&rsquo;s possible to have multiple tags for each data item, like &ldquo;Data, SPSS, June 2021&rdquo;.</p>
 <p>File paths are automatically generated from the &ldquo;file&rdquo; column. Because of this, you should probably use relative paths rather than absolute paths unless you want to have a lengthy path string in Dataverse.</p>
 <p><strong>Usage</strong></p>
-<pre class="codehilite"><code class="language-nohighlight">usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [-t TRUNCATE] [--version] [tsv]
+<pre class="codehilite"><code class="language-nohighlight">usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [-r] [-t TRUNCATE] [--version] [tsv]
 
 Uploads data sets to an *existing* Dataverse study from the contents of a TSV (tab separated value) file. Metadata, file tags, paths, etc are all read from the TSV. JSON output from the
 Dataverse API is printed to stdout during the process.
@@ -192,6 +192,7 @@ optional arguments:
   -p PID, --pid PID     Dataverse study persistent identifier (DOI/handle)
   -k KEY, --key KEY     API key
   -u URL, --url URL     Dataverse installation base url. defaults to &quot;https://abacus.library.ubc.ca&quot;
+  -r, --restrict        Restrict files after upload.
   -t TRUNCATE, --truncate TRUNCATE
                         Left truncate file path. As Dataverse studies can retain directory structure, you can set an arbitrary starting point by removing the leftmost portion. Eg: if the
                         TSV has a file path of /home/user/Data/file.txt, setting --truncate to &quot;/home/user&quot; would have file.txt in the Data directory in the Dataverse study. The file is

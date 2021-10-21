@@ -76,6 +76,8 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#upload_file">upload_file</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#restrict_file">restrict_file</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#upload_from_tsv">upload_from_tsv</a>
     </li>
         </ul>
@@ -117,8 +119,6 @@
         </ul>
     </li>
         </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#returns-json-from-connection-attempt">Returns json from connection attempt.</a>
     </li>
     </ul>
                     </li>
@@ -204,7 +204,7 @@ with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.<
   Input file list. Defaults to recursive walk of current directory.</p>
 <p>def_tag : str
   Default Dataverse tag (eg, Data, Documentation, etc)
-  Separate tags with an easily splitable character:
+  Separate tags with a comma:
   eg. (&lsquo;Data, 2016&rsquo;)</p>
 <p>inc_header : bool
   Include header row</p>
@@ -345,6 +345,33 @@ Requires superuser API key.</p>
 <p>trunc : str
   OPTIONAL
   Leftmost portion of path to remove</p>
+<p>rest : bool
+  OPTIONAL
+  Restrict file. Defaults to false unless True supplied</p>
+<p><a name="dataverse_utils.dataverse_utils.restrict_file"></a></p>
+<h5 id="restrict_file">restrict_file<a class="headerlink" href="#restrict_file" title="Permanent link">&para;</a></h5>
+<pre class="codehilite"><code class="language-python">restrict_file(**kwargs)</code></pre>
+
+
+<p>Restrict file in Dataverse study.</p>
+<hr />
+<p><strong>Arguments</strong>:</p>
+<p>kwargs : dict</p>
+<p>other parameters. Acceptable keywords and contents are:</p>
+<p><strong>One of pid or fid is required</strong>
+  pid : str
+  file persistent ID</p>
+<p>fid : str
+  file database ID</p>
+<p>dv : str
+  REQUIRED
+  url to base Dataverse installation
+- <code>eg</code> - &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
+<p>apikey : str
+  REQUIRED
+  API key for user</p>
+<p>rest : bool
+  On True, restrict. Default True</p>
 <p><a name="dataverse_utils.dataverse_utils.upload_from_tsv"></a></p>
 <h5 id="upload_from_tsv">upload_from_tsv<a class="headerlink" href="#upload_from_tsv" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python">upload_from_tsv(fil, hdl, **kwargs)</code></pre>
@@ -374,6 +401,8 @@ as tsv with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&r
 <p>apikey : str
   REQUIRED
   API key for user</p>
+<p>rest : bool
+  On True, restrict access. Default False</p>
 <p><a name="dataverse_utils.ldc"></a></p>
 <h2 id="dataverse_utilsldc">dataverse_utils.ldc<a class="headerlink" href="#dataverse_utilsldc" title="Permanent link">&para;</a></h2>
 <p>Creates dataverse JSON from Linguistic Data Consortium
@@ -501,7 +530,8 @@ page.</p>
 
 
 <p>Uploads metadata to dataverse</p>
-<h2 id="returns-json-from-connection-attempt">Returns json from connection attempt.<a class="headerlink" href="#returns-json-from-connection-attempt" title="Permanent link">&para;</a></h2>
+<p>Returns json from connection attempt.</p>
+<hr />
 <p><strong>Arguments</strong>:</p>
 <p>kwargs:</p>
 <p>url : str
