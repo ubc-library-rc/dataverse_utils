@@ -205,8 +205,15 @@ class Ldc(ds.Serializer):
         dryad['keywords'] = ['Linguistics']
 
         #Dataverse accepts only ISO formatted date
-        releaseDate = time.strptime(ldc['Release Date'], '%B %d, %Y')
-        releaseDate = time.strftime('%Y-%m-%d', releaseDate)
+        
+        try:
+            releaseDate = time.strptime(ldc['Release Date'], '%B %d, %Y')
+            releaseDate = time.strftime('%Y-%m-%d', releaseDate)
+        except KeyError:
+            #Older surveys don't have a release date field
+            #so it must be created from the record number
+            if self.ldc[3] == '9':
+                releaseDate = '19' + self.ldc[3:5]
         dryad['lastModificationDate'] = releaseDate
         dryad['publicationDate'] = releaseDate
 

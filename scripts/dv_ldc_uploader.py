@@ -10,7 +10,7 @@ import sys
 import dataverse_utils as du
 from dataverse_utils import ldc
 
-VERSION = (0, 1, 3)
+VERSION = (0, 2, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -47,6 +47,8 @@ def parse() -> argparse.ArgumentParser():
                               'Using this option '
                               'requires only one positional *studies* argument'),
                         default=None)
+    parser.add_argument('-r', '--no-restrict', action='store_false', dest='rest',
+                        help=("Don't restrict files after upload."))
     parser.add_argument('-n', '--cname',
                         help=('Study contact name. '
                               'Default: "Abacus support"'),
@@ -103,7 +105,8 @@ def main() -> None:
         with open(args.tsv, newline='') as fil:
             du.upload_from_tsv(fil, hdl=pid,
                                dv=args.url, apikey=args.key,
-                               trunc='')
+                               trunc='',
+                               rest=args.rest)
 
         sys.exit()
 
