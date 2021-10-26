@@ -11,8 +11,16 @@ Any installation will require the use of the command line/command prompt.
 The easiest installation is with `pip`:
 
 ```
-pip install git+https://github.com/ubc-library-rc/dataverse_utils
+pip install git+https://github.com/ubc-library-rc/dataverse_utils@master
 ```
+
+### Upgrading
+Upgrading is slightly different than the usual `pip` method, because it's not coming from pypi:
+
+```
+pip install --upgrade git+https://github.com/ubc-library-rc/dataverse_utils@master
+```
+Sadly, it's more to type.
 
 Other methods of installing Python packages can be found at <https://packaging.python.org/tutorials/installing-packages/>.
 
