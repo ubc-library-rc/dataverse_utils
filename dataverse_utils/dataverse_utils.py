@@ -329,10 +329,7 @@ def upload_file(fpath, hdl, **kwargs):
     #Does SPSS detection happen *after* upload
     #Does the file need to be renamed post hoc?
     #I don't think this can be fixed. Goddamitsomuch.
-    if kwargs['dv'].endswith(os.sep):
-        dvurl = kwargs['dv'][:-1]
-    else:
-        dvurl = kwargs['dv']
+    dvurl = kwargs['dv'].strip('\\ /')
     if os.path.splitext(fpath)[1].lower() in NOTAB:
         file_name_clean = os.path.basename(fpath)
         #file_name = os.path.basename(fpath) + '.NOPROCESS'
@@ -341,7 +338,9 @@ def upload_file(fpath, hdl, **kwargs):
     else:
         file_name = os.path.basename(fpath)
         file_name_clean = file_name
-
+    #My workstation python on Windows produces null for isos for some reason
+    if mimetypes.guess_type('test.iso') == (None, None):
+        mimetypes.add_type('application/x-iso9660-image', '.iso')
     mime = mimetypes.guess_type(fpath)[0]
     if file_name.endswith('.NOPROCESS') or mime == 'application/zip':
         mime = 'application/octet-stream'
