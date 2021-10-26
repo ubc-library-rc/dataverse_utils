@@ -51,6 +51,10 @@
                     <li class="toctree-l1 current"><a class="reference internal current" href=".">Overview</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#upgrading">Upgrading</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#the-components">The components</a>
         <ul>
@@ -123,9 +127,15 @@
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <p>Any installation will require the use of the command line/command prompt.</p>
 <p>The easiest installation is with <code>pip</code>:</p>
-<pre class="codehilite"><code>pip install git+https://github.com/ubc-library-rc/dataverse_utils</code></pre>
+<pre class="codehilite"><code>pip install git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
 
 
+<h3 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h3>
+<p>Upgrading is slightly different than the usual <code>pip</code> method, because it&rsquo;s not coming from pypi:</p>
+<pre class="codehilite"><code>pip install --upgrade git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
+
+
+<p>Sadly, it&rsquo;s more to type.</p>
 <p>Other methods of installing Python packages can be found at <a href="https://packaging.python.org/tutorials/installing-packages/">https://packaging.python.org/tutorials/installing-packages/</a>.</p>
 <p>If you have <a href="https://www.mkdocs.org">mkdocs</a> installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the  <em>Github repo</em> by running <code>mkdocs serve</code>.</p>
 <h2 id="the-components">The components<a class="headerlink" href="#the-components" title="Permanent link">&para;</a></h2>
@@ -245,5 +255,5 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 
 <!--
 MkDocs version : 1.1.2
-Build Date UTC : 2021-10-21 16:32:53.765154+00:00
+Build Date UTC : 2021-10-26 21:15:47.601509+00:00
 -->
