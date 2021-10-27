@@ -46,7 +46,7 @@ CONFIG = {
     'version' : PKG_VERSION,
     'install_requires': ['requests', 'requests_toolbelt',
                          ('dryad2dataverse @ git+https://github.com/'
-                           'ubc-library-rc/dryad2dataverse.git'),
+                           'ubc-library-rc/dryad2dataverse.git@master'),
                          'beautifulsoup4', 'Markdown', 'markdownify'],
     'packages':setuptools.find_packages(),
     'include_package_data' : True,

@@ -1,3 +1,4 @@
+#!python
 '''
 Reads the date from a Dataverse study and forces the facet sidebar to use that
 date by manually updating the Dataverse Postgres database.
