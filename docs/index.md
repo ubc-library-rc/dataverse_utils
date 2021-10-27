@@ -10,17 +10,17 @@ Any installation will require the use of the command line/command prompt.
 
 The easiest installation is with `pip`:
 
-```
+```nohighlight
 pip install git+https://github.com/ubc-library-rc/dataverse_utils@master
 ```
 
 ### Upgrading
 Upgrading is slightly different than the usual `pip` method, because it's not coming from pypi:
 
-```
+```nohighlight
 pip install --upgrade git+https://github.com/ubc-library-rc/dataverse_utils@master
 ```
-Sadly, it's more to type.
+Sadly, it's more to type than a normal `pip` upgrade string.
 
 Other methods of installing Python packages can be found at <https://packaging.python.org/tutorials/installing-packages/>.
 
@@ -30,7 +30,7 @@ If you have [mkdocs](https://www.mkdocs.org) installed, you can view the documen
 
 ### Scripts
 
-There are five (5) scripts currently available.
+There are six (6) scripts currently available.
 
 * **dv_del.py**: Bulk (unpublished) file deletion utility
 
@@ -41,6 +41,8 @@ There are five (5) scripts currently available.
 * **dv_release.py**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
 
 * **dv_upload_tsv.py**: Takes a tsv file in the format from *dv_manifest_gen.py* and does all the uploading and metadata entry.
+
+* **dv_pg_facet_date.py**: A server-based tool which updates the publication date facet and performs a study reindex.
 
 More information about these can be found on the [scripts page](scripts.md).
 

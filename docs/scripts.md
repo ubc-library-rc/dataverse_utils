@@ -175,6 +175,64 @@ optional arguments:
   --version             Show version number and exit
 ```
 
+
+## dv_pg_facet_date.py 
+
+This specialized tool is designed to be run on the **server** on which the Dataverse installation exists. When material is published in a Dataverse installation, the "Publication Year" facet in the Dataverse GUI is automatically populated with a date, which is the publication date *in that Dataverse installation*. This makes sense from the point of view of research data which is first deposited into a Dataverse installation, but fails as a finding aid for either;
+
+*  older data sets that have been migrated and reingested
+*  licensed data sets which may have been published years before they were purchased and ingested.
+
+For example, if you have a dataset that was published in 1971 but you only added it to your Dataverse installation in 2021, it is not necessarily intuitive to the end user that the "publication date" in this instance would be 2021. Ideally, you might like it to be 1971.
+
+Unfortunately, there is no API-based tool to manage this date. The only way to change it, as of late 2021, is to modify the underlying PostgreSQL database directly with the desired date. Subsequently, the study must be reindexed so that the revised publication date appears as an option in the facet.
+
+This tool will perform those operations. However, the tool must be run on the *server* on which the Dataverse installation exists, as reindexing API calls must be from localhost and database access is necessarily restricted.
+
+There are a few other prerequisites for using this tool which differ from the rest of the scripts included in this package. 
+
+* The user must have shell access to the server hosting the Dataverse installation
+* Python 3.6 or higher must be installed
+* The user must possess a valid Dataverse API key
+* The user must know the PostgreSQL password
+* If the database name and user have been changed, the user must know this as well
+* The script requires the manual installation of `psycopg2-binary` or have a successfully compiled `psycopg2` package for Python. See <https://www.psycopg.org/docs/>. This **is not installed** with the normal `pip install` of the *dataverse_utils* package as none of the other scripts require it and, in general, the odds of someone using this utility are low. If you forget to install it, the program will politely remind you.
+
+This cannot be stressed enough. **This tool will directly change values within the PostgreSQL database which holds all of Dataverse's information**. Use this at your own risk; no warranty is implied and no responsibility will be accepted for data loss, etc. If any of the items listed make no sense to you or sound like gibberish, do not use this tool.
+
+Because editing the underlying database may have a high pucker factor for some, there is both a dry-run option and an option to just dump out SQL instead of actually touching anything. These two options do not perform a study reindex and don't alter the contents of the database.
+
+**Usage**
+
+```nohighlight
+usage: dv_pg_facet_date.py [-h] [-d DBNAME] [-u USER] -p PASSWORD [-r | -o] [-s] -k KEY [-w URL] [--version] pids [pids ...] {distributionDate,productionDate,dateOfDeposit,dist,prod,dep}
+
+A utility to change the 'Production Date' web interface facet in a Dataverse installation to one of the three acceptable date types: 'distributionDate', 'productionDate', or
+'dateOfDeposit'. This must be done in the PostgreSQL database directly, so this utility must be run on the *server* that hosts a Dataverse installation. Back up your database if you are
+unsure.
+
+positional arguments:
+  pids                  persistentIdentifier
+  {distributionDate,productionDate,dateOfDeposit,dist,prod,dep}
+                        date type which is to be shown in the facet. The short forms are aliases for the long forms.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DBNAME, --dbname DBNAME
+                        Database name
+  -u USER, --user USER  PostgreSQL username
+  -p PASSWORD, --password PASSWORD
+                        PostgreSQL password
+  -r, --dry-run         print proposed SQL to stdout
+  -o, --sql-only        dump sql to file called *pg_sql.sql* in current directory. Appends to file if it exists
+  -s, --save-old        Dump old values to tsv called *pg_changed.tsv* in current directory. Appends to file if it exists
+  -k KEY, --key KEY     API key for Dataverse installation.
+  -w URL, --url URL     URL for base Dataverse installation. Default https://abacus.library.ubc.ca
+  --version             Show version number and exit
+
+THIS WILL EDIT YOUR POSTGRESQL DATABASE DIRECTLY. USE AT YOUR OWN RISK.
+```
+
 <a name='footnote' />
 ## Notes for Windows users
 
