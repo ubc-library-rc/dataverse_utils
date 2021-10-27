@@ -127,20 +127,20 @@
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <p>Any installation will require the use of the command line/command prompt.</p>
 <p>The easiest installation is with <code>pip</code>:</p>
-<pre class="codehilite"><code>pip install git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
+<pre class="codehilite"><code class="language-nohighlight">pip install git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
 
 
 <h3 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h3>
 <p>Upgrading is slightly different than the usual <code>pip</code> method, because it&rsquo;s not coming from pypi:</p>
-<pre class="codehilite"><code>pip install --upgrade git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
+<pre class="codehilite"><code class="language-nohighlight">pip install --upgrade git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
 
 
-<p>Sadly, it&rsquo;s more to type.</p>
+<p>Sadly, it&rsquo;s more to type than a normal <code>pip</code> upgrade string.</p>
 <p>Other methods of installing Python packages can be found at <a href="https://packaging.python.org/tutorials/installing-packages/">https://packaging.python.org/tutorials/installing-packages/</a>.</p>
 <p>If you have <a href="https://www.mkdocs.org">mkdocs</a> installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the  <em>Github repo</em> by running <code>mkdocs serve</code>.</p>
 <h2 id="the-components">The components<a class="headerlink" href="#the-components" title="Permanent link">&para;</a></h2>
 <h3 id="scripts">Scripts<a class="headerlink" href="#scripts" title="Permanent link">&para;</a></h3>
-<p>There are five (5) scripts currently available.</p>
+<p>There are six (6) scripts currently available.</p>
 <ul>
 <li>
 <p><strong>dv_del.py</strong>: Bulk (unpublished) file deletion utility</p>
@@ -156,6 +156,9 @@
 </li>
 <li>
 <p><strong>dv_upload_tsv.py</strong>: Takes a tsv file in the format from <em>dv_manifest_gen.py</em> and does all the uploading and metadata entry.</p>
+</li>
+<li>
+<p><strong>dv_pg_facet_date.py</strong>: A server-based tool which updates the publication date facet and performs a study reindex.</p>
 </li>
 </ul>
 <p>More information about these can be found on the <a href="scripts/">scripts page</a>.</p>
@@ -255,5 +258,5 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 
 <!--
 MkDocs version : 1.1.2
-Build Date UTC : 2021-10-26 21:15:47.601509+00:00
+Build Date UTC : 2021-10-27 21:04:28.393185+00:00
 -->
