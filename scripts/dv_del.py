@@ -7,7 +7,7 @@ import argparse
 #import json
 import sys
 import requests
-VERSION = (0, 2, 0)
+VERSION = (0, 2, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def delstudy(dvurl, key, pid):
@@ -92,7 +92,7 @@ def main():
     args.dvurl = args.dvurl.strip('/')
 
     if args.dataverse:
-        info = requests.get(f'{args.dvurl}/dataverses/{args.dataverse}/contents',
+        info = requests.get(f'{args.dvurl}/api/dataverses/{args.dataverse}/contents',
                             headers={'X-Dataverse-key': args.key}, timeout=10).json()
         pids = [f'{x["protocol"]}:{x["authority"]}/{x["identifier"]}' for x in info['data']]
         if not pids:
