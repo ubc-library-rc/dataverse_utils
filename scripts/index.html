@@ -156,7 +156,7 @@ optional arguments:
 <p>Tags may be separated by commas, eg: &ldquo;Data, SAS, June 2021&rdquo;.</p>
 <p>Using stdout and a redirect will also save time. First dump a file as normal. Add other files to the end with different information using the exclude header switch <code>-x</code> and different tags along with output redirection <code>&gt;&gt;</code>.</p>
 <p><strong>Usage</strong></p>
-<pre class="codehilite"><code class="language-nohighlight">usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-a] [--version] [files [files ...]]
+<pre class="codehilite"><code class="language-nohighlight">usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [--version] [files [files ...]]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
@@ -172,6 +172,9 @@ optional arguments:
   -t TAG, --tag TAG     Default tag(s). Separate with comma and use quotes if there are spaces. eg. &quot;Data, June 2021&quot;. Defaults to &quot;Data&quot;
   -x, --no-header       Don't include header in output. Useful if creating a complex tsv using redirects (ie, &quot;&gt;&gt;&quot;).
   -r, --recursive       Recursive listing.
+  -q QUOTE, --quote QUOTE
+                        Quote type. Cell value quoting parameters. Options: none (no quotes), min (minimal, ie. special characters only )nonum (non-numeric), all (all cells). Default:
+                        min
   -a, --show-hidden     Include hidden files.
   --version             Show version number and exit</code></pre>
 

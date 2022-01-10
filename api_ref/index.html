@@ -189,7 +189,7 @@ manipulation</p>
 <p>Raised on md5 mismatch</p>
 <p><a name="dataverse_utils.dataverse_utils.make_tsv"></a></p>
 <h5 id="make_tsv">make_tsv<a class="headerlink" href="#make_tsv" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python">make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -&gt; str</code></pre>
+<pre class="codehilite"><code class="language-python">make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True, quotype=csv.QUOTE_MINIMAL) -&gt; str</code></pre>
 
 
 <p>Recurses the tree for files and produces tsv output with
@@ -208,9 +208,19 @@ with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.<
   eg. (&lsquo;Data, 2016&rsquo;)</p>
 <p>inc_header : bool
   Include header row</p>
+<ul>
+<li><code>quotype</code> - int
+  integer value or csv quote type.
+  Default = csv.QUOTE_MINIMAL
+  Acceptable values:
+  csv.QUOTE_MINIMAL / 0
+  csv.QUOTE_ALL / 1
+  csv.QUOTE_NONNUMERIC / 2
+  csv.QUOTE_NONE / 3</li>
+</ul>
 <p><a name="dataverse_utils.dataverse_utils.dump_tsv"></a></p>
 <h5 id="dump_tsv">dump_tsv<a class="headerlink" href="#dump_tsv" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python">dump_tsv(start_dir, filename, in_list=None, def_tag='Data', inc_header=True)</code></pre>
+<pre class="codehilite"><code class="language-python">dump_tsv(start_dir, filename, in_list=None, **kwargs)</code></pre>
 
 
 <p>Dumps output of make_tsv manifest to a file.</p>
@@ -221,12 +231,25 @@ with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.<
 <p>in_list : list
   List of files for which to create manifest entries. Will
   default to recursive directory crawl</p>
+<p>OPTIONAL KEYWORD ARGUMENTS</p>
 <p>def_tag : str
   Default Dataverse tag (eg, Data, Documentation, etc)
   Separate tags with an easily splitable character:
-  eg. (&lsquo;Data, 2016&rsquo;)</p>
+  eg. (&lsquo;Data, 2016&rsquo;)
+- <code>Default</code> - &lsquo;Data&rsquo;</p>
 <p>inc_header : bool
-  Include header for tsv.</p>
+  Include header for tsv.
+  Default : True</p>
+<ul>
+<li><code>quotype</code> - int
+  integer value or csv quote type.
+  Default : csv.QUOTE_MINIMAL
+  Acceptable values:
+  csv.QUOTE_MINIMAL / 0
+  csv.QUOTE_ALL / 1
+  csv.QUOTE_NONNUMERIC / 2
+  csv.QUOTE_NONE / 3</li>
+</ul>
 <p><a name="dataverse_utils.dataverse_utils.file_path"></a></p>
 <h5 id="file_path">file_path<a class="headerlink" href="#file_path" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python">file_path(fpath, trunc='') -&gt; str</code></pre>
