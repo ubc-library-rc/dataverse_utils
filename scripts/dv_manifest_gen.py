@@ -16,7 +16,7 @@ import sys
 
 import dataverse_utils as du
 
-VERSION = (0, 2, 1)
+VERSION = (0, 3, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -57,6 +57,14 @@ def parse() -> argparse.ArgumentParser():
     parser.add_argument('-r', '--recursive',
                         help=('Recursive listing.'),
                         action='store_true')
+    parser.add_argument('-q', '--quote',
+                        help=('Quote type. Cell value quoting parameters. '
+                              'Options: none (no quotes), min (minimal, '
+                              'ie. special characters only )'
+                              'nonum (non-numeric), all (all cells). '
+                              'Default: min'
+                              ),
+                        default='min')
     parser.add_argument('-a', '--show-hidden',
                         help=('Include hidden files.'),
                         action='store_true')
@@ -65,12 +73,27 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
+def quotype(quote: str)-> int:
+    '''
+    Parse quotation type for csv parser.
+
+    returns csv quote constant.
+    '''
+    vals = {'min'  : 0,
+            'all' : 1,
+            'nonum' : 2,
+            'none' : 3}
+    return vals.get(quote.lower(), -1)
+
 def main() -> None:
     '''
     The main function call
     '''
     parser = parse()
     args = parser.parse_args()
+    args.quote = quotype(args.quote)
+    if  args.quote == -1:
+        parser.error('Invalid quotation type')
     f_list = []
 
     if not args.files:
@@ -96,11 +119,13 @@ def main() -> None:
         du.dump_tsv(os.getcwd(), filename=args.filename,
                     in_list=f_list,
                     def_tag=args.tag,
-                    inc_header=args.inc_header)
+                    inc_header=args.inc_header,
+                    quotype=args.quote)
     else:
         print(du.make_tsv(os.getcwd(), in_list=f_list,
                           def_tag=args.tag,
-                          inc_header=args.inc_header))
+                          inc_header=args.inc_header,
+                          quotype=args.quote))
 
 if __name__ == '__main__':
     main()

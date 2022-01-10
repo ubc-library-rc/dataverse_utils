@@ -53,7 +53,8 @@ def _make_info(dv_url, study, apikey) -> tuple:
     params = {'persistentId': study}
     return (dv_url, headers, params)
 
-def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
+def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True,
+             quotype=csv.QUOTE_MINIMAL) -> str:
     '''
     Recurses the tree for files and produces tsv output with
     with headers 'file', 'description', 'tags'.
@@ -78,6 +79,16 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
 
     inc_header : bool
         Include header row
+
+    quotype: int
+        integer value or csv quote type.
+        Default = csv.QUOTE_MINIMAL
+        Acceptable values:
+        csv.QUOTE_MINIMAL / 0
+        csv.QUOTE_ALL / 1
+        csv.QUOTE_NONNUMERIC / 2
+        csv.QUOTE_NONE / 3
+
     '''
     if start_dir.endswith(os.sep):
         #start_dir += os.sep
@@ -94,7 +105,7 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
     headers = ['file', 'description', 'tags']
     outf = io.StringIO(newline='')
     tsv_writer = csv.writer(outf, delimiter='\t',
-                            quoting=csv.QUOTE_NONNUMERIC,
+                            quoting=quotype
                             )
     if inc_header:
         tsv_writer.writerow(headers)
@@ -108,7 +119,7 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str:
     return outfile
 
 def dump_tsv(start_dir, filename, in_list=None,
-             def_tag='Data', inc_header=True):
+             **kwargs):
     '''
     Dumps output of make_tsv manifest to a file.
 
@@ -122,15 +133,34 @@ def dump_tsv(start_dir, filename, in_list=None,
         List of files for which to create manifest entries. Will
         default to recursive directory crawl
 
+    OPTIONAL KEYWORD ARGUMENTS
+
     def_tag : str
         Default Dataverse tag (eg, Data, Documentation, etc)
         Separate tags with an easily splitable character:
         eg. ('Data, 2016')
+        Default: 'Data'
 
     inc_header : bool
         Include header for tsv.
+        Default : True
+
+    quotype: int
+        integer value or csv quote type.
+        Default : csv.QUOTE_MINIMAL
+        Acceptable values:
+        csv.QUOTE_MINIMAL / 0
+        csv.QUOTE_ALL / 1
+        csv.QUOTE_NONNUMERIC / 2
+        csv.QUOTE_NONE / 3
+
     '''
-    dumper = make_tsv(start_dir, in_list, def_tag, inc_header)
+
+    def_tag= kwargs.get('def_tag', 'Data')
+    inc_header =kwargs.get('inc_header', True)
+    quotype = kwargs.get('quotype', csv.QUOTE_MINIMAL)
+
+    dumper = make_tsv(start_dir, in_list, def_tag, inc_header, quotype)
     with open(filename, 'w', newline='') as tsvfile:
         tsvfile.write(dumper)
 
@@ -448,7 +478,6 @@ def restrict_file(**kwargs):
         LOGGER.error('No file ID/PID supplied for file restriction')
         raise KeyError('One of persistentId (pid) or database ID'
                        '(fid) is required for file restriction')
-
 
 def upload_from_tsv(fil, hdl, **kwargs):
     '''
