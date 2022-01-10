@@ -60,7 +60,7 @@ Using stdout and a redirect will also save time. First dump a file as normal. Ad
 **Usage**
 
 ```nohighlight
-usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-a] [--version] [files [files ...]]
+usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [--version] [files [files ...]]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
@@ -76,6 +76,9 @@ optional arguments:
   -t TAG, --tag TAG     Default tag(s). Separate with comma and use quotes if there are spaces. eg. "Data, June 2021". Defaults to "Data"
   -x, --no-header       Don't include header in output. Useful if creating a complex tsv using redirects (ie, ">>").
   -r, --recursive       Recursive listing.
+  -q QUOTE, --quote QUOTE
+                        Quote type. Cell value quoting parameters. Options: none (no quotes), min (minimal, ie. special characters only )nonum (non-numeric), all (all cells). Default:
+                        min
   -a, --show-hidden     Include hidden files.
   --version             Show version number and exit
 ```

@@ -38,7 +38,7 @@ Raised on md5 mismatch
 ##### make\_tsv
 
 ```python
-make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True) -> str
+make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True, quotype=csv.QUOTE_MINIMAL) -> str
 ```
 
 Recurses the tree for files and produces tsv output with
@@ -66,13 +66,22 @@ Returns tsv as string.
   
   inc_header : bool
   Include header row
+  
+- `quotype` - int
+  integer value or csv quote type.
+  Default = csv.QUOTE_MINIMAL
+  Acceptable values:
+  csv.QUOTE_MINIMAL / 0
+  csv.QUOTE_ALL / 1
+  csv.QUOTE_NONNUMERIC / 2
+  csv.QUOTE_NONE / 3
 
 <a name="dataverse_utils.dataverse_utils.dump_tsv"></a>
 
 ##### dump\_tsv
 
 ```python
-dump_tsv(start_dir, filename, in_list=None, def_tag='Data', inc_header=True)
+dump_tsv(start_dir, filename, in_list=None, **kwargs)
 ```
 
 Dumps output of make_tsv manifest to a file.
@@ -89,13 +98,26 @@ Dumps output of make_tsv manifest to a file.
   List of files for which to create manifest entries. Will
   default to recursive directory crawl
   
+  OPTIONAL KEYWORD ARGUMENTS
+  
   def_tag : str
   Default Dataverse tag (eg, Data, Documentation, etc)
   Separate tags with an easily splitable character:
   eg. ('Data, 2016')
+- `Default` - 'Data'
   
   inc_header : bool
   Include header for tsv.
+  Default : True
+  
+- `quotype` - int
+  integer value or csv quote type.
+  Default : csv.QUOTE_MINIMAL
+  Acceptable values:
+  csv.QUOTE_MINIMAL / 0
+  csv.QUOTE_ALL / 1
+  csv.QUOTE_NONNUMERIC / 2
+  csv.QUOTE_NONE / 3
 
 <a name="dataverse_utils.dataverse_utils.file_path"></a>
 
