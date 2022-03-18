@@ -6,8 +6,9 @@ Deletes unpublished studies at the command line
 import argparse
 #import json
 import sys
+import time
 import requests
-VERSION = (0, 2, 1)
+VERSION = (0, 2, 3)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def delstudy(dvurl, key, pid):
@@ -25,8 +26,9 @@ def delstudy(dvurl, key, pid):
         deler = requests.delete(f'{dvurl}/api/datasets/:persistentId/versions/:draft',
                                 headers={'X-Dataverse-key':key},
                                 params={'persistentId':pid},
-                                timeout=30)
+                                timeout=60)
         if deler.status_code == 200:
+            print(deler.json())
             return f'Deleted {pid}'
         deler.raise_for_status()
         return None
@@ -66,9 +68,9 @@ def getsize(dvurl, pid, key):
     except requests.exceptions.HTTPError:
         return (0, 0)
 
-def main():
+def parsley()->argparse.ArgumentParser:
     '''
-    Command line bulk deleter
+    Argument parser as separate function
     '''
     parser = argparse.ArgumentParser(description='Delete draft studies from a Dataverse collection')
     parser.add_argument('-k', '--key', help='Dataverse user API key', required=True, dest='key')
@@ -84,12 +86,20 @@ def main():
                         help="Confirm each study deletion",
                         action='store_true', dest='conf')
     parser.add_argument('-u', '--url', help='URL to base Dataverse installation',
-                        default='https://soroban.library.ubc.ca', dest='dvurl')
+                        default='https://abacus.library.ubc.ca', dest='dvurl')
     parser.add_argument('--version', action='version',
                         version='%(prog)s '+__version__,
                         help='Show version number and exit')
-    args = parser.parse_args()
+    return parser
+
+def main():
+    '''
+    Command line bulk deleter
+    '''
+    args = parsley().parse_args()
     args.dvurl = args.dvurl.strip('/')
+    import sys
+    print(args)
 
     if args.dataverse:
         info = requests.get(f'{args.dvurl}/api/dataverses/{args.dataverse}/contents',
@@ -97,7 +107,10 @@ def main():
         pids = [f'{x["protocol"]}:{x["authority"]}/{x["identifier"]}' for x in info['data']]
         if not pids:
             print(f'Dataverse collection {args.dataverse} empty')
-        for pid in pids:
+        for count, pid in enumerate(pids):
+            #Reduce timeouts by waiting between requests
+            if count !=0 and not count%10:
+                time.sleep(5)
             try:
                 if args.conf:
                     if conf(pid):

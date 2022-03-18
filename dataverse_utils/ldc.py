@@ -234,6 +234,8 @@ class Ldc(ds.Serializer):
         if not ldc:
             ldc = self.ldcJson
         note_fields = ['DCMI Type(s)',
+                       'Sample Type',
+                       'Sample Rate', 
                        'Application(s)',
                        'Language(s)',
                        'Language ID(s)']
