@@ -8,7 +8,7 @@ import argparse
 import sys
 import time
 import requests
-VERSION = (0, 2, 3)
+VERSION = (0, 2, 4)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def delstudy(dvurl, key, pid):
@@ -104,7 +104,8 @@ def main():
     if args.dataverse:
         info = requests.get(f'{args.dvurl}/api/dataverses/{args.dataverse}/contents',
                             headers={'X-Dataverse-key': args.key}, timeout=10).json()
-        pids = [f'{x["protocol"]}:{x["authority"]}/{x["identifier"]}' for x in info['data']]
+        #Protocol key only present in a dataset, not in a sub-collection listing
+        pids = [f'{x["protocol"]}:{x["authority"]}/{x["identifier"]}' for x in info['data'] if x.get('protocol')]
         if not pids:
             print(f'Dataverse collection {args.dataverse} empty')
         for count, pid in enumerate(pids):
