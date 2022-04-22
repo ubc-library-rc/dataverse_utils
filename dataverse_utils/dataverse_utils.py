@@ -3,7 +3,6 @@ A collection of Dataverse utilities for file and metadata
 manipulation
 '''
 
-
 import csv
 import io
 #Dataverse/Glassfish can sometimes partially crash and the
@@ -53,7 +52,9 @@ def _make_info(dv_url, study, apikey) -> tuple:
     params = {'persistentId': study}
     return (dv_url, headers, params)
 
-def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True,
+def make_tsv(start_dir, in_list=None, def_tag='Data',
+             inc_header=True,
+             mime=False,
              quotype=csv.QUOTE_MINIMAL) -> str:
     '''
     Recurses the tree for files and produces tsv output with
@@ -80,6 +81,9 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True,
     inc_header : bool
         Include header row
 
+    mime : bool
+        Include automatically determined mimetype
+
     quotype: int
         integer value or csv quote type.
         Default = csv.QUOTE_MINIMAL
@@ -103,6 +107,8 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True,
     in_list.sort()
     def_tag = ", ".join([x.strip() for x in def_tag.split(',')])
     headers = ['file', 'description', 'tags']
+    if mime:
+        headers.append('mimetype')
     outf = io.StringIO(newline='')
     tsv_writer = csv.writer(outf, delimiter='\t',
                             quoting=quotype
@@ -111,7 +117,11 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True,
         tsv_writer.writerow(headers)
     for row in in_list:
         desc = os.path.splitext(os.path.basename(row))[0]
-        tsv_writer.writerow([row, desc, def_tag])
+        if mime:
+            mtype = mimetypes.guess_type(row)[0]
+            tsv_writer.writerow([row, desc, def_tag, mtype])
+        else:
+            tsv_writer.writerow([row, desc, def_tag])
     outf.seek(0)
     outfile = outf.read()
     outf.close()
@@ -158,9 +168,10 @@ def dump_tsv(start_dir, filename, in_list=None,
 
     def_tag= kwargs.get('def_tag', 'Data')
     inc_header =kwargs.get('inc_header', True)
+    mime = kwargs.get('mime', False)
     quotype = kwargs.get('quotype', csv.QUOTE_MINIMAL)
 
-    dumper = make_tsv(start_dir, in_list, def_tag, inc_header, quotype)
+    dumper = make_tsv(start_dir, in_list, def_tag, inc_header, mime, quotype)
     with open(filename, 'w', newline='') as tsvfile:
         tsvfile.write(dumper)
 
@@ -354,6 +365,12 @@ def upload_file(fpath, hdl, **kwargs):
         rest : bool
             OPTIONAL
             Restrict file. Defaults to false unless True supplied
+
+        mimetype : str
+            OPTIONAL
+            Mimetype of file. Useful if using File Previewers. Mimetype for zip files
+            (application/zip) will be ignored to circumvent Dataverse's automatic
+            unzipping function.
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -372,6 +389,8 @@ def upload_file(fpath, hdl, **kwargs):
     if mimetypes.guess_type('test.iso') == (None, None):
         mimetypes.add_type('application/x-iso9660-image', '.iso')
     mime = mimetypes.guess_type(fpath)[0]
+    if kwargs.get('mimetype'):
+        mime = kwargs['mimetype']
     if file_name.endswith('.NOPROCESS') or mime == 'application/zip':
         mime = 'application/octet-stream'
 
@@ -517,15 +536,22 @@ def upload_from_tsv(fil, hdl, **kwargs):
 
         rest : bool
             On True, restrict access. Default False '''
-    reader = csv.reader(fil, delimiter='\t', quotechar='"')
+    #reader = csv.reader(fil, delimiter='\t', quotechar='"')
+    #new, optional mimetype column allows using GeoJSONS.
+    #Read the headers from the file first before using DictReader
+    headers = fil.readline().strip('\n').split('\t')
+    fil.seek(0)
+    reader = csv.DictReader(fil, fieldnames=headers, quotechar='"', delimiter='\t')
+    #See API call for "Adding File Metadata"
     for num, row in enumerate(reader):
         if num == 0:
             continue
         #dirlabel = file_path(row[0], './')
-        dirlabel = file_path(row[0], kwargs.get('trunc', ''))
-        tags = row[-1].split(',')
+        dirlabel = file_path(row['file'], kwargs.get('trunc', ''))
+        tags = row['tags'].split(',')
         tags = [x.strip() for x in tags]
-        descr = row[1]
+        descr = row['description']
+        mimetype = row.get('mimetype')
         params = {'dv' : kwargs.get('dv'),
                   'tags' : tags,
                   'descr' : descr,
@@ -533,7 +559,9 @@ def upload_from_tsv(fil, hdl, **kwargs):
                   'apikey' : kwargs.get('apikey'),
                   'md5' : kwargs.get('md5', ''),
                   'rest': kwargs.get('rest', False)}
-        upload_file(row[0], hdl, **params)
+        if mimetype:
+            params['mimetype'] = mimetype
+        upload_file(row['file'], hdl, **params)
 
 if __name__ == '__main__':
     import doctest
