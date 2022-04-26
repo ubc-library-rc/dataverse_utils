@@ -38,7 +38,7 @@ Raised on md5 mismatch
 ##### make\_tsv
 
 ```python
-make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True, quotype=csv.QUOTE_MINIMAL) -> str
+make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True, mime=False, quotype=csv.QUOTE_MINIMAL) -> str
 ```
 
 Recurses the tree for files and produces tsv output with
@@ -66,6 +66,9 @@ Returns tsv as string.
   
   inc_header : bool
   Include header row
+  
+  mime : bool
+  Include automatically determined mimetype
   
 - `quotype` - int
   integer value or csv quote type.
@@ -295,6 +298,12 @@ Uploads file to Dataverse study and sets file metadata and tags.
   rest : bool
   OPTIONAL
   Restrict file. Defaults to false unless True supplied
+  
+  mimetype : str
+  OPTIONAL
+  Mimetype of file. Useful if using File Previewers. Mimetype for zip files
+  (application/zip) will be ignored to circumvent Dataverse's automatic
+  unzipping function.
 
 <a name="dataverse_utils.dataverse_utils.restrict_file"></a>
 

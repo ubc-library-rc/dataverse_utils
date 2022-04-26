@@ -49,7 +49,7 @@ optional arguments:
 
 ##  dv_manifest_gen.py
 
-Not technically a Dataverse-specific script, this utility will generate a tab-separated value output. The file consists of 3 columns: **file, description and tags**. 
+Not technically a Dataverse-specific script, this utility will generate a tab-separated value output. The file consists of 3 columns: **file, description and tags**, and optionally a **mimetype** column.
 
 Editing the result and using the upload utility to parse the tsv will add descriptive metadata, tags and file paths to an upload instead of laboriously using the Dataverse GUI.
 
@@ -60,7 +60,7 @@ Using stdout and a redirect will also save time. First dump a file as normal. Ad
 **Usage**
 
 ```nohighlight
-usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [--version] [files [files ...]]
+usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [--version] [files [files ...]]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
@@ -80,6 +80,7 @@ optional arguments:
                         Quote type. Cell value quoting parameters. Options: none (no quotes), min (minimal, ie. special characters only )nonum (non-numeric), all (all cells). Default:
                         min
   -a, --show-hidden     Include hidden files.
+  -m, --mime            Include autodetected mimetypes
   --version             Show version number and exit
 ```
 
@@ -90,6 +91,10 @@ Now that you have a tsv full of nicely described data, you can easily upload it 
 For the best metadata, you should probably edit it manually to add correct descriptive metadata, notably the "Description" and "Tags". Tags are split separated by commas, so it's possible to have multiple tags for each data item, like "Data, SPSS, June 2021".
 
 File paths are automatically generated from the "file" column. Because of this, you should probably use relative paths rather than absolute paths unless you want to have a lengthy path string in Dataverse.
+
+If uploading a tsv which includes mimetypes, be aware that mimetypes for zip files will be ignored to circumvent Dataverse's automatic unzipping feature.
+
+The rationale for manually specifiying mimetypes is to enable the use of previews which require a specific mimetype to function, but Dataverse does not correctly detect the type. For example, the GeoJSON file previewer requires a mimetype of `application/geo+json`, but the detection of this mimetype is not supported until Dataverse v5.9. By manually setting the mimetype, the previewer can be used by earlier Dataverse versions.
 
 **Usage**
 
