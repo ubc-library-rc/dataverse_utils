@@ -151,12 +151,12 @@ optional arguments:
 
 
 <h2 id="dv_manifest_genpy">dv_manifest_gen.py<a class="headerlink" href="#dv_manifest_genpy" title="Permanent link">&para;</a></h2>
-<p>Not technically a Dataverse-specific script, this utility will generate a tab-separated value output. The file consists of 3 columns: <strong>file, description and tags</strong>. </p>
+<p>Not technically a Dataverse-specific script, this utility will generate a tab-separated value output. The file consists of 3 columns: <strong>file, description and tags</strong>, and optionally a <strong>mimetype</strong> column.</p>
 <p>Editing the result and using the upload utility to parse the tsv will add descriptive metadata, tags and file paths to an upload instead of laboriously using the Dataverse GUI.</p>
 <p>Tags may be separated by commas, eg: &ldquo;Data, SAS, June 2021&rdquo;.</p>
 <p>Using stdout and a redirect will also save time. First dump a file as normal. Add other files to the end with different information using the exclude header switch <code>-x</code> and different tags along with output redirection <code>&gt;&gt;</code>.</p>
 <p><strong>Usage</strong></p>
-<pre class="codehilite"><code class="language-nohighlight">usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [--version] [files [files ...]]
+<pre class="codehilite"><code class="language-nohighlight">usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [--version] [files [files ...]]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
@@ -176,6 +176,7 @@ optional arguments:
                         Quote type. Cell value quoting parameters. Options: none (no quotes), min (minimal, ie. special characters only )nonum (non-numeric), all (all cells). Default:
                         min
   -a, --show-hidden     Include hidden files.
+  -m, --mime            Include autodetected mimetypes
   --version             Show version number and exit</code></pre>
 
 
@@ -183,6 +184,8 @@ optional arguments:
 <p>Now that you have a tsv full of nicely described data, you can easily upload it to an existing study if you know the persistent ID and have an API key.</p>
 <p>For the best metadata, you should probably edit it manually to add correct descriptive metadata, notably the &ldquo;Description&rdquo; and &ldquo;Tags&rdquo;. Tags are split separated by commas, so it&rsquo;s possible to have multiple tags for each data item, like &ldquo;Data, SPSS, June 2021&rdquo;.</p>
 <p>File paths are automatically generated from the &ldquo;file&rdquo; column. Because of this, you should probably use relative paths rather than absolute paths unless you want to have a lengthy path string in Dataverse.</p>
+<p>If uploading a tsv which includes mimetypes, be aware that mimetypes for zip files will be ignored to circumvent Dataverse&rsquo;s automatic unzipping feature.</p>
+<p>The rationale for manually specifiying mimetypes is to enable the use of previews which require a specific mimetype to function, but Dataverse does not correctly detect the type. For example, the GeoJSON file previewer requires a mimetype of <code>application/geo+json</code>, but the detection of this mimetype is not supported until Dataverse v5.9. By manually setting the mimetype, the previewer can be used by earlier Dataverse versions.</p>
 <p><strong>Usage</strong></p>
 <pre class="codehilite"><code class="language-nohighlight">usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [-r] [-t TRUNCATE] [--version] [tsv]
 

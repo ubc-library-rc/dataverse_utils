@@ -189,7 +189,7 @@ manipulation</p>
 <p>Raised on md5 mismatch</p>
 <p><a name="dataverse_utils.dataverse_utils.make_tsv"></a></p>
 <h5 id="make_tsv">make_tsv<a class="headerlink" href="#make_tsv" title="Permanent link">&para;</a></h5>
-<pre class="codehilite"><code class="language-python">make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True, quotype=csv.QUOTE_MINIMAL) -&gt; str</code></pre>
+<pre class="codehilite"><code class="language-python">make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True, mime=False, quotype=csv.QUOTE_MINIMAL) -&gt; str</code></pre>
 
 
 <p>Recurses the tree for files and produces tsv output with
@@ -208,6 +208,8 @@ with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.<
   eg. (&lsquo;Data, 2016&rsquo;)</p>
 <p>inc_header : bool
   Include header row</p>
+<p>mime : bool
+  Include automatically determined mimetype</p>
 <ul>
 <li><code>quotype</code> - int
   integer value or csv quote type.
@@ -371,6 +373,11 @@ Requires superuser API key.</p>
 <p>rest : bool
   OPTIONAL
   Restrict file. Defaults to false unless True supplied</p>
+<p>mimetype : str
+  OPTIONAL
+  Mimetype of file. Useful if using File Previewers. Mimetype for zip files
+  (application/zip) will be ignored to circumvent Dataverse&rsquo;s automatic
+  unzipping function.</p>
 <p><a name="dataverse_utils.dataverse_utils.restrict_file"></a></p>
 <h5 id="restrict_file">restrict_file<a class="headerlink" href="#restrict_file" title="Permanent link">&para;</a></h5>
 <pre class="codehilite"><code class="language-python">restrict_file(**kwargs)</code></pre>
