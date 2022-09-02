@@ -401,7 +401,8 @@ def upload_file(fpath, hdl, **kwargs):
                 'categories': kwargs.get('tags', [])}
     fpath = os.path.abspath(fpath)
     fields = {'file': (file_name, open(fpath, 'rb'), mime)}
-    fields.update({'jsonData' : f'{dv4_meta}'})
+    #fields.update({'jsonData' : f'{dv4_meta}'})
+    fields.update({'jsonData' : json.dumps(dv4_meta)})
     multi = MultipartEncoder(fields=fields) # use multipart streaming for large files
     headers = {'X-Dataverse-key' : kwargs.get('apikey'),
                'Content-type' : multi.content_type}
@@ -539,7 +540,7 @@ def upload_from_tsv(fil, hdl, **kwargs):
     #reader = csv.reader(fil, delimiter='\t', quotechar='"')
     #new, optional mimetype column allows using GeoJSONS.
     #Read the headers from the file first before using DictReader
-    headers = fil.readline().strip('\n').split('\t')
+    headers = fil.readline().strip('\n\r').split('\t')#Goddamn it Windows
     fil.seek(0)
     reader = csv.DictReader(fil, fieldnames=headers, quotechar='"', delimiter='\t')
     #See API call for "Adding File Metadata"
