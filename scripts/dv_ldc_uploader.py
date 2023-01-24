@@ -10,7 +10,7 @@ import sys
 import dataverse_utils as du
 from dataverse_utils import ldc
 
-VERSION = (0, 2, 0)
+VERSION = (0, 3, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -53,6 +53,12 @@ def parse() -> argparse.ArgumentParser():
                         help=('Study contact name. '
                               'Default: "Abacus support"'),
                         default='Abacus Support')
+    parser.add_argument('-c', '--certchain',
+                        help=('Certificate chain PEM: use if SSL issues '
+                              'are present. The PEM chain must be downloaded '
+                              'with a browser. '
+                              'Default: None'),
+                        default=None)
     parser.add_argument('-e', '--email',
                         help=('Dataverse study contact email address. '
                               'Default: abacus-support@lists.ubc.ca'),
@@ -65,7 +71,7 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
-def upload_meta(ldccat: str, url: str, key: str, dvs: str, verbose: bool = False) -> str:
+def upload_meta(ldccat: str, url: str, key: str, dvs: str, verbose: bool = False, certchain: str = None) -> str:
     '''
     Uploads metadata to target dataverse collection. Returns persistentId.
 
@@ -77,8 +83,10 @@ def upload_meta(ldccat: str, url: str, key: str, dvs: str, verbose: bool = False
         API key
     dvs : str
         Target Dataverse collection short name
+    certchain : str
+        Path to LDC .PEM certificate chain
     '''
-    stud = ldc.Ldc(ldccat)
+    stud = ldc.Ldc(ldccat, cert=certchain)
     stud.fetch_record()
     if verbose:
         print(f'Uploading {stud.ldc} metadata')
@@ -99,7 +107,7 @@ def main() -> None:
             print('Error: Only one LDC study may be processed with the -t/--tsv option')
             sys.exit()
         pid = upload_meta(args.studies[0], args.url, args.key,
-                          args.dvs, args.verbose)
+                          args.dvs, args.verbose, args.certchain)
         if args.verbose:
             print(f'Uploading files to {pid}')
         with open(args.tsv, newline='') as fil:
@@ -112,7 +120,7 @@ def main() -> None:
 
     for stud in args.studies:
         pid = upload_meta(stud, args.url, args.key,
-                          args.dvs, args.verbose)
+                          args.dvs, args.verbose, args.certchain)
         if args.verbose:
             print(pid)
 

@@ -25,7 +25,7 @@ class Ldc(ds.Serializer):
     '''
     An LDC item (eg, LDC2021T01)
     '''
-    def __init__(self, ldc):
+    def __init__(self, ldc, cert=None):
         '''
         Returns a dict with keys created from an LDC catalogue web
         page.
@@ -36,15 +36,23 @@ class Ldc(ds.Serializer):
         ldc : str
            Linguistic Consortium Catalogue Number (eg. 'LDC2015T05'.
            This is what forms the last part of the LDC catalogue URL.
+        cert : str
+            Path to certificate chain; LDC has had a problem
+            with intermediate certificates, so you can
+            download the chain with a browser and supply a
+            path to the .pem with this parameter
         '''
         self.ldc = ldc.strip().upper()
         self.ldcHtml = None
         self._ldcJson = None
         self._dryadJson = None
         self._dvJson = None
+        self.cert = cert
         self.session = requests.Session()
         self.session.mount('https://',
                            HTTPAdapter(max_retries=ds.constants.RETRY_STRATEGY))
+        if self.cert:
+            self.cert = os.path.expanduser(self.cert)
 
     @property
     def ldcJson(self):
@@ -108,7 +116,7 @@ class Ldc(ds.Serializer):
         '''
         Downloads record from LDC website
         '''
-        interim = self.session.get(f'https://catalog.ldc.upenn.edu/{self.ldc}')
+        interim = self.session.get(f'https://catalog.ldc.upenn.edu/{self.ldc}', verify=self.cert)
         interim.raise_for_status()
         self.ldcHtml = interim.text
 
