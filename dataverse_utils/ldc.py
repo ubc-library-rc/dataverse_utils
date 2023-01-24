@@ -145,7 +145,12 @@ class Ldc(ds.Serializer):
         other_meta = soup.find_all('div')
         alldesc = [x for x in other_meta if x.attrs.get('itemprop') == 'description']
         #sections use h3, so split on these
-        alldesc = str(alldesc).split('<h3>')
+        #24 Jan 23 Apparently, this is all done manually so some of them sometime use h4.
+        #Because reasons.
+        #was:
+        #alldesc = str(alldesc).split('<h3>')
+        #is now
+        alldesc = str(alldesc).replace('h4>', 'h3>').split('<h3>')
         for i in range(1, len(alldesc)):
             alldesc[i] = '<h3>' + alldesc[i]
         #first one is not actually useful, so discard it
@@ -199,6 +204,7 @@ class Ldc(ds.Serializer):
         '''
         if not ldc:
             ldc = self.ldcJson
+        print(ldc)
         dryad = {}
         dryad['title'] = ldc['Item Name']
         dryad['authors'] = [Ldc.name_parser(x) for x in ldc['Author(s)']]
