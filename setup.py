@@ -2,7 +2,7 @@
 dataverse_utils setup file. Very basic
 '''
 import ast
-import glob
+#import glob
 import os
 import setuptools
 
@@ -51,7 +51,16 @@ CONFIG = {
     'packages':setuptools.find_packages(),
     'include_package_data' : True,
     'package_data' : {'': ['data/*']},
-    'scripts': glob.glob('scripts/*py'),
+    'entry_points':{'console_scripts':[
+        'dv_del=dataverse_utils.scripts.dv_del:main',
+        'dv_ldc_uploader=dataverse_utils.scripts.dv_ldc_uploader:main',
+        'dv_manifest_gen=dataverse_utils.scripts.dv_manifest_gen:main',
+        'dv_pg_facet_date=dataverse_utils.scripts.dv_pg_facet_date:main',
+        'dv_record_copy=dataverse_utils.scripts.dv_record_copy:main',
+        'dv_release=dataverse_utils.scripts.dv_release:main',
+        'dv_replace_licenses=dataverse_utils.scripts.dv_replace_licenses:main',
+        'dv_upload_tsv=dataverse_utils.scripts.dv_upload_tsv:main']},
+    #'scripts': glob.glob('scripts/*py'),
     'name': 'dataverse_utils',
     'python_requires': '>=3.6'
 }

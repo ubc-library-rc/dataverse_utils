@@ -1,4 +1,3 @@
-#!python
 '''Dataverse Bulk Deleter
 Deletes unpublished studies at the command line
 '''
