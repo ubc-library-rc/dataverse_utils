@@ -8,4 +8,11 @@ __pycache__/**
 test.py
 tmp
 tmp/**
-
+build/
+lib/
+bin/
+lib/**
+bin/**
+dist/**
+dist
+pyvenv.cfg
