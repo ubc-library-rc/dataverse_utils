@@ -30,15 +30,16 @@ classifiers = ['Development Status :: 4 - Beta',
 			   'Topic :: Internet :: WWW/HTTP :: Site Management',
 			   'Topic :: Utilities']
 requires-python = '>=3.6'
-dynamic = ['version']
+dynamic = ['version', 'dependencies']
 
 [tools.setuptools]
 license-files = ['LICEN[CS]*']
 
 [project.urls]
-homepage = 'https://ubc-library-rc.github.io/dataverse_utils'
-documentation = 'https://ubc-library-rc.github.io/dataverse_utils'
-repository = 'https://github.com/ubc-library-rc/dataverse_utils.git'
+Homepage = 'https://ubc-library-rc.github.io/dataverse_utils'
+#Documentation = 'https://ubc-library-rc.github.io/dataverse_utils'
+Repository = 'https://github.com/ubc-library-rc/dataverse_utils.git'
+'Issue Tracker' = 'https://github.com/ubc-library-rc/dataverse_utils/issues'
 #changelog = 'https://github.com/me/spam/blob/master/CHANGELOG.md'
 
 [project.scripts]
@@ -51,4 +52,3 @@ dv_record_copy = 'dataverse_utils.scripts.dv_record_copy:main'
 dv_release = 'dataverse_utils.scripts.dv_release:main'
 dv_replace_licenses = 'dataverse_utils.scripts.dv_replace_licenses:main'
 dv_upload_tsv = 'dataverse_utils.scripts.dv_upload_tsv:main'
-dv_bulk_releaser = 'dataverse_utils.scripts.dv_bulk_releaser:main'
