@@ -32,6 +32,10 @@ classifiers = ['Development Status :: 4 - Beta',
 requires-python = '>=3.6'
 dynamic = ['version', 'dependencies']
 
+#optional-dependencies = {server = ['psycopg2-binary']} #or as below
+[project.optional-dependencies]
+server = ['psycopg2-binary']
+
 [tools.setuptools]
 license-files = ['LICEN[CS]*']
 
@@ -47,8 +51,9 @@ Repository = 'https://github.com/ubc-library-rc/dataverse_utils.git'
 dv_del = 'dataverse_utils.scripts.dv_del:main'
 dv_ldc_uploader = 'dataverse_utils.scripts.dv_ldc_uploader:main'
 dv_manifest_gen = 'dataverse_utils.scripts.dv_manifest_gen:main'
-dv_pg_facet_date = 'dataverse_utils.scripts.dv_pg_facet_date:main'
+dv_pg_facet_date = 'dataverse_utils.scripts.dv_pg_facet_date:main [server]'
 dv_record_copy = 'dataverse_utils.scripts.dv_record_copy:main'
 dv_release = 'dataverse_utils.scripts.dv_release:main'
-dv_replace_licenses = 'dataverse_utils.scripts.dv_replace_licenses:main'
+dv_replace_licence = 'dataverse_utils.scripts.dv_replace_licences:main'
+dv_replace_license = 'dataverse_utils.scripts.dv_replace_licences:main'
 dv_upload_tsv = 'dataverse_utils.scripts.dv_upload_tsv:main'
