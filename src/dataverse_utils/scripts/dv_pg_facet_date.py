@@ -24,12 +24,16 @@ import requests
 try:
     import psycopg2
 except ModuleNotFoundError:
-    print(('This software requires manual installation of '
-           'one of psycopg2-binary or psycopg2. ie: \n'
-           '\'pip install pyscopyg2-binary\''))
+    print(('Packge psycopg2 not found.'
+           'Either install dataverse_utils[server] or '
+           'Manually install psycopg2. \n'
+           'Generally, try \'pip install psycopg2-binary\' to  '
+           'install pre-compiled binaries. If unavailable for your '
+           'platform, use \'pip install pysycopg2\'.'
+           ))
     sys.exit()
 
-VERSION = (0, 1, 0)
+VERSION = (0, 1, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parsely() -> argparse.ArgumentParser: #HAHA it's parsley but misspelled.
@@ -94,8 +98,8 @@ def parse_dtype(dtype) -> str:
     mapper = {'distributionDate': ['dist', 'distributionDate'],
               'productionDate' : ['prod', 'productionDate'],
               'dateOfDeposit' : ['dep', 'dateOfDeposit']}
-    for key in mapper:
-        if dtype in mapper[key]:
+    for key, value in mapper.items():
+        if dtype in value:
             return key
     return None
 
@@ -112,7 +116,7 @@ def write_old(data) -> None:
         Postqres query output list (ie, data = cursor.fetchall())
     '''
     flag = os.path.exists('pg_changed.tsv')
-    with open('pg_changed.tsv', 'a') as tsv:
+    with open('pg_changed.tsv', 'a', encoding='utf-8') as tsv:
         writer = csv.writer(tsv, delimiter='\t')
         if not flag:
             writer.writerow(['id', 'authority', 'identifier', 'publicationdate'])
@@ -130,9 +134,9 @@ def write_sql(data) -> None:
     else:
         flag = 1
     if flag:
-        with open('pg_sql.sql') as sql:
+        with open('pg_sql.sql', encoding='utf-8') as sql:
             lines = list(sql)[:-1]
-    with open('pg_sql.sql', 'w') as sql:
+    with open('pg_sql.sql', 'w', encoding='utf-8') as sql:
         if not flag:
             sql.write('BEGIN;\n')
         if flag:
