@@ -1,4 +1,4 @@
-# Utility scripts
+# Console utilities 
 
 <style>
 code {
@@ -6,35 +6,33 @@ code {
 }
 </style>
 
-These scripts are available at the command line/command prompt and don't require any Python knowledge except how to install a Python library via pip, as outlined in the [overview](index.md) document.
+These utilities are available at the command line/command prompt and don't require any Python knowledge except how to install a Python library via pip, as outlined in the [overview](index.md) document.
 
-Once installed via pip, the scripts [_should_](#footnote) be available via the command line and will not require calling Python explicitly. That is, they can be called from the command line directly. For example:
+Once installed via pip, the scripts [will](#footnote) be available via the command line and will not require calling Python explicitly. That is, they can be called from the command line directly. For example:
 
-`dv_tsv_manifest.py`
+`dv_tsv_manifest`
 
 is all you will need to type.
 
-Note that these programs have been primarily tested on Linux and MacOS, with [Windows a tertiary priority](#footnote). Windows is notable for its unusual file  handling, so, as the MIT licenses stipulates, there is no warranty as to the suitability for a particular purpose.
+Note that these programs have been primarily tested on Linux and MacOS, with [Windows a tertiary priority](#footnote). Windows is notable for its unusual file  handling, so, as the MIT licence stipulates, there is no warranty as to the suitability for a particular purpose.
 
-Of course, they *should* work.
 
-In no particular order:
+In alphabetical order:
 
-## dv_del.py
+## dv_del
 
 This is bulk deletion utility for unpublished studies (or even single studies). It's useful when your automated procedures have gone wrong, or if you don't feel like navigating through many menus.
 
 Note the `-i` switch which can ask for manual confirmation of deletions.
 
-
 **Usage**
 
 ```nohighlight
-usage: dv_del.py [-h] -k KEY [-d DATAVERSE | -p PID] [-i] [-u DVURL] [--version]
+usage: dv_del [-h] -k KEY [-d DATAVERSE | -p PID] [-i] [-u DVURL] [--version]
 
 Delete draft studies from a Dataverse collection
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -k KEY, --key KEY     Dataverse user API key
   -d DATAVERSE, --dataverse DATAVERSE
@@ -47,7 +45,61 @@ optional arguments:
   --version             Show version number and exit
 ```
 
-##  dv_manifest_gen.py
+## dv_ldc_uploader
+
+This is a very specialized utility which will scrape metadata from the [Linguistic Data Consortium](https://www.ldc.upenn.edu/) (LDC) and create a metadata record in a Dataverse. The LDC does not have an API, so the metadata is scraped from their web site. This means that the metadata may not be quite as controlled as that which comes from an API. 
+
+Data from the LDC website is converted to [Dryad](https://datadryad.org)-style JSON via `dataverse_utils.ldc` via the use of the [dryad2dataverse](https://ubc-library-rc.github.io/dryad2dataverse) library.
+
+There are two main methods of use for this utility:
+
+1. Multiple metadata uploads. Multiple LDC record numbers can be supplied and a study without files will be created for each one.
+
+2. If a TSV file with file information is upplied via the `-t` or `--tsv` switch, the utility will upload a single LDC study and upload the contents of the tsv file to the created record.
+
+**Important note**
+As of early 2023, the LDC website is not supported by `certifi`. You will need to manually supply a certificate chain to use the utility.
+
+To obtain the certificate chain (in Firefox) perform the following steps:
+
+1. Select Tools/Page Info
+2. In the Security tab, select View Certificate
+3. Scroll to "PEM (chain)"
+4. Right click and "Save link as"
+
+Use this file for the -c/--certchain option below.
+
+Searching for "download pem certificate chain [browser]" in a search engine will undoubtedly bring up results for whatever browser you like.
+
+**Usage**
+
+```nohighlight
+usage: dv_ldc_uploader [-h] [-u URL] -k KEY [-d DVS] [-t TSV] [-r] [-n CNAME] [-c CERTCHAIN] [-e EMAIL] [-v] [--version] studies [studies ...]
+
+Linguistic Data Consortium metadata uploader for Dataverse. This utility will scrape the metadata from the LDC website (https://catalog.ldc.upenn.edu) and upload data based on a TSV
+manifest. Please note that this utility was built with the Abacus repository (https://abacus.library.ubc.ca) in mind, so many of the defaults are specific to that Dataverse installation.
+
+positional arguments:
+  studies               LDC Catalogue numbers to process, separated by spaces. eg. "LDC2012T19 LDC2011T07". Case is ignored, so "ldc2012T19" will also work.
+
+options:
+  -h, --help            show this help message and exit
+  -u URL, --url URL     Dataverse installation base URL. Defaults to "https://abacus.library.ubc.ca"
+  -k KEY, --key KEY     API key
+  -d DVS, --dvs DVS     Short name of target Dataverse collection (eg: ldc). Defaults to "ldc"
+  -t TSV, --tsv TSV     Manifest tsv file for uploading and metadata. If not supplied, only metadata will be uploaded. Using this option requires only one positional *studies* argument
+  -r, --no-restrict     Don't restrict files after upload.
+  -n CNAME, --cname CNAME
+                        Study contact name. Default: "Abacus support"
+  -c CERTCHAIN, --certchain CERTCHAIN
+                        Certificate chain PEM: use if SSL issues are present. The PEM chain must be downloaded with a browser. Default: None
+  -e EMAIL, --email EMAIL
+                        Dataverse study contact email address. Default: abacus-support@lists.ubc.ca
+  -v, --verbose         Verbose output
+  --version             Show version number and exit
+```
+
+##  dv_manifest_gen
 
 Not technically a Dataverse-specific script, this utility will generate a tab-separated value output. The file consists of 3 columns: **file, description and tags**, and optionally a **mimetype** column.
 
@@ -60,7 +112,7 @@ Using stdout and a redirect will also save time. First dump a file as normal. Ad
 **Usage**
 
 ```nohighlight
-usage: dv_manifest_gen.py [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [--version] [files [files ...]]
+usage: dv_manifest_gen [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [--version] [files ...]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
@@ -69,7 +121,7 @@ command and a dash (ie, "dv_manifest_gen.py -" produces full paths for some reas
 positional arguments:
   files                 Files to add to manifest. Leaving it blank will add all files in the current directory. If using -r will recursively show all.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -f FILENAME, --filename FILENAME
                         Save to file instead of outputting to stdout
@@ -84,107 +136,7 @@ optional arguments:
   --version             Show version number and exit
 ```
 
-## dv_upload_tsv.py
-
-Now that you have a tsv full of nicely described data, you can easily upload it to an existing study if you know the persistent ID and have an API key.
-
-For the best metadata, you should probably edit it manually to add correct descriptive metadata, notably the "Description" and "Tags". Tags are split separated by commas, so it's possible to have multiple tags for each data item, like "Data, SPSS, June 2021".
-
-File paths are automatically generated from the "file" column. Because of this, you should probably use relative paths rather than absolute paths unless you want to have a lengthy path string in Dataverse.
-
-If uploading a tsv which includes mimetypes, be aware that mimetypes for zip files will be ignored to circumvent Dataverse's automatic unzipping feature.
-
-The rationale for manually specifiying mimetypes is to enable the use of previews which require a specific mimetype to function, but Dataverse does not correctly detect the type. For example, the GeoJSON file previewer requires a mimetype of `application/geo+json`, but the detection of this mimetype is not supported until Dataverse v5.9. By manually setting the mimetype, the previewer can be used by earlier Dataverse versions.
-
-**Usage**
-
-```nohighlight
-usage: dv_upload_tsv.py [-h] -p PID -k KEY [-u URL] [-r] [-t TRUNCATE] [--version] [tsv]
-
-Uploads data sets to an *existing* Dataverse study from the contents of a TSV (tab separated value) file. Metadata, file tags, paths, etc are all read from the TSV. JSON output from the
-Dataverse API is printed to stdout during the process.
-
-positional arguments:
-  tsv                   TSV file to upload
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -p PID, --pid PID     Dataverse study persistent identifier (DOI/handle)
-  -k KEY, --key KEY     API key
-  -u URL, --url URL     Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
-  -r, --restrict        Restrict files after upload.
-  -t TRUNCATE, --truncate TRUNCATE
-                        Left truncate file path. As Dataverse studies can retain directory structure, you can set an arbitrary starting point by removing the leftmost portion. Eg: if the
-                        TSV has a file path of /home/user/Data/file.txt, setting --truncate to "/home/user" would have file.txt in the Data directory in the Dataverse study. The file is
-                        still loaded from the path in the spreadsheet. Defaults to no truncation.
-  --version             Show version number and exit
-```
-
-## dv_release.py
-
-A bulk release utility for Dataverse. This utility will normally be used after a migration or large data transfer, such as a [dryad2dataverse](https://ubc-library-rc.github.io/dryad2dataverse) transfer from the Dryad data repository. It can release studies individually by persistent ID or just release all unreleased files in a Dataverse.
-
-**Usage**
-
-```nohighlight
-usage: dv_release.py [-h] [-u URL] -k KEY [-i] [--time STIME] [-v] [-r] [-d DV | -p PID [PID ...]] [--version]
-
-Bulk file releaser for unpublished Dataverse studies. Either releases individual studies or all unreleased studies in a single Dataverse collection.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -u URL, --url URL     Dataverse installation base URL. Default: https://abacus.library.ubc.ca
-  -k KEY, --key KEY     API key
-  -i, --interactive     Manually confirm each release
-  --time STIME, -t STIME
-                        Time between release attempts in seconds. Default 10
-  -v                    Verbose mode
-  -r, --dry-run         Only output a list of studies to be released
-  -d DV, --dv DV        Short name of Dataverse collection to process (eg: statcan)
-  -p PID [PID ...], --pid PID [PID ...]
-                        Handles or DOIs to release in format hdl:11272.1/FK2/12345 or doi:10.80240/FK2/NWRABI. Multiple values OK
-  --version             Show version number and exit
-```
-
-## dv_ldc_uploader.py
-
-This is a very specialized utility which will scrape metadata from the [Linguistic Data Consortium](https://www.ldc.upenn.edu/) (LDC) and create a metadata record in a Dataverse. The LDC does not have an API, so the metadata is scraped from their web site. This means that the metadata may not be quite as controlled as that which comes from an API. 
-
-Data from the LDC website is converted to [Dryad](https://datadryad.org)-style JSON via `dataverse_utils.ldc` via the use of the [dryad2dataverse](https://ubc-library-rc.github.io/dryad2dataverse) library.
-
-There are two main methods of use for this utility:
-
-1. Multiple metadata uploads. Multiple LDC record numbers can be supplied and a study without files will be created for each one.
-
-2. If a TSV file with file information is upplied via the `-t` or `--tsv` switch, the utility will upload a single LDC study and upload the contents of the tsv file to the created record.
-
-**Usage**
-
-```nohighlight
-usage: dv_ldc_uploader.py [-h] [-u URL] -k KEY [-d DVS] [-t TSV] [-n CNAME] [-e EMAIL] [-v] [--version] studies [studies ...]
-
-Linguistic Data Consortium metadata uploader for Dataverse. This utility will scrape the metadata from the LDC website (https://catalog.ldc.upenn.edu) and upload data based on a TSV
-manifest. Please note that this utility was built with the Abacus repository (https://abacus.library.ubc.ca) in mind, so many of the defaults are specific to that Dataverse installation.
-
-positional arguments:
-  studies               LDC Catalogue numbers to process, separated by spaces. eg. "LDC2012T19 LDC2011T07". Case is ignored, so "ldc2012T19" will also work.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -u URL, --url URL     Dataverse installation base URL. Defaults to "https://abacus.library.ubc.ca"
-  -k KEY, --key KEY     API key
-  -d DVS, --dvs DVS     Short name of target Dataverse collection (eg: ldc). Defaults to "ldc"
-  -t TSV, --tsv TSV     Manifest tsv file for uploading and metadata. If not supplied, only metadata will be uploaded. Using this option requires only one positional *studies* argument
-  -n CNAME, --cname CNAME
-                        Study contact name. Default: "Abacus support"
-  -e EMAIL, --email EMAIL
-                        Dataverse study contact email address. Default: abacus-support@lists.ubc.ca
-  -v, --verbose         Verbose output
-  --version             Show version number and exit
-```
-
-
-## dv_pg_facet_date.py 
+## dv_pg_facet_date 
 
 This specialized tool is designed to be run on the **server** on which the Dataverse installation exists. When material is published in a Dataverse installation, the "Publication Year" facet in the Dataverse GUI is automatically populated with a date, which is the publication date *in that Dataverse installation*. This makes sense from the point of view of research data which is first deposited into a Dataverse installation, but fails as a finding aid for either;
 
@@ -206,14 +158,14 @@ There are a few other prerequisites for using this tool which differ from the re
 * If the database name and user have been changed, the user must know this as well
 * The script requires the manual installation of `psycopg2-binary` or have a successfully compiled `psycopg2` package for Python. See <https://www.psycopg.org/docs/>. This **is not installed** with the normal `pip install` of the *dataverse_utils* package as none of the other scripts require it and, in general, the odds of someone using this utility are low. If you forget to install it, the program will politely remind you.
 
-This cannot be stressed enough. **This tool will directly change values within the PostgreSQL database which holds all of Dataverse's information**. Use this at your own risk; no warranty is implied and no responsibility will be accepted for data loss, etc. If any of the items listed make no sense to you or sound like gibberish, do not use this tool.
+This cannot be stressed enough. **This tool will directly change values within the PostgreSQL database which holds all of Dataverse's information**. Use this at your own risk; no warranty is implied and no responsibility will be accepted for data loss, etc. If any of the options listed for the utility make no sense to you or sound like gibberish, do not use this tool.
 
 Because editing the underlying database may have a high pucker factor for some, there is both a dry-run option and an option to just dump out SQL instead of actually touching anything. These two options do not perform a study reindex and don't alter the contents of the database.
 
 **Usage**
 
 ```nohighlight
-usage: dv_pg_facet_date.py [-h] [-d DBNAME] [-u USER] -p PASSWORD [-r | -o] [-s] -k KEY [-w URL] [--version] pids [pids ...] {distributionDate,productionDate,dateOfDeposit,dist,prod,dep}
+usage: dv_pg_facet_date [-h] [-d DBNAME] [-u USER] -p PASSWORD [-r | -o] [-s] -k KEY [-w URL] [--version] pids [pids ...] {distributionDate,productionDate,dateOfDeposit,dist,prod,dep}
 
 A utility to change the 'Production Date' web interface facet in a Dataverse installation to one of the three acceptable date types: 'distributionDate', 'productionDate', or
 'dateOfDeposit'. This must be done in the PostgreSQL database directly, so this utility must be run on the *server* that hosts a Dataverse installation. Back up your database if you are
@@ -239,6 +191,103 @@ optional arguments:
   --version             Show version number and exit
 
 THIS WILL EDIT YOUR POSTGRESQL DATABASE DIRECTLY. USE AT YOUR OWN RISK.
+```
+
+## dv_record_copy
+
+Copies an existing Dataverse study metadata record to a target collection, or replaces a currently existing record. Files are not copied, only the study record. This utility is useful for mateial which is in a series, requiring only minor changes for each iteration.
+
+**Usage**
+
+```nohighlight
+usage: dv_record_copy [-h] [-u URL] -k KEY (-c COLLECTION | -r REPLACE) [-v] pid
+
+Record duplicator for Dataverse. This utility will download a Dataverse record And then upload the study level metadata
+into a new record in a user-specified collection. Please note that this utility was built with the Abacus repository
+(https://abacus.library.ubc.ca) in mind, so many of the defaults are specific to that Dataverse installation.
+
+positional arguments:
+  pid                   PID of original dataverse recordseparated by spaces. eg. "LDC2012T19 LDC2011T07". Case is
+                        ignored, so "ldc2012T19" will also work.
+
+options:
+  -h, --help            show this help message and exit
+  -u URL, --url URL     Dataverse installation base URL. Defaults to "https://abacus.library.ubc.ca"
+  -k KEY, --key KEY     API key
+  -c COLLECTION, --collection COLLECTION
+                        Short name of target Dataverse collection (eg: ldc). Defaults to "ldc"
+  -r REPLACE, --replace REPLACE
+                        Replace metadata data in record with this PID
+  -v, --version         Show version number and exit
+```
+
+## dv_release
+
+A bulk release utility for Dataverse. This utility will normally be used after a migration or large data transfer, such as a [dryad2dataverse](https://ubc-library-rc.github.io/dryad2dataverse) transfer from the Dryad data repository. It can release studies individually by persistent ID or just release all unreleased files in a Dataverse.
+
+**Usage**
+
+```nohighlight
+usage: dv_release [-h] [-u URL] -k KEY [-i] [--time STIME] [-v] [-r] [-d DV | -p PID [PID ...]] [--version]
+
+Bulk file releaser for unpublished Dataverse studies. Either releases individual studies or all unreleased studies in a single Dataverse collection.
+
+options:
+  -h, --help            show this help message and exit
+  -u URL, --url URL     Dataverse installation base URL. Default: https://abacus.library.ubc.ca
+  -k KEY, --key KEY     API key
+  -i, --interactive     Manually confirm each release
+  --time STIME, -t STIME
+                        Time between release attempts in seconds. Default 10
+  -v                    Verbose mode
+  -r, --dry-run         Only output a list of studies to be released
+  -d DV, --dv DV        Short name of Dataverse collection to process (eg: statcan)
+  -p PID [PID ...], --pid PID [PID ...]
+                        Handles or DOIs to release in format hdl:11272.1/FK2/12345 or doi:10.80240/FK2/NWRABI. Multiple values OK
+  --version             Show version number and exit
+```
+
+##dv_replace_licen[cs]e
+
+This will replace the text in a record with the text Markdown file. Text is converted to HTML. Optionally, the record can be republished without incrementing the version (ie, with `type=updatecurrent`.
+
+```nohighlight
+``` 
+
+## dv_upload_tsv
+
+Now that you have a tsv full of nicely described data, you can easily upload it to an existing study if you know the persistent ID and have an API key.
+
+For the best metadata, you should probably edit it manually to add correct descriptive metadata, notably the "Description" and "Tags". Tags are split separated by commas, so it's possible to have multiple tags for each data item, like "Data, SPSS, June 2021".
+
+File paths are automatically generated from the "file" column. Because of this, you should probably use relative paths rather than absolute paths unless you want to have a lengthy path string in Dataverse.
+
+If uploading a tsv which includes mimetypes, be aware that mimetypes for zip files will be ignored to circumvent Dataverse's automatic unzipping feature.
+
+The rationale for manually specifiying mimetypes is to enable the use of previews which require a specific mimetype to function, but Dataverse does not correctly detect the type. For example, the GeoJSON file previewer requires a mimetype of `application/geo+json`, but the detection of this mimetype is not supported until Dataverse v5.9. By manually setting the mimetype, the previewer can be used by earlier Dataverse versions.
+
+**Usage**
+
+```nohighlight
+usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-t TRUNCATE] [--version] [tsv]
+
+Uploads data sets to an *existing* Dataverse study from the contents of a TSV (tab separated value) file. Metadata, file tags, paths, etc are all read from the TSV. JSON output from the
+Dataverse API is printed to stdout during the process.
+
+positional arguments:
+  tsv                   TSV file to upload
+
+options:
+  -h, --help            show this help message and exit
+  -p PID, --pid PID     Dataverse study persistent identifier (DOI/handle)
+  -k KEY, --key KEY     API key
+  -u URL, --url URL     Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
+  -r, --restrict        Restrict files after upload.
+  -t TRUNCATE, --truncate TRUNCATE
+                        Left truncate file path. As Dataverse studies can retain directory structure, you can set an arbitrary starting point by removing the leftmost portion. Eg: if the
+                        TSV has a file path of /home/user/Data/file.txt, setting --truncate to "/home/user" would have file.txt in the Data directory in the Dataverse study. The file is
+                        still loaded from the path in the spreadsheet. Defaults to no truncation.
+  --version             Show version number and exit
 ```
 
 <a name='footnote' />

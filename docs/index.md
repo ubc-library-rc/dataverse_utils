@@ -1,8 +1,19 @@
 # Dataverse utilities
 
-This is a generalized set of utilities which help with managing [Dataverse](https://dataverse.org) repositories. These utilities are _ad-hoc_, written as needed and subject to change.
+This is a generalized set of utilities which help with managing [Dataverse](https://dataverse.org) repositories. This has *nothing* to do with the Microsoft product of the same name. Despite being written as they were required, that doesn't mean they're not useful or user-friendly. 
 
-That being said, the effort is being made to make this a useful library. Source code (and this documentation) is available at the Github repository <https://github.com/ubc-library-rc/dataverse_utils>, and the user-friendly version of the documentation is at <https://ubc-library-rc.github.io/dataverse_utils>.
+With these utilities you can:
+
+* Upload your data sets from a tab-separated-value spreadsheet
+* Bulk release multiple data sets
+* Bulk delete (unpublished) assets
+* Quickly duplicate records
+* Replace licences
+* and more!
+
+**Get your copy today!**
+
+Source code (and this documentation) is available at the Github repository <https://github.com/ubc-library-rc/dataverse_utils>, and the user-friendly version of the documentation is at <https://ubc-library-rc.github.io/dataverse_utils>. Presumably you know this already otherwise you wouldn't be reading this.
 
 ## Installation
 
@@ -11,60 +22,78 @@ Any installation will require the use of the command line/command prompt.
 The easiest installation is with `pip`:
 
 ```nohighlight
-pip install git+https://github.com/ubc-library-rc/dataverse_utils@master
+pip install dataverse_utils
 ```
 
-### Upgrading
-Upgrading is slightly different than the usual `pip` method, because it's not coming from pypi:
+There is also a *server specific version* if you need to use the **dv_facet_date** utility. This can *only* be run on a server hosting a Dataverse instance, so for the vast majority of users it will be unusable.
+
+This can also be installed with `pip`:
 
 ```nohighlight
-pip install --upgrade git+https://github.com/ubc-library-rc/dataverse_utils@master
+pip install 'dataverse_utils[server]'
 ```
-Sadly, it's more to type than a normal `pip` upgrade string.
+
+Note the extra quotes. You can install the server version if you want to, but it's useless without server access.
+
+### Upgrading
+
+Just as easy as installation:
+
+```nohighlight
+pip install --upgrade dataverse_utils
+```
 
 Other methods of installing Python packages can be found at <https://packaging.python.org/tutorials/installing-packages/>.
 
-If you have [mkdocs](https://www.mkdocs.org) installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the  *Github repo* by running `mkdocs serve`.
+### Downloading the source code
+
+Source code is available at <https://github.com/ubc-library-rc/dataverse_utils>. Working on the assumption that `git` is installed, you can download the whole works with:
+
+`git clone https://github.com/ubc-library-rc/dataverse_utils`
+
+If you have [mkdocs](https://www.mkdocs.org) installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the *downloaded source files* by running `mkdocs serve`.
 
 ## The components
 
-### Scripts
+### Console utilities 
 
-There are six (6) scripts currently available.
+There are eight (8) console utilities currently available.
 
 * **dv_del.py**: Bulk (unpublished) file deletion utility
 
-* **dv_ldc_uploader.py**: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files.
+* **dv_ldc_uploader.py**: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. **As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain**. Don't worry, that's not as hard as it sounds.
 
 * **dv_manifest_gen.py**: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.
 
+* **dv_pg_facet_date.py**: A server-based tool which updates the publication date facet and performs a study reindex.
+
+* **dv_record_copy.py**: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.
+
 * **dv_release.py**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
+
+* **dv_replace_licences**: Replaces the licence associated with a PID with text from a Markdown file. Also available as **dv_replace_licenses** for those using American English.
 
 * **dv_upload_tsv.py**: Takes a tsv file in the format from *dv_manifest_gen.py* and does all the uploading and metadata entry.
 
-* **dv_pg_facet_date.py**: A server-based tool which updates the publication date facet and performs a study reindex.
 
-More information about these can be found on the [scripts page](scripts.md).
+More information about these can be found on the [console utilities page](scripts.md).
 
-### Python library: dataverse_utils
+### Python package: dataverse_utils
 
-The default feature set from `import dataverse_utils` (or, more easily, `import dataverse_utils as du` is designed to work with data already present locally.
+This package contains a variety of utility functions which, for the most part, allow uploads of files and associated metadata without having to touch the Dataverse GUI or to have complex JSON attached.
 
-The idea of this portion is to create a tsv file manifest for files which are to be uploaded to a Dataverse instance. Once the manifest is created, it's edited to add descriptive metadata, file paths and tags. Then, the manifest is used to upload those files to a an existing Dataverse study.
+For example, the `upload_file` requires no JSON attachments:
 
 ```
-import dataverse_utils as du
-du.dump_tsv('.', '/Users/you/tmp/testme.tsv')
-[Edit the .tsv at this stage here]
-du.upload_from_tsv(fil='/Users/you/tmp/testme.tsv',
-                   hdl='hdl:PERSIST/ID',
-		   dv='https://dataverse.invalid'
-		   apikey='IAM-YOUR-DVERSE-APIKEY')
+dataverse_utils.upload_file('/path/to/file.ext',
+                            dv='https://targetdataverse.invalid'
+                            descr='A file description',
+                            tags=['Data', 'Example', 'Spam'],
+                            dirlabel=['path/to/spam'],
+                            mimetype='application/geo+json') 
 ```
 
-The tsv should be edited to have a description. Tags should be separated by commas in the "Tags" column.
-
-If you are using relative paths, make sure that the script you are using is reading from the correct location.
+Consult the [API reference](api_ref.md) for full details.
 
 #### ldc
 
@@ -98,9 +127,3 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 Note that one method uses `key` and the other `apikey`. This is what is known as _ad hoc_. 
 
 More information is available at the [API reference](api_ref.md).
-
-### Samples
-
-The `sample` directory contains Python scripts which demonstrate the usage of the _dataverse_utils_ library. They're not necessarily complete examples or optimized. Or even present, intially. You know,  _ad_hoc_.
-
-

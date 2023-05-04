@@ -1,10 +1,29 @@
-# Running the dataverse_utils scripts under Windows
+# Running the dataverse_utils console utilities under Windows
 
 On Mac and Linux, running the scripts supplied with `dataverse_utils` is straightforward. They're available at the command line, which means that you can simply run them by (for example):
 
 `$ dv_manifest_gen.py` followed by switches and variables as normal.
 
 Doing this results in output to the terminal window. **This is not necessarily the case in Windows**.
+
+Whether or not the utility appears on the Windows command line will likely depend on the shell you installed it with:
+
+Commonly used shells on Windows include, but are not limited to:
+
+* Command prompt (cmd.exe) 
+* PowerShell
+* Git bash
+* Cygwin
+
+If the utilities are not functioning the way you are expecting, make sure that Python and the install location is in your PATH.
+
+As of version 0.8.3 the installation has been updated to use newer packaging standards which will ideally reduce the frequency of installation problems. 
+
+Also as of v0.8.3, the .py suffix has been removed from the console utilities. This means if you are forced to run a command manually, it would be run with `python [utilityname]` **not** `python [utilityname.py]`
+
+## Troubleshooting 
+
+These are (likely deprecated) notes from testing on a variety of Windows installations. If you're luckly, a solution can be found below.
 
 This test case uses a new installation of <https://python.org> Python, v.3.9.6, installed in Windows using the GUI, so it's as basic a Windows installation as you can get.
 

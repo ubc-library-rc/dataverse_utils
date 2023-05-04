@@ -2,9 +2,10 @@ site_name: 'dataverse_utils'
 docs_dir: 'docs'
 nav:
   - Overview: index.md
+  - Console utilities: scripts.md
   - API reference: api_ref.md
-  - Scripts: scripts.md
   - FAQ: faq.md
+  - Windows notes: windows.md
   - Credits: credits.md
 
 markdown_extensions:
