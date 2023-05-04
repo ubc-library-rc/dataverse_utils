@@ -1,108 +1,125 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Running the dataverse_utils scripts under Windows - dataverse_utils</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="../css/theme.css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Running the dataverse_utils scripts under Windows";
-    var mkdocs_page_input_path = "windows.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Windows notes - dataverse_utils</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Windows notes";
+        var mkdocs_page_input_path = "windows.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> dataverse_utils</a>
-        <div role="search">
+          <a href=".." class="icon icon-home"> dataverse_utils
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../api_ref/">API reference</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../scripts/">Scripts</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
-                    </li>
-                </ul>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../scripts/">Console utilities</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api_ref/">API reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Windows notes</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#windows-terminal-type">Windows Terminal type</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#powershell">PowerShell</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#command-prompt">Command prompt</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#ssh-session">SSH session</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#git-bash">Git Bash</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
+                </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">dataverse_utils</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">dataverse_utils</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Running the dataverse_utils scripts under Windows</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li>Windows notes</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
-                <h1 id="running-the-dataverse_utils-scripts-under-windows">Running the dataverse_utils scripts under Windows<a class="headerlink" href="#running-the-dataverse_utils-scripts-under-windows" title="Permanent link">&para;</a></h1>
+                <h1 id="running-the-dataverse_utils-console-utilities-under-windows">Running the dataverse_utils console utilities under Windows<a class="headerlink" href="#running-the-dataverse_utils-console-utilities-under-windows" title="Permanent link">&para;</a></h1>
 <p>On Mac and Linux, running the scripts supplied with <code>dataverse_utils</code> is straightforward. They&rsquo;re available at the command line, which means that you can simply run them by (for example):</p>
 <p><code>$ dv_manifest_gen.py</code> followed by switches and variables as normal.</p>
 <p>Doing this results in output to the terminal window. <strong>This is not necessarily the case in Windows</strong>.</p>
+<p>Whether or not the utility appears on the Windows command line will likely depend on the shell you installed it with:</p>
+<p>Commonly used shells on Windows include, but are not limited to:</p>
+<ul>
+<li>Command prompt (cmd.exe) </li>
+<li>PowerShell</li>
+<li>Git bash</li>
+<li>Cygwin</li>
+</ul>
+<p>If the utilities are not functioning the way you are expecting, make sure that Python and the install location is in your PATH.</p>
+<p>As of version 0.8.3 the installation has been updated to use newer packaging standards which will ideally reduce the frequency of installation problems. </p>
+<p>Also as of v0.8.3, the .py suffix has been removed from the console utilities. This means if you are forced to run a command manually, it would be run with <code>python [utilityname]</code> <strong>not</strong> <code>python [utilityname.py]</code></p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p>These are (likely deprecated) notes from testing on a variety of Windows installations. If you&rsquo;re luckly, a solution can be found below.</p>
 <p>This test case uses a new installation of <a href="https://python.org">https://python.org</a> Python, v.3.9.6, installed in Windows using the GUI, so it&rsquo;s as basic a Windows installation as you can get.</p>
 <p>In this instance, <code>dataverse_utils</code> were installed using pip from the PowerShell, ie <code>pip install git+https://github.com/ubc-library-rc/dataverse_utils</code>. However, pip should be pip regardless of which console you use to install.</p>
 <p>Here&rsquo;s a handy guide to show the results of how/if the command line scripts run. This example uses <code>dv_manifest.gen.py</code>, but appears to be generally applicable to any scripts configured with setuptools.setup()  (ie, <code>setuptools.setup(scripts=[whatever]</code>). If this means nothing to you because you&rsquo;re not distributing your own Python packages,, just skip to the table below.</p>
@@ -159,20 +176,21 @@
 <p>There are many options for Git Bash installation; testing has not covered all possible permutations of installation options.</p>
               
             </div>
-          </div>
-          <footer>
-  
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../faq/" class="btn btn-neutral float-left" title="FAQ"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../credits/" class="btn btn-neutral float-right" title="Credits">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -180,14 +198,19 @@
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../faq/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../credits/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
     <script src="../js/theme.js" defer></script>
       <script src="../search/main.js" defer></script>
     <script defer>

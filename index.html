@@ -1,186 +1,192 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="None">
-  
-  
-  <link rel="shortcut icon" href="img/favicon.ico">
-  <title>dataverse_utils</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
-
-  <link rel="stylesheet" href="css/theme.css" />
-  <link rel="stylesheet" href="css/theme_extra.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Overview";
-    var mkdocs_page_input_path = "index.md";
-    var mkdocs_page_url = null;
-  </script>
-  
-  <script src="js/jquery-2.1.1.min.js" defer></script>
-  <script src="js/modernizr-2.8.3.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>dataverse_utils</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Overview";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> dataverse_utils</a>
-        <div role="search">
+          <a href="." class="icon icon-home"> dataverse_utils
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-                <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Overview</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Overview</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#upgrading">Upgrading</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#downloading-the-source-code">Downloading the source code</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#the-components">The components</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#scripts">Scripts</a>
+    <li class="toctree-l3"><a class="reference internal" href="#console-utilities">Console utilities</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#python-library-dataverse_utils">Python library: dataverse_utils</a>
+    <li class="toctree-l3"><a class="reference internal" href="#python-package-dataverse_utils">Python package: dataverse_utils</a>
         <ul>
     <li class="toctree-l4"><a class="reference internal" href="#ldc">ldc</a>
     </li>
         </ul>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#samples">Samples</a>
-    </li>
         </ul>
     </li>
     </ul>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="api_ref/">API reference</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="scripts/">Scripts</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="faq/">FAQ</a>
-                    </li>
-                </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="credits/">Credits</a>
-                    </li>
-                </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="scripts/">Console utilities</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="api_ref/">API reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="faq/">FAQ</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="windows/">Windows notes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="credits/">Credits</a>
+                </li>
+              </ul>
       </div>
     </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href=".">dataverse_utils</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">dataverse_utils</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Overview</li>
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li>Overview</li>
     <li class="wy-breadcrumbs-aside">
-      
     </li>
   </ul>
-  
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h1 id="dataverse-utilities">Dataverse utilities<a class="headerlink" href="#dataverse-utilities" title="Permanent link">&para;</a></h1>
-<p>This is a generalized set of utilities which help with managing <a href="https://dataverse.org">Dataverse</a> repositories. These utilities are <em>ad-hoc</em>, written as needed and subject to change.</p>
-<p>That being said, the effort is being made to make this a useful library. Source code (and this documentation) is available at the Github repository <a href="https://github.com/ubc-library-rc/dataverse_utils">https://github.com/ubc-library-rc/dataverse_utils</a>, and the user-friendly version of the documentation is at <a href="https://ubc-library-rc.github.io/dataverse_utils">https://ubc-library-rc.github.io/dataverse_utils</a>.</p>
+<p>This is a generalized set of utilities which help with managing <a href="https://dataverse.org">Dataverse</a> repositories. This has <em>nothing</em> to do with the Microsoft product of the same name. Despite being written as they were required, that doesn&rsquo;t mean they&rsquo;re not useful or user-friendly. </p>
+<p>With these utilities you can:</p>
+<ul>
+<li>Upload your data sets from a tab-separated-value spreadsheet</li>
+<li>Bulk release multiple data sets</li>
+<li>Bulk delete (unpublished) assets</li>
+<li>Quickly duplicate records</li>
+<li>Replace licences</li>
+<li>and more!</li>
+</ul>
+<p><strong>Get your copy today!</strong></p>
+<p>Source code (and this documentation) is available at the Github repository <a href="https://github.com/ubc-library-rc/dataverse_utils">https://github.com/ubc-library-rc/dataverse_utils</a>, and the user-friendly version of the documentation is at <a href="https://ubc-library-rc.github.io/dataverse_utils">https://ubc-library-rc.github.io/dataverse_utils</a>. Presumably you know this already otherwise you wouldn&rsquo;t be reading this.</p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
 <p>Any installation will require the use of the command line/command prompt.</p>
 <p>The easiest installation is with <code>pip</code>:</p>
-<pre class="codehilite"><code class="language-nohighlight">pip install git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
-
-
+<pre><code class="language-nohighlight">pip install dataverse_utils
+</code></pre>
+<p>There is also a <em>server specific version</em> if you need to use the <strong>dv_facet_date</strong> utility. This can <em>only</em> be run on a server hosting a Dataverse instance, so for the vast majority of users it will be unusable.</p>
+<p>This can also be installed with <code>pip</code>:</p>
+<pre><code class="language-nohighlight">pip install 'dataverse_utils[server]'
+</code></pre>
+<p>Note the extra quotes. You can install the server version if you want to, but it&rsquo;s useless without server access.</p>
 <h3 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h3>
-<p>Upgrading is slightly different than the usual <code>pip</code> method, because it&rsquo;s not coming from pypi:</p>
-<pre class="codehilite"><code class="language-nohighlight">pip install --upgrade git+https://github.com/ubc-library-rc/dataverse_utils@master</code></pre>
-
-
-<p>Sadly, it&rsquo;s more to type than a normal <code>pip</code> upgrade string.</p>
+<p>Just as easy as installation:</p>
+<pre><code class="language-nohighlight">pip install --upgrade dataverse_utils
+</code></pre>
 <p>Other methods of installing Python packages can be found at <a href="https://packaging.python.org/tutorials/installing-packages/">https://packaging.python.org/tutorials/installing-packages/</a>.</p>
-<p>If you have <a href="https://www.mkdocs.org">mkdocs</a> installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the  <em>Github repo</em> by running <code>mkdocs serve</code>.</p>
+<h3 id="downloading-the-source-code">Downloading the source code<a class="headerlink" href="#downloading-the-source-code" title="Permanent link">&para;</a></h3>
+<p>Source code is available at <a href="https://github.com/ubc-library-rc/dataverse_utils">https://github.com/ubc-library-rc/dataverse_utils</a>. Working on the assumption that <code>git</code> is installed, you can download the whole works with:</p>
+<p><code>git clone https://github.com/ubc-library-rc/dataverse_utils</code></p>
+<p>If you have <a href="https://www.mkdocs.org">mkdocs</a> installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the <em>downloaded source files</em> by running <code>mkdocs serve</code>.</p>
 <h2 id="the-components">The components<a class="headerlink" href="#the-components" title="Permanent link">&para;</a></h2>
-<h3 id="scripts">Scripts<a class="headerlink" href="#scripts" title="Permanent link">&para;</a></h3>
-<p>There are six (6) scripts currently available.</p>
+<h3 id="console-utilities">Console utilities<a class="headerlink" href="#console-utilities" title="Permanent link">&para;</a></h3>
+<p>There are eight (8) console utilities currently available.</p>
 <ul>
 <li>
 <p><strong>dv_del.py</strong>: Bulk (unpublished) file deletion utility</p>
 </li>
 <li>
-<p><strong>dv_ldc_uploader.py</strong>: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files.</p>
+<p><strong>dv_ldc_uploader.py</strong>: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. <strong>As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain</strong>. Don&rsquo;t worry, that&rsquo;s not as hard as it sounds.</p>
 </li>
 <li>
 <p><strong>dv_manifest_gen.py</strong>: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.</p>
 </li>
 <li>
+<p><strong>dv_pg_facet_date.py</strong>: A server-based tool which updates the publication date facet and performs a study reindex.</p>
+</li>
+<li>
+<p><strong>dv_record_copy.py</strong>: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.</p>
+</li>
+<li>
 <p><strong>dv_release.py</strong>: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.</p>
+</li>
+<li>
+<p><strong>dv_replace_licences</strong>: Replaces the licence associated with a PID with text from a Markdown file. Also available as <strong>dv_replace_licenses</strong> for those using American English.</p>
 </li>
 <li>
 <p><strong>dv_upload_tsv.py</strong>: Takes a tsv file in the format from <em>dv_manifest_gen.py</em> and does all the uploading and metadata entry.</p>
 </li>
-<li>
-<p><strong>dv_pg_facet_date.py</strong>: A server-based tool which updates the publication date facet and performs a study reindex.</p>
-</li>
 </ul>
-<p>More information about these can be found on the <a href="scripts/">scripts page</a>.</p>
-<h3 id="python-library-dataverse_utils">Python library: dataverse_utils<a class="headerlink" href="#python-library-dataverse_utils" title="Permanent link">&para;</a></h3>
-<p>The default feature set from <code>import dataverse_utils</code> (or, more easily, <code>import dataverse_utils as du</code> is designed to work with data already present locally.</p>
-<p>The idea of this portion is to create a tsv file manifest for files which are to be uploaded to a Dataverse instance. Once the manifest is created, it&rsquo;s edited to add descriptive metadata, file paths and tags. Then, the manifest is used to upload those files to a an existing Dataverse study.</p>
-<pre class="codehilite"><code>import dataverse_utils as du
-du.dump_tsv('.', '/Users/you/tmp/testme.tsv')
-[Edit the .tsv at this stage here]
-du.upload_from_tsv(fil='/Users/you/tmp/testme.tsv',
-                   hdl='hdl:PERSIST/ID',
-           dv='https://dataverse.invalid'
-           apikey='IAM-YOUR-DVERSE-APIKEY')</code></pre>
-
-
-<p>The tsv should be edited to have a description. Tags should be separated by commas in the &ldquo;Tags&rdquo; column.</p>
-<p>If you are using relative paths, make sure that the script you are using is reading from the correct location.</p>
+<p>More information about these can be found on the <a href="scripts/">console utilities page</a>.</p>
+<h3 id="python-package-dataverse_utils">Python package: dataverse_utils<a class="headerlink" href="#python-package-dataverse_utils" title="Permanent link">&para;</a></h3>
+<p>This package contains a variety of utility functions which, for the most part, allow uploads of files and associated metadata without having to touch the Dataverse GUI or to have complex JSON attached.</p>
+<p>For example, the <code>upload_file</code> requires no JSON attachments:</p>
+<pre><code>dataverse_utils.upload_file('/path/to/file.ext',
+                            dv='https://targetdataverse.invalid'
+                            descr='A file description',
+                            tags=['Data', 'Example', 'Spam'],
+                            dirlabel=['path/to/spam'],
+                            mimetype='application/geo+json') 
+</code></pre>
+<p>Consult the <a href="api_ref/">API reference</a> for full details.</p>
 <h4 id="ldc">ldc<a class="headerlink" href="#ldc" title="Permanent link">&para;</a></h4>
 <p>The <code>ldc</code> component represents the <a href="https://catalog.ldc.upenn.edu/">Linguistic Data Consortium</a> or LDC. The ldc module is designed to harvest LDC metadata from its catalogue, convert it to Dataverse JSON, then upload it to a Dataverse installation. Once the study has been created, the general <code>dataverse_utils</code> module can handle the file uploading.</p>
 <p>The <code>ldc</code> module requires the <a href="https://github.com/ubc-library-rc/dryad2dataverse">dryad2dataverse</a> package.</p>
 <p>Because of this, it requires a tiny bit more effort, because LDC material doesn&rsquo;t have the required metadata. Here&rsquo;s snippet that shows how it works.</p>
-<pre class="codehilite"><code>import dataverse_utils.ldc as ldc
+<pre><code>import dataverse_utils.ldc as ldc
 
 ldc.ds.constants.DV_CONTACT_EMAIL='iamcontact@test.invalid'
 ldc.ds.constants.DV_CONTACT_NAME='Generic Support Email'
@@ -198,36 +204,26 @@ hdl =  info['data']['persistentId']
 
 with open('/Users/you/tmp/testme.tsv') as fil:
     du.upload_from_tsv(fil, hdl=hdl,dv='https://dataverse.invalid', 
-                       apikey=KEY)</code></pre>
-
-
+                       apikey=KEY)
+</code></pre>
 <p>Note that one method uses <code>key</code> and the other <code>apikey</code>. This is what is known as <em>ad hoc</em>. </p>
 <p>More information is available at the <a href="api_ref/">API reference</a>.</p>
-<h3 id="samples">Samples<a class="headerlink" href="#samples" title="Permanent link">&para;</a></h3>
-<p>The <code>sample</code> directory contains Python scripts which demonstrate the usage of the <em>dataverse_utils</em> library. They&rsquo;re not necessarily complete examples or optimized. Or even present, intially. You know,  <em>ad_hoc</em>.</p>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="api_ref/" class="btn btn-neutral float-right" title="API reference">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="scripts/" class="btn btn-neutral float-right" title="Console utilities">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+          
         </div>
       </div>
 
@@ -235,16 +231,17 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 
   </div>
 
-  <div class="rst-versions" role="note" aria-label="versions">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-      
-        <span style="margin-left: 15px"><a href="api_ref/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="scripts/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
     <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
     <script src="js/theme.js" defer></script>
       <script src="search/main.js" defer></script>
     <script defer>
@@ -257,6 +254,6 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 </html>
 
 <!--
-MkDocs version : 1.1.2
-Build Date UTC : 2022-04-26 15:29:01.218914+00:00
+MkDocs version : 1.4.3
+Build Date UTC : 2023-05-04 22:06:00.132677+00:00
 -->
