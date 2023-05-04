@@ -11,8 +11,9 @@ import json
 import markdown
 import requests
 
-VERSION = (0, 1, 0)
+VERSION = (0, 1, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
+TIMEOUT = 100
 
 def parsley() -> argparse.ArgumentParser() :
     '''
@@ -22,13 +23,13 @@ def parsley() -> argparse.ArgumentParser() :
                   'Dataverse study and republishes it '
                   'as the same version. '
                   'Superuser privileges are required for '
-                  'republishing as the version is not incremented.'
+                  'republishing as the version is not incremented. '
                   'This software requires the Dataverse installation '
                   'to be running Dataverse software version >= 5.6.')
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('studies', nargs='+', help='Persistent IDs of studies')
     parser.add_argument('-u', '--url',
-                        help=('Base URL of Dataverse installation'
+                        help=('Base URL of Dataverse installation. '
                               'Defaults to "https://abacus.library.ubc.ca"'),
                         default='https://abacus.library.ubc.ca')
     parser.add_argument('-l', '--license', help='License file in Markdown format',
@@ -67,7 +68,7 @@ def replace_licence(hdl, lic, key,
             '@context' : {'dvcore' : 'https://dataverse.org/schema/core#'}}
     req = requests.put(f'{url}/api/datasets/:persistentId/metadata',
                        headers=headers, params=params,
-                       json=data)
+                       json=data, timeout=TIMEOUT)
     try:
         req.raise_for_status()
         return req.json()
@@ -90,7 +91,8 @@ def republish(hdl, key, url='https://abacus.library.ubc.ca'):
     headers = {'X-Dataverse-key' : key}
     params = {'persistentId' : hdl, 'type':'updatecurrent'}
     req = requests.post(f'{url}/api/datasets/:persistentId/actions/:publish',
-                        headers=headers, params=params)
+                        headers=headers, params=params,
+                        timeout=TIMEOUT)
     try:
         req.raise_for_status()
         return req.json()
@@ -117,7 +119,7 @@ def main():
     parse = parsley()
     args = parse.parse_args()
     args.url = args.url.strip('/ ')
-    with open(args.lic) as fil:
+    with open(args.lic, encoding='utf-8') as fil:
         newlic = fil.read()
     for pid in args.studies:
         print(f'Changing license for {pid}')
