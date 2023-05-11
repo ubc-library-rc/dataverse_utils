@@ -252,6 +252,22 @@ options:
 This will replace the text in a record with the text Markdown file. Text is converted to HTML. Optionally, the record can be republished without incrementing the version (ie, with `type=updatecurrent`.
 
 ```nohighlight
+usage: dv_replace_licence [-h] [-u URL] -l LIC -k KEY [-r] [--version] studies [studies ...]
+
+Replaces the licence text in a Dataverse study and [optionally] republishes it as the same version. Superuser privileges are required for republishing as the version is not incremented.
+This software requires the Dataverse installation to be running Dataverse software version >= 5.6.
+
+positional arguments:
+  studies               Persistent IDs of studies
+
+options:
+  -h, --help            show this help message and exit
+  -u URL, --url URL     Base URL of Dataverse installation. Defaults to "https://abacus.library.ubc.ca"
+  -l LIC, --licence LIC
+                        Licence file in Markdown format
+  -k KEY, --key KEY     Dataverse API key
+  -r, --republish       Republish study without incrementing version
+  --version             Show version number and exit
 ``` 
 
 ## dv_upload_tsv
