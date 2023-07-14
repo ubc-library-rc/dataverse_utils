@@ -52,7 +52,7 @@ def _make_info(dv_url, study, apikey) -> tuple:
     params = {'persistentId': study}
     return (dv_url, headers, params)
 
-def make_tsv(start_dir, in_list=None, def_tag='Data',
+def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many-arguments
              inc_header=True,
              mime=False,
              quotype=csv.QUOTE_MINIMAL) -> str:
@@ -172,7 +172,7 @@ def dump_tsv(start_dir, filename, in_list=None,
     quotype = kwargs.get('quotype', csv.QUOTE_MINIMAL)
 
     dumper = make_tsv(start_dir, in_list, def_tag, inc_header, mime, quotype)
-    with open(filename, 'w', newline='') as tsvfile:
+    with open(filename, 'w', newline='', encoding='utf-8') as tsvfile:
         tsvfile.write(dumper)
 
 def file_path(fpath, trunc='') -> str:
@@ -400,7 +400,7 @@ def upload_file(fpath, hdl, **kwargs):
                 'directoryLabel': kwargs.get('dirlabel', ''),
                 'categories': kwargs.get('tags', [])}
     fpath = os.path.abspath(fpath)
-    fields = {'file': (file_name, open(fpath, 'rb'), mime)}
+    fields = {'file': (file_name, open(fpath, 'rb'), mime)}#pylint: disable=consider-using-with
     #fields.update({'jsonData' : f'{dv4_meta}'})
     fields.update({'jsonData' : json.dumps(dv4_meta)})
     multi = MultipartEncoder(fields=fields) # use multipart streaming for large files
@@ -408,7 +408,7 @@ def upload_file(fpath, hdl, **kwargs):
                'Content-type' : multi.content_type}
     params = {'persistentId' : hdl}
 
-    print(multi)
+    #print(multi)
 
     LOGGER.info('Uploading %s to %s', fpath, hdl)
     upload = requests.post(f"{dvurl}/api/datasets/:persistentId/add",
@@ -490,10 +490,11 @@ def restrict_file(**kwargs):
         rest = requests.put(f'{kwargs["dv"]}/api/files/:persistentId/restrict',
                             headers=headers,
                             params=params,
-                            data=rest)
+                            data=rest,
+                            timeout=300)
     elif kwargs.get('fid'):
         rest = requests.put(f'{kwargs["dv"]}/api/files/{kwargs["fid"]}/restrict',
-                            headers=headers, data=rest)
+                            headers=headers, data=rest, timeout=300)
     else:
         LOGGER.error('No file ID/PID supplied for file restriction')
         raise KeyError('One of persistentId (pid) or database ID'
