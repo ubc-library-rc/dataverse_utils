@@ -114,7 +114,8 @@ class File(dict):
 
     def download_file(self):
         '''
-        Downloads the file to a temporary location
+        Downloads the file to a temporary location. Data will be in the ORIGINAL format,
+        not Dataverse-processed TSVs
         '''
         if not self['downloaded'] or not os.path.exists(self.get('downloaded_file_name', '')):
             try:
@@ -122,6 +123,7 @@ class File(dict):
                 dwnld = requests.get(self['url']+'/api/access/datafile/'+
                                                 str(self['dataFile']['id']),
                                      headers={'X-Dataverse-key': self['key']},
+                                     params = {'format':'original'},
                                      timeout=self['timeout'])
                 with tempfile.NamedTemporaryFile(delete=False) as fil:
                     self['downloaded_file_name'] = fil.name
