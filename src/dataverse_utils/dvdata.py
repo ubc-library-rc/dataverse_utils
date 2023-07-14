@@ -19,7 +19,8 @@ class Study(dict): #pylint: disable=too-few-public-methods
     is represented with a dictionary.
     '''
     def __init__(self, pid: str,
-                 url:str, key:str):
+                 url:str, key:str,
+                 **kwargs):
         '''
         pid : str
             Record persistent identifier: hdl or doi
@@ -38,6 +39,7 @@ class Study(dict): #pylint: disable=too-few-public-methods
         self['file_info'] = self['orig_json']['files']
         self['file_ids'] = [x['dataFile'].get('id') for x in self['orig_json']['files']]
         self['file_persistentIds'] = self._get_file_pids()
+        self['timeout'] = kwargs.get('timeout',TIMEOUT)
 
     def _orig_json(self) -> dict:
         '''
@@ -50,7 +52,7 @@ class Study(dict): #pylint: disable=too-few-public-methods
         getjson = requests.get(self['url']+'/api/datasets/:persistentId',
                                headers={'X-Dataverse-key':self['key']},
                                params = {'persistentId': self['pid']},
-                               timeout = TIMEOUT)
+                               timeout = self['timeout'])
         getjson.raise_for_status()
         return getjson.json()['data']['latestVersion']
 
@@ -108,8 +110,9 @@ class File(dict):
         #        self['dv_file_metadata'] = self._get_file_metadata()
         for keey, val in kwargs.items():
             self[keey] = val
+        self['timeout'] = kwargs.get('timeout', TIMEOUT)
 
-    def download_file(self, timeout=TIMEOUT):
+    def download_file(self):
         '''
         Downloads the file to a temporary location
         '''
@@ -119,7 +122,7 @@ class File(dict):
                 dwnld = requests.get(self['url']+'/api/access/datafile/'+
                                                 str(self['dataFile']['id']),
                                      headers={'X-Dataverse-key': self['key']},
-                                     timeout=timeout)
+                                     timeout=self['timeout'])
                 with tempfile.NamedTemporaryFile(delete=False) as fil:
                     self['downloaded_file_name'] = fil.name
                     fil.write(dwnld.content)
