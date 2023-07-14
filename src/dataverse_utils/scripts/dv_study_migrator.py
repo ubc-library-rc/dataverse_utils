@@ -64,7 +64,7 @@ def upload_file_to_target(indict:dict, pid,
     file.download_file() 
     file.verify()
     if file['verified']:
-        dataverse_utils.upload_file(fpath=file['downloaded_file_name']
+        dataverse_utils.upload_file(fpath=file['downloaded_file_name'],
                                     dv=target_url,
                                     mimetype=file['dataFile'].get('contentType',
                                                                   'application/octet-stream'),
