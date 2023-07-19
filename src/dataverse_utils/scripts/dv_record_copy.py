@@ -10,7 +10,7 @@ Dataverse GUI.
 import argparse
 import requests
 
-VERSION = (0, 1, 0)
+VERSION = (0, 1, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 TIMEOUT = 100
 
@@ -31,8 +31,8 @@ def parsley() -> argparse.ArgumentParser():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('pid',
                         help=('PID of original dataverse record'
-                              'separated by spaces. eg. "LDC2012T19 LDC2011T07". '
-                              'Case is ignored, so "ldc2012T19" will also work.'))
+                              'separated by spaces. eg. "hdl:11272.1/AB2/NOMATH hdl:11272.1/AB2/HANDLE". '
+                              'Case is ignored, so "hdl:11272.1/ab2/handle" will also work.'))
     parser.add_argument('-u', '--url', default='https://abacus.library.ubc.ca',
                         help=('Dataverse installation base URL. '
                               'Defaults to "https://abacus.library.ubc.ca"'))
