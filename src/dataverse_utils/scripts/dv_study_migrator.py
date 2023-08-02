@@ -18,7 +18,7 @@ def parsley() -> argparse.ArgumentParser():
     Returns argparse.ArgumentParser
     '''
     description=textwrap.dedent('''
-                Record migrator for Datverse.
+                Record migrator for Dataverse.
 
                 This utility will take the most recent version of a study
                 from one Dataverse installation and copy the metadata
@@ -26,7 +26,15 @@ def parsley() -> argparse.ArgumentParser():
 
                 You could also use it to copy records from one collection to another.
                 ''')
-
+    replac = textwrap.dedent('''
+                             Replace data in these target PIDs with data from the
+                             source PIDS. Number of PIDs listed here must match
+                             the number of PID arguments to follow. That is, the number
+                             of records must be equal. Records will be matched on a
+                             1-1 basis in order. For example:
+                             [rest of command] -r doi:123.34/etc hdl:12323/AB/SOMETHI
+                             will replace the record with identifier 'doi' with the data from 'hdl'.
+                             ''')
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('pids',
@@ -53,7 +61,8 @@ def parsley() -> argparse.ArgumentParser():
                         help=('Short name of target Dataverse collection (eg: dli).'),
                         )
     group.add_argument('-r', '--replace',
-                        help=('Replace metadata and data in records with this/these PIDs'),
+                       nargs='+',
+                       help=replac[1:]
                         )
     parser.add_argument('-v','--version', action='version',
                         version='%(prog)s '+__version__,
@@ -80,6 +89,26 @@ def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments
                                     rest=file.get('restricted')
                                     )
 
+def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
+    '''
+    Removes all files from a dataverse record.
+        record: dataverse_utils.dvdata.Study
+        timeout: int
+            Timeout in seconds
+    '''
+    for badfile in record['file_ids']:
+        #I know, let's have two APIs for no reason!
+        badf = requests.delete((f'{record["url"]}/dvn/api/data-deposit/'
+                                'v1.1/swordv2/edit-media/file/{badfile}'),
+                               auth=(record['key'],''),
+                               timeout=timeout)
+        try:
+            badf.raise_for_status()
+        except requests.exceptions.HTTPError:
+            print(f'File delete error for {record["pid"]}, fileid: {badfile}: Exiting',
+                  file = sys.stderr)
+            sys.exit()
+
 def main():
     '''
     Run this, obviously
@@ -88,10 +117,11 @@ def main():
     args.source_url = args.source_url.strip('/ ')
     args.target_url = args.target_url.strip('/ ')
 
-    for pid in args.pids:
-        stud = dataverse_utils.dvdata.Study(pid, args.source_url,
-                                            args.source_key)
-        if args.collection:
+    studs = [dataverse_utils.dvdata.Study(x, args.source_url,
+                                                args.source_key)
+             for x in args.pids]
+    if args.collection:
+        for stud in studs:
             upload = requests.post(f'{args.target_url}/api/dataverses/{args.collection}/datasets',
                                    json=stud['upload_json'],
                                    headers={'X-Dataverse-key': args.tkey},
@@ -99,10 +129,35 @@ def main():
             try:
                 upload.raise_for_status()
             except requests.exceptions.HTTPError:
-                print(f'Study upload error for {pid}: Exiting')
+                print(f'Study upload error for {stud["pid"]}: Exiting',
+                      file = sys.stderr)
                 sys.exit()
             doi = upload.json()['data']['persistentId']
             for fil in stud['file_info']:
+                upload_file_to_target(fil, doi,
+                                      args.source_url, args.source_key,
+                                      args.target_url, args.target_key)
+    if args.replace:
+        if len(args.replace) != len(args.pids):
+            print('Number of replacements must match number of input records',
+                  file=sys.stderr)
+            sys.exit()
+        for rec in zip(args.replace, studs):
+            oldrec = dataverse_utils.dvdata.Study(rec[0], args.target_url,
+                                                args.target_key)
+            remove_target_files(oldrec, args.timeout)
+            upload = requests.put(f'{args.url}/api/datasets/:persistentId/versions/:draft',
+                                   json=rec[1]['upload_json'],
+                                   headers={'X-Dataverse-key' : args.key},
+                                   params={'persistentId' : rec[0], 'replace':True},
+                                   timeout=args.timeout)
+            try:
+                upload.raise_for_status()
+            except requests.exceptions.HTTPError:
+                print(f'Study upload error for {rec[0]} / {rec[1]["pid"]}: Exiting',
+                      file = sys.stderr)
+                sys.exit()
+            for fil in rec[1]['file_info']:
                 upload_file_to_target(fil, doi,
                                       args.source_url, args.source_key,
                                       args.target_url, args.target_key)
@@ -116,6 +171,5 @@ def main2():
     args.target_url = args.target_url.strip('/ ')
     print(args)
 
-#Upload file
 if __name__ == '__main__':
     main2()

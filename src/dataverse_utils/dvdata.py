@@ -33,13 +33,13 @@ class Study(dict): #pylint: disable=too-few-public-methods
         self['url'] = url
         self['key'] = key
         self['orig_json'] = None
+        self['timeout'] = kwargs.get('timeout',TIMEOUT)
         if not self['orig_json']:
             self['orig_json'] = self._orig_json()
         self['upload_json'] = self._upload_json
         self['file_info'] = self['orig_json']['files']
         self['file_ids'] = [x['dataFile'].get('id') for x in self['orig_json']['files']]
         self['file_persistentIds'] = self._get_file_pids()
-        self['timeout'] = kwargs.get('timeout',TIMEOUT)
 
     def _orig_json(self) -> dict:
         '''
