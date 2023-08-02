@@ -1,6 +1,10 @@
+'''
+Copies an entire record and migrates it *including the data*
+'''
 import argparse
 import textwrap
 import sys
+import requests
 import dataverse_utils
 import dataverse_utils.dvdata
 
@@ -49,7 +53,7 @@ def parsley() -> argparse.ArgumentParser():
                         help=('Short name of target Dataverse collection (eg: dli).'),
                         )
     group.add_argument('-r', '--replace',
-                        help=('Replace metadata and data in record with this PID'),
+                        help=('Replace metadata and data in records with this/these PIDs'),
                         )
     parser.add_argument('-v','--version', action='version',
                         version='%(prog)s '+__version__,
@@ -57,11 +61,14 @@ def parsley() -> argparse.ArgumentParser():
     return parser
 #create record
 
-def upload_file_to_target(indict:dict, pid,
+def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments
                           source_url, source_key,
                           target_url, target_key):
+    '''
+    Uploads a single file with metadata to a dataverse record
+    '''
     file = dataverse_utils.dvdata.File(source_url, source_key, **indict)
-    file.download_file() 
+    file.download_file()
     file.verify()
     if file['verified']:
         dataverse_utils.upload_file(fpath=file['downloaded_file_name'],
@@ -71,7 +78,7 @@ def upload_file_to_target(indict:dict, pid,
                                     apikey=target_key,
                                     hdl=pid,
                                     rest=file.get('restricted')
-                                    ) 
+                                    )
 
 def main():
     '''
@@ -80,6 +87,7 @@ def main():
     args = parsley().parse_args()
     args.source_url = args.source_url.strip('/ ')
     args.target_url = args.target_url.strip('/ ')
+
     for pid in args.pids:
         stud = dataverse_utils.dvdata.Study(pid, args.source_url,
                                             args.source_key)
@@ -91,12 +99,13 @@ def main():
             try:
                 upload.raise_for_status()
             except requests.exceptions.HTTPError:
-                print('Study upload error')
+                print(f'Study upload error for {pid}: Exiting')
                 sys.exit()
             doi = upload.json()['data']['persistentId']
             for fil in stud['file_info']:
-                upload_file_to_target(fil)
-                                    
+                upload_file_to_target(fil, doi,
+                                      args.source_url, args.source_key,
+                                      args.target_url, args.target_key)
 
 def main2():
     '''
@@ -106,9 +115,7 @@ def main2():
     args.source_url = args.source_url.strip('/ ')
     args.target_url = args.target_url.strip('/ ')
     print(args)
-    
 
 #Upload file
 if __name__ == '__main__':
     main2()
-
