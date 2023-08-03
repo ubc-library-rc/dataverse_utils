@@ -8,7 +8,7 @@ import requests
 import dataverse_utils
 import dataverse_utils.dvdata
 
-VERSION = (0, 1, 0)
+VERSION = (0, 3, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parsley() -> argparse.ArgumentParser():
@@ -34,28 +34,36 @@ def parsley() -> argparse.ArgumentParser():
                              1-1 basis in order. For example:
                              [rest of command] -r doi:123.34/etc hdl:12323/AB/SOMETHI
                              will replace the record with identifier 'doi' with the data from 'hdl'.
+
+                             Make sure you don't use this as the penultimate switch, because 
+                             then it's not possible to disambiguate PIDS from this argument
+                             and positional arguments.
+                             ie, something like dv_study_migrator -r blah blah -s http//test.invalid etc.
                              ''')
+    pidhelp = textwrap.dedent('''
+                              PID(s) of original Dataverse record(s) in source Dataverse
+                              separated by spaces. eg. "hdl:11272.1/AB2/JEG5RH
+                              doi:11272.1/AB2/JEG5RH".
+                              Case is ignored.
+                              ''')
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('pids',
-                        help=('PID(s) of original Dataverse record(s) in source Dataverse '
-                              'separated by spaces. eg. "hdl:11272.1/AB2/JEG5RH '
-                              'doi:11272.1/AB2/JEG5RH". '
-                              'Case is ignored'),
+                        help=pidhelp[1:],
                         nargs='+'
                        )
     parser.add_argument('-s', '--source_url', default='https://abacus.library.ubc.ca',
-                        help=('Source Dataverse installation base URL. '),
+                        help=('Source Dataverse installation base URL.'),
                         required=True)
     parser.add_argument('-a', '--source_key', required=True,
-                        help='API key for source Dataverse installation')
+                        help='API key for source Dataverse installation.')
     parser.add_argument('-t', '--target_url', default=None,
-                        help=('Source Dataverse installation base URL. '),
+                        help=('Source Dataverse installation base URL.'),
                         required=True)
-    parser.add_argument('-b', '--tkey', required=True,
-                        help='API key for target Dataverse installation')
+    parser.add_argument('-b', '--target_key', required=True,
+                        help='API key for target Dataverse installation.')
     parser.add_argument('-o', '--timeout', default=100,
-                        help='Request timeout in seconds. Default 100')
+                        help='Request timeout in seconds. Default 100.')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--collection',
                         help=('Short name of target Dataverse collection (eg: dli).'),
@@ -68,7 +76,6 @@ def parsley() -> argparse.ArgumentParser():
                         version='%(prog)s '+__version__,
                         help='Show version number and exit')
     return parser
-#create record
 
 def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments
                           source_url, source_key,
@@ -79,14 +86,21 @@ def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments
     file = dataverse_utils.dvdata.File(source_url, source_key, **indict)
     file.download_file()
     file.verify()
+    label = file['dataFile'].get('originalFileName',
+                file['dataFile'].get('filename', file['label']))
+    mimetype=file['dataFile'].get('originalFileFormat',
+                file['dataFile'].get('contentType','application/octet-stream'))
     if file['verified']:
         dataverse_utils.upload_file(fpath=file['downloaded_file_name'],
                                     dv=target_url,
-                                    mimetype=file['dataFile'].get('contentType',
-                                                                  'application/octet-stream'),
+                                    mimetype=mimetype,
                                     apikey=target_key,
                                     hdl=pid,
-                                    rest=file.get('restricted')
+                                    rest=file.get('restricted'),
+                                    label=label,
+                                    dirlabel=file.get('directoryLabel', ''),
+                                    descr=file.get('description', ''),
+                                    tags=file.get('categories')
                                     )
 
 def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
@@ -99,7 +113,7 @@ def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
     for badfile in record['file_ids']:
         #I know, let's have two APIs for no reason!
         badf = requests.delete((f'{record["url"]}/dvn/api/data-deposit/'
-                                'v1.1/swordv2/edit-media/file/{badfile}'),
+                                f'v1.1/swordv2/edit-media/file/{badfile}'),
                                auth=(record['key'],''),
                                timeout=timeout)
         try:
@@ -124,7 +138,7 @@ def main():
         for stud in studs:
             upload = requests.post(f'{args.target_url}/api/dataverses/{args.collection}/datasets',
                                    json=stud['upload_json'],
-                                   headers={'X-Dataverse-key': args.tkey},
+                                   headers={'X-Dataverse-key': args.target_key},
                                    timeout=args.timeout)
             try:
                 upload.raise_for_status()
@@ -146,10 +160,14 @@ def main():
             oldrec = dataverse_utils.dvdata.Study(rec[0], args.target_url,
                                                 args.target_key)
             remove_target_files(oldrec, args.timeout)
-            upload = requests.put(f'{args.url}/api/datasets/:persistentId/versions/:draft',
-                                   json=rec[1]['upload_json'],
-                                   headers={'X-Dataverse-key' : args.key},
-                                   params={'persistentId' : rec[0], 'replace':True},
+            # JFC payload = {'metadataBlocks': _output_json(record)['datasetVersion']\
+            # ['metadataBlocks']}
+
+            upload = requests.put(f'{args.target_url}/api/datasets/:persistentId/versions/:draft',
+                                   json={'metadataBlocks': rec[1]['upload_json']\
+                                                           ['datasetVersion']['metadataBlocks']},
+                                   headers={'X-Dataverse-key' : args.target_key},
+                                   params={'persistentId' : rec[0]},
                                    timeout=args.timeout)
             try:
                 upload.raise_for_status()
@@ -158,18 +176,10 @@ def main():
                       file = sys.stderr)
                 sys.exit()
             for fil in rec[1]['file_info']:
-                upload_file_to_target(fil, doi,
+                #doi = upload.json()['data']['persistentId']
+                upload_file_to_target(fil, rec[0],
                                       args.source_url, args.source_key,
                                       args.target_url, args.target_key)
 
-def main2():
-    '''
-    Testing
-    '''
-    args = parsley().parse_args()
-    args.source_url = args.source_url.strip('/ ')
-    args.target_url = args.target_url.strip('/ ')
-    print(args)
-
 if __name__ == '__main__':
-    main2()
+    main()
