@@ -1,19 +1,21 @@
 # API Reference
 
-<a name="dataverse_utils"></a>
+<a id="dataverse_utils"></a>
 
 ## dataverse\_utils
 
-Generalized dataverse utilities
+Generalized dataverse utilities. Note that
+`import dataverse_utils` is the equivalent of
+`import dataverse_utils.dataverse_utils`
 
-<a name="dataverse_utils.dataverse_utils"></a>
+<a id="dataverse_utils.dataverse_utils"></a>
 
 ## dataverse\_utils.dataverse\_utils
 
 A collection of Dataverse utilities for file and metadata
 manipulation
 
-<a name="dataverse_utils.dataverse_utils.DvGeneralUploadError"></a>
+<a id="dataverse_utils.dataverse_utils.DvGeneralUploadError"></a>
 
 ### DvGeneralUploadError Objects
 
@@ -23,7 +25,7 @@ class DvGeneralUploadError(Exception)
 
 Raised on non-200 URL response
 
-<a name="dataverse_utils.dataverse_utils.Md5Error"></a>
+<a id="dataverse_utils.dataverse_utils.Md5Error"></a>
 
 ### Md5Error Objects
 
@@ -33,12 +35,17 @@ class Md5Error(Exception)
 
 Raised on md5 mismatch
 
-<a name="dataverse_utils.dataverse_utils.make_tsv"></a>
+<a id="dataverse_utils.dataverse_utils.make_tsv"></a>
 
 ##### make\_tsv
 
 ```python
-make_tsv(start_dir, in_list=None, def_tag='Data', inc_header=True, mime=False, quotype=csv.QUOTE_MINIMAL) -> str
+def make_tsv(start_dir,
+             in_list=None,
+             def_tag='Data',
+             inc_header=True,
+             mime=False,
+             quotype=csv.QUOTE_MINIMAL) -> str
 ```
 
 Recurses the tree for files and produces tsv output with
@@ -79,12 +86,12 @@ Returns tsv as string.
   csv.QUOTE_NONNUMERIC / 2
   csv.QUOTE_NONE / 3
 
-<a name="dataverse_utils.dataverse_utils.dump_tsv"></a>
+<a id="dataverse_utils.dataverse_utils.dump_tsv"></a>
 
 ##### dump\_tsv
 
 ```python
-dump_tsv(start_dir, filename, in_list=None, **kwargs)
+def dump_tsv(start_dir, filename, in_list=None, **kwargs)
 ```
 
 Dumps output of make_tsv manifest to a file.
@@ -122,12 +129,12 @@ Dumps output of make_tsv manifest to a file.
   csv.QUOTE_NONNUMERIC / 2
   csv.QUOTE_NONE / 3
 
-<a name="dataverse_utils.dataverse_utils.file_path"></a>
+<a id="dataverse_utils.dataverse_utils.file_path"></a>
 
 ##### file\_path
 
 ```python
-file_path(fpath, trunc='') -> str
+def file_path(fpath, trunc='') -> str
 ```
 
 Create relative file path from full path string
@@ -148,12 +155,12 @@ Create relative file path from full path string
   trunc : str
   Leftmost portion of path to remove
 
-<a name="dataverse_utils.dataverse_utils.check_lock"></a>
+<a id="dataverse_utils.dataverse_utils.check_lock"></a>
 
 ##### check\_lock
 
 ```python
-check_lock(dv_url, study, apikey) -> bool
+def check_lock(dv_url, study, apikey) -> bool
 ```
 
 Checks study lock status; returns True if locked.
@@ -172,12 +179,12 @@ Checks study lock status; returns True if locked.
   apikey : str
   API key for user
 
-<a name="dataverse_utils.dataverse_utils.force_notab_unlock"></a>
+<a id="dataverse_utils.dataverse_utils.force_notab_unlock"></a>
 
 ##### force\_notab\_unlock
 
 ```python
-force_notab_unlock(study, dv_url, fid, apikey, try_uningest=True) -> int
+def force_notab_unlock(study, dv_url, fid, apikey, try_uningest=True) -> int
 ```
 
 Forcibly unlocks and uningests
@@ -207,12 +214,12 @@ Returns 0 if unlocked, file id if locked (and then unlocked).
   Try to uningest the file that was locked.
 - `Default` - True
 
-<a name="dataverse_utils.dataverse_utils.uningest_file"></a>
+<a id="dataverse_utils.dataverse_utils.uningest_file"></a>
 
 ##### uningest\_file
 
 ```python
-uningest_file(dv_url, fid, apikey, study='n/a')
+def uningest_file(dv_url, fid, apikey, study='n/a')
 ```
 
 Tries to uningest a file that has been ingested.
@@ -235,12 +242,12 @@ Requires superuser API key.
   study : str
   Optional handle parameter for log messages
 
-<a name="dataverse_utils.dataverse_utils.upload_file"></a>
+<a id="dataverse_utils.dataverse_utils.upload_file"></a>
 
 ##### upload\_file
 
 ```python
-upload_file(fpath, hdl, **kwargs)
+def upload_file(fpath, hdl, **kwargs)
 ```
 
 Uploads file to Dataverse study and sets file metadata and tags.
@@ -304,13 +311,19 @@ Uploads file to Dataverse study and sets file metadata and tags.
   Mimetype of file. Useful if using File Previewers. Mimetype for zip files
   (application/zip) will be ignored to circumvent Dataverse's automatic
   unzipping function.
+  label : str
+  OPTIONAL
+  If included in kwargs, this value will be used for the label
+  timeout = int
+  OPTIONAL
+  Timeout in seconds
 
-<a name="dataverse_utils.dataverse_utils.restrict_file"></a>
+<a id="dataverse_utils.dataverse_utils.restrict_file"></a>
 
 ##### restrict\_file
 
 ```python
-restrict_file(**kwargs)
+def restrict_file(**kwargs)
 ```
 
 Restrict file in Dataverse study.
@@ -344,12 +357,12 @@ Restrict file in Dataverse study.
   rest : bool
   On True, restrict. Default True
 
-<a name="dataverse_utils.dataverse_utils.upload_from_tsv"></a>
+<a id="dataverse_utils.dataverse_utils.upload_from_tsv"></a>
 
 ##### upload\_from\_tsv
 
 ```python
-upload_from_tsv(fil, hdl, **kwargs)
+def upload_from_tsv(fil, hdl, **kwargs)
 ```
 
 Utility for bulk uploading. Assumes fil is formatted
@@ -391,14 +404,14 @@ as tsv with headers 'file', 'description', 'tags'.
   rest : bool
   On True, restrict access. Default False
 
-<a name="dataverse_utils.ldc"></a>
+<a id="dataverse_utils.ldc"></a>
 
 ## dataverse\_utils.ldc
 
 Creates dataverse JSON from Linguistic Data Consortium
 website page.
 
-<a name="dataverse_utils.ldc.Ldc"></a>
+<a id="dataverse_utils.ldc.Ldc"></a>
 
 ### Ldc Objects
 
@@ -408,12 +421,12 @@ class Ldc(ds.Serializer)
 
 An LDC item (eg, LDC2021T01)
 
-<a name="dataverse_utils.ldc.Ldc.__init__"></a>
+<a id="dataverse_utils.ldc.Ldc.__init__"></a>
 
 ##### \_\_init\_\_
 
 ```python
- | __init__(ldc)
+def __init__(ldc, cert=None)
 ```
 
 Returns a dict with keys created from an LDC catalogue web
@@ -427,101 +440,106 @@ page.
   ldc : str
   Linguistic Consortium Catalogue Number (eg. 'LDC2015T05'.
   This is what forms the last part of the LDC catalogue URL.
+  cert : str
+  Path to certificate chain; LDC has had a problem
+  with intermediate certificates, so you can
+  download the chain with a browser and supply a
+  path to the .pem with this parameter
 
-<a name="dataverse_utils.ldc.Ldc.ldcJson"></a>
+<a id="dataverse_utils.ldc.Ldc.ldcJson"></a>
 
 ##### ldcJson
 
 ```python
- | @property
- | ldcJson()
+@property
+def ldcJson()
 ```
 
 Returns a JSON based on the LDC web page scraping
 
-<a name="dataverse_utils.ldc.Ldc.dryadJson"></a>
+<a id="dataverse_utils.ldc.Ldc.dryadJson"></a>
 
 ##### dryadJson
 
 ```python
- | @property
- | dryadJson()
+@property
+def dryadJson()
 ```
 
 LDC metadata in Dryad JSON format
 
-<a name="dataverse_utils.ldc.Ldc.dvJson"></a>
+<a id="dataverse_utils.ldc.Ldc.dvJson"></a>
 
 ##### dvJson
 
 ```python
- | @property
- | dvJson()
+@property
+def dvJson()
 ```
 
 LDC metadata in Dataverse JSON format
 
-<a name="dataverse_utils.ldc.Ldc.embargo"></a>
+<a id="dataverse_utils.ldc.Ldc.embargo"></a>
 
 ##### embargo
 
 ```python
- | @property
- | embargo()
+@property
+def embargo()
 ```
 
 Boolean indicating embargo status
 
-<a name="dataverse_utils.ldc.Ldc.fileJson"></a>
+<a id="dataverse_utils.ldc.Ldc.fileJson"></a>
 
 ##### fileJson
 
 ```python
- | @property
- | fileJson(timeout=45)
+@property
+def fileJson(timeout=45)
 ```
 
 Returns False: No attached files possible at LDC
 
-<a name="dataverse_utils.ldc.Ldc.files"></a>
+<a id="dataverse_utils.ldc.Ldc.files"></a>
 
 ##### files
 
 ```python
- | @property
- | files()
+@property
+def files()
 ```
 
 Returns None. No files possible
 
-<a name="dataverse_utils.ldc.Ldc.fetch_record"></a>
+<a id="dataverse_utils.ldc.Ldc.fetch_record"></a>
 
 ##### fetch\_record
 
 ```python
- | fetch_record(url=None, timeout=45)
+def fetch_record(url=None, timeout=45)
 ```
 
 Downloads record from LDC website
 
-<a name="dataverse_utils.ldc.Ldc.make_ldc_json"></a>
+<a id="dataverse_utils.ldc.Ldc.make_ldc_json"></a>
 
 ##### make\_ldc\_json
 
 ```python
- | make_ldc_json()
+def make_ldc_json()
 ```
 
 Returns a dict with keys created from an LDC catalogue web
 page.
 
-<a name="dataverse_utils.ldc.Ldc.name_parser"></a>
+<a id="dataverse_utils.ldc.Ldc.name_parser"></a>
 
 ##### name\_parser
 
 ```python
- | @staticmethod
- | name_parser(name)
+@staticmethod
+def name_parser(name)
 ```
 
 Returns lastName/firstName JSON snippet from name
@@ -534,12 +552,12 @@ Returns lastName/firstName JSON snippet from name
   name : str
   A name
 
-<a name="dataverse_utils.ldc.Ldc.make_dryad_json"></a>
+<a id="dataverse_utils.ldc.Ldc.make_dryad_json"></a>
 
 ##### make\_dryad\_json
 
 ```python
- | make_dryad_json(ldc=None)
+def make_dryad_json(ldc=None)
 ```
 
 Creates a Dryad-style dict from an LDC dictionary
@@ -552,13 +570,13 @@ Creates a Dryad-style dict from an LDC dictionary
   ldc : dict
   Dictionary containing LDC data. Defaults to self.ldcJson
 
-<a name="dataverse_utils.ldc.Ldc.find_block_index"></a>
+<a id="dataverse_utils.ldc.Ldc.find_block_index"></a>
 
 ##### find\_block\_index
 
 ```python
- | @staticmethod
- | find_block_index(dvjson, key)
+@staticmethod
+def find_block_index(dvjson, key)
 ```
 
 Finds the index number of an item in Dataverse's idiotic JSON list
@@ -574,12 +592,12 @@ Finds the index number of an item in Dataverse's idiotic JSON list
   key : str
   key for which to find list index
 
-<a name="dataverse_utils.ldc.Ldc.make_dv_json"></a>
+<a id="dataverse_utils.ldc.Ldc.make_dv_json"></a>
 
 ##### make\_dv\_json
 
 ```python
- | make_dv_json(ldc=None)
+def make_dv_json(ldc=None)
 ```
 
 Returns complete Dataverse JSON
@@ -592,12 +610,12 @@ Returns complete Dataverse JSON
   ldc : dict
   LDC dictionary. Defaults to self.ldcJson
 
-<a name="dataverse_utils.ldc.Ldc.upload_metadata"></a>
+<a id="dataverse_utils.ldc.Ldc.upload_metadata"></a>
 
 ##### upload\_metadata
 
 ```python
- | upload_metadata(**kwargs) -> dict
+def upload_metadata(**kwargs) -> dict
 ```
 
 Uploads metadata to dataverse
@@ -619,4 +637,119 @@ Returns json from connection attempt.
   
   dv : str
   Dataverse to which it is being uploaded
+
+<a id="dataverse_utils.dvdata"></a>
+
+## dataverse\_utils.dvdata
+
+Dataverse studies and files
+
+<a id="dataverse_utils.dvdata.Study"></a>
+
+### Study Objects
+
+```python
+class Study(dict)
+```
+
+Dataverse record. Dataverse study records are pure metadata so this
+is represented with a dictionary.
+
+<a id="dataverse_utils.dvdata.Study.__init__"></a>
+
+##### \_\_init\_\_
+
+```python
+def __init__(pid: str, url: str, key: str, **kwargs)
+```
+
+pid : str
+    Record persistent identifier: hdl or doi
+url : str
+    Base URL to host Dataverse instance
+key : str
+    Dataverse API key with downloader privileges
+
+<a id="dataverse_utils.dvdata.File"></a>
+
+### File Objects
+
+```python
+class File(dict)
+```
+
+Class representing a file on a Dataverse instance
+
+<a id="dataverse_utils.dvdata.File.__init__"></a>
+
+##### \_\_init\_\_
+
+```python
+def __init__(url: str, key: str, **kwargs)
+```
+
+url : str
+    Base URL to host Dataverse instance
+key : str
+    Dataverse API key with downloader privileges
+id : int or str
+    File identifier; can be a file ID or PID
+args : list
+kwargs : dict
+
+To initialize correctly, pass a value from Study['file_info'].
+
+Eg: File('https://test.invalid', 'ABC123', **Study_instance['file_info'][0])
+
+<a id="dataverse_utils.dvdata.File.download_file"></a>
+
+##### download\_file
+
+```python
+def download_file()
+```
+
+Downloads the file to a temporary location. Data will be in the ORIGINAL format,
+not Dataverse-processed TSVs
+
+<a id="dataverse_utils.dvdata.File.del_tempfile"></a>
+
+##### del\_tempfile
+
+```python
+def del_tempfile()
+```
+
+Delete tempfile if it exists
+
+<a id="dataverse_utils.dvdata.File.produce_digest"></a>
+
+##### produce\_digest
+
+```python
+def produce_digest(prot: str = 'md5', blocksize: int = 2**16) -> str
+```
+
+Returns hex digest for object
+
+    fname : str
+       Path to a file object
+
+    prot : str
+       Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
+          'sha384', 'sha512', 'blake2b', 'blake2s', 'md5'.
+          Default: 'md5'
+
+    blocksize : int
+       Read block size in bytes
+
+<a id="dataverse_utils.dvdata.File.verify"></a>
+
+##### verify
+
+```python
+def verify() -> None
+```
+
+Compares checksum with stated checksum
 
