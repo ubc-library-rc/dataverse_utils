@@ -63,7 +63,7 @@ class Study(dict): #pylint: disable=too-few-public-methods
         suitable for upload as a new Dataverse study record.
         '''
         return {'datasetVersion': {'license': self['orig_json']['license'],
-                                     'termsOfUse': self['orig_json']['termsOfUse'],
+                                     'termsOfUse': self['orig_json'].get('termsOfUse',''),
                                      'metadataBlocks': self['orig_json']['metadataBlocks']
                                      }
                   }
