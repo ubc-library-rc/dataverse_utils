@@ -371,6 +371,12 @@ def upload_file(fpath, hdl, **kwargs):
             Mimetype of file. Useful if using File Previewers. Mimetype for zip files
             (application/zip) will be ignored to circumvent Dataverse's automatic
             unzipping function.
+        label : str
+            OPTIONAL
+            If included in kwargs, this value will be used for the label
+        timeout = int
+            OPTIONAL
+            Timeout in seconds
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -395,7 +401,7 @@ def upload_file(fpath, hdl, **kwargs):
         mime = 'application/octet-stream'
 
     #create file metadata in nice, simple, chunks
-    dv4_meta = {'label' : file_name_clean,
+    dv4_meta = {'label' : kwargs.get('label', file_name_clean),
                 'description' : kwargs.get('descr', ''),
                 'directoryLabel': kwargs.get('dirlabel', ''),
                 'categories': kwargs.get('tags', [])}
@@ -413,7 +419,7 @@ def upload_file(fpath, hdl, **kwargs):
     LOGGER.info('Uploading %s to %s', fpath, hdl)
     upload = requests.post(f"{dvurl}/api/datasets/:persistentId/add",
                            params=params, headers=headers, data=multi,
-                           timeout=1000)#timeout hardcoded. Bad idea?
+                           timeout=kwargs.get('timeout',1000))
     try:
         print(upload.json())
     except json.decoder.JSONDecodeError:
