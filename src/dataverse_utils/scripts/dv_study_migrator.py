@@ -8,7 +8,7 @@ import requests
 import dataverse_utils
 import dataverse_utils.dvdata
 
-VERSION = (0, 3, 0)
+VERSION = (0, 4, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parsley() -> argparse.ArgumentParser():
@@ -123,6 +123,42 @@ def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
                   file = sys.stderr)
             sys.exit()
 
+def fix_licence(badstudy:dataverse_utils.dvdata.Study)->None:
+    '''
+    With Dataverse v5.10+, a licence type of 'NONE' is now forbidden.
+    Now, as per <https://guides.dataverse.org/en/5.14/api/sword.html?highlight=invalid%20license>,
+    non-standard licences may be replaced with None.
+
+    This function edits the same Study object *in place*, so returns nothing.
+    '''
+    if badstudy['upload_json']['datasetVersion']['license'] == 'NONE':
+        badstudy['upload_json']['datasetVersion']['license'] = None
+
+    if not badstudy['upload_json']['datasetVersion']['termsOfUse']:
+        #This shouldn't happen, but UBC has datasets from the early 1970s
+        badstudy['upload_json']['datasetVersion']['termsOfUse'] = 'Not available'
+
+def check_dv_ver(url: str, timeout=100)->bool:
+    '''
+    Returns True if Dataverse >= v5.10. Useful if there are issues with licence fields.
+    '''
+    ver = requests.get(f'{url}/api/info/version',
+                       #headers = {'X-Dataverse-key' : key},
+                       timeout = timeout)
+    try:
+        ver.raise_for_status()
+    except requests.exceptions.HTTPError:
+        print(r'Error getting version for {url}', file =sys.stderr)
+        sys.exit()
+    verf = ver.json()['data']['version'].strip('v ').split('.')
+    verf = [x.split('-')[0] for x in verf]
+    verf =[int(b)/10**(3*a) for a,b in enumerate(verf)]
+    #it's 3*a in case for some reason we hit, say v5.99.99 and there's more before v6.
+    verf = sum(verf)
+    if verf >= 5.010: # which is really v5.10.0, ie 5 + .010 + 000000
+        return True
+    return False
+
 def main():
     '''
     Run this, obviously
@@ -131,9 +167,11 @@ def main():
     args.source_url = args.source_url.strip('/ ')
     args.target_url = args.target_url.strip('/ ')
 
-    studs = [dataverse_utils.dvdata.Study(x, args.source_url,
-                                                args.source_key)
+    studs = [dataverse_utils.dvdata.Study(x, args.source_url, args.source_key)
              for x in args.pids]
+    if check_dv_ver(args.target_url):
+        for bad in studs:
+            fix_licence(bad)
     if args.collection:
         for stud in studs:
             upload = requests.post(f'{args.target_url}/api/dataverses/{args.collection}/datasets',
@@ -145,6 +183,7 @@ def main():
             except requests.exceptions.HTTPError:
                 print(f'Study upload error for {stud["pid"]}: Exiting',
                       file = sys.stderr)
+                print(upload.json())
                 sys.exit()
             doi = upload.json()['data']['persistentId']
             for fil in stud['file_info']:
@@ -160,7 +199,7 @@ def main():
             oldrec = dataverse_utils.dvdata.Study(rec[0], args.target_url,
                                                 args.target_key)
             remove_target_files(oldrec, args.timeout)
-            # JFC payload = {'metadataBlocks': _output_json(record)['datasetVersion']\
+            #  payload = {'metadataBlocks': _output_json(record)['datasetVersion']\
             # ['metadataBlocks']}
 
             upload = requests.put(f'{args.target_url}/api/datasets/:persistentId/versions/:draft',
