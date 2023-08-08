@@ -40,6 +40,56 @@ class Study(dict): #pylint: disable=too-few-public-methods
         self['file_info'] = self['orig_json']['files']
         self['file_ids'] = [x['dataFile'].get('id') for x in self['orig_json']['files']]
         self['file_persistentIds'] = self._get_file_pids()
+        self['target_version'] = None
+        if not self['target_version']:
+            self['target_version'] = Study.get_version(url)
+
+    @classmethod
+    def get_version(cls, url:str, timeout:int=100)->float:
+        '''
+        Returns a float representing a Dataverse version number.
+        Floating point value composed of:
+        float(f'{major_version}.{minor_verson:03d}{patch:03d}')
+        ie, version 5.9.2 would be 5.009002
+        url : str
+            URL of base Dataverse instance. eg: 'https://abacus.library.ubc.ca'
+        timeout : int
+            Request timeout in seconds
+        '''
+        ver = requests.get(f'{url}/api/info/version',
+                           #headers = {'X-Dataverse-key' : key},
+                           timeout = timeout)
+        try:
+            ver.raise_for_status()
+        except requests.exceptions.HTTPError as exc:
+            LOGGER.error(r'Error getting version for {url}')
+            LOGGER.exception(exc)
+            LOGGER.exception(traceback.format_exc())
+            raise requests.exceptions.HTTPError
+        #Scholars Portal version is formatted as v5.13.9-SP, so. . .
+        verf = ver.json()['data']['version'].strip('v ').split('.')
+        verf = [x.split('-')[0] for x in verf]
+        verf =[int(b)/10**(3*a) for a,b in enumerate(verf)]
+        #it's 3*a in case for some reason we hit, say v5.99.99 and there's more before v6.
+        verf = sum(verf)
+        return verf
+
+    def set_version(self, url:str, timeout:int=100)->None:
+        '''
+        Sets self['target_version'] to appropriate integer value *AND*
+        formats self['upload_json'] to correct JSON format
+
+        url : str
+            URL of *target* Dataverse instance
+        timeout : int
+            request timeout in seconds
+        '''
+        self['target_version'] = Study.get_version(url, timeout)
+        # Now fix the metadata to work with various versions
+        if self['target_version'] >= 5.010:
+            self.fix_licence()
+        if self['target_version'] >= 5.013:
+            self.production_location()
 
     def _orig_json(self) -> dict:
         '''
@@ -77,6 +127,52 @@ class Study(dict): #pylint: disable=too-few-public-methods
         if not all(pids):
             return None
         return pids
+
+    ######
+    #JSON metdata fixes for different versions
+    ######
+    def fix_licence(self)->None:
+        '''
+        With Dataverse v5.10+, a licence type of 'NONE' is now forbidden.
+        Now, as per <https://guides.dataverse.org/en/5.14/api/sword.html\
+        ?highlight=invalid%20license>,
+        non-standard licences may be replaced with None.
+
+        This function edits the same Study object *in place*, so returns nothing.
+        '''
+        if self['upload_json']['datasetVersion']['license'] == 'NONE':
+            self['upload_json']['datasetVersion']['license'] = None
+
+        if not self['upload_json']['datasetVersion']['termsOfUse']:
+            #This shouldn't happen, but UBC has datasets from the early 1970s
+            self['upload_json']['datasetVersion']['termsOfUse'] = 'Not available'
+
+    def production_location(self)->None:
+        '''
+        Changes "multiple" to True where typeName == 'productionPlace' in
+        Study['upload_json'] Changes are done
+        *in place*.
+        This change came into effect with Dataverse v5.13
+        '''
+        #{'typeName': 'productionPlace', 'multiple': True, 'typeClass': 'primitive',
+        #'value': ['Vancouver, BC', 'Ottawa, ON']}
+
+        # get index
+        indy = None
+        for ind, val in enumerate(self['upload_json']['datasetVersion']\
+                                      ['metadataBlocks']['citation']['fields']):
+            if val['typeName'] == 'productionPlace':
+                indy = ind
+                break
+
+        if indy and not self['upload_json']['datasetVersion']['metadataBlocks']\
+                ['citation']['fields'][indy]['multiple']:
+            self['upload_json']['datasetVersion']['metadataBlocks']\
+                ['citation']['fields'][indy]['multiple'] = True
+            self['upload_json']['datasetVersion']['metadataBlocks']\
+                ['citation']['fields'][indy]['value'] = [self['upload_json']['datasetVersion']\
+                                                         ['metadataBlocks']['citation']\
+                                                         ['fields'][indy]['value']]
 
 class File(dict):
     '''
