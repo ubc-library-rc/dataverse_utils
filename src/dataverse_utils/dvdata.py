@@ -40,6 +40,7 @@ class Study(dict): #pylint: disable=too-few-public-methods
         self['file_info'] = self['orig_json']['files']
         self['file_ids'] = [x['dataFile'].get('id') for x in self['orig_json']['files']]
         self['file_persistentIds'] = self._get_file_pids()
+        self['source_version'] = Study.get_version(url)
         self['target_version'] = None
         if not self['target_version']:
             self['target_version'] = Study.get_version(url)
