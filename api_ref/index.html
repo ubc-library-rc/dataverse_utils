@@ -53,6 +53,166 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#dataverse_utils">dataverse_utils</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsdvdata">dataverse_utils.dvdata</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#study-objects">Study Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__init__">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#get_version">get_version</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#set_version">set_version</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#fix_licence">fix_licence</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#production_location">production_location</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#file-objects">File Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__init___1">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#download_file">download_file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#del_tempfile">del_tempfile</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#produce_digest">produce_digest</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#verify">verify</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_record_copy">dataverse_utils.scripts.dv_record_copy</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#parsley">parsley</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main">main</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_study_migrator">dataverse_utils.scripts.dv_study_migrator</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#parsley_1">parsley</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#upload_file_to_target">upload_file_to_target</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#remove_target_files">remove_target_files</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main_1">main</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_ldc_uploader">dataverse_utils.scripts.dv_ldc_uploader</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#parse">parse</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#upload_meta">upload_meta</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main_2">main</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_pg_facet_date">dataverse_utils.scripts.dv_pg_facet_date</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#parsely">parsely</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#parse_dtype">parse_dtype</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#write_old">write_old</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#publicationdate-is-assumed-to-be-a-datetimedatetime-instance">publicationdate is assumed to be a datetime.datetime instance.</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#write_sql">write_sql</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get_datetime">get_datetime</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fetch_date_api">fetch_date_api</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#reindex">reindex</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main_3">main</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_release">dataverse_utils.scripts.dv_release</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#argp">argp</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dverse-objects">Dverse Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__init___2">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#study_list">study_list</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#unreleased">unreleased</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#study-objects_1">Study Objects</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#__init___3">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#status_ok">status_ok</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#release_me">release_me</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#main_4">main</a>
+    </li>
+        </ul>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_del">dataverse_utils.scripts.dv_del</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#delstudy">delstudy</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#conf">conf</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#getsize">getsize</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#parsley_2">parsley</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main_5">main</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_replace_licence">dataverse_utils.scripts.dv_replace_licence</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#parsley_3">parsley</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#replace_licence">replace_licence</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#republish">republish</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#print_stat">print_stat</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main_6">main</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_upload_tsv">dataverse_utils.scripts.dv_upload_tsv</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#parse_1">parse</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main_7">main</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsscriptsdv_manifest_gen">dataverse_utils.scripts.dv_manifest_gen</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#parse_2">parse</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#quotype">quotype</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main_8">main</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsdataverse_utils">dataverse_utils.dataverse_utils</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#dvgeneraluploaderror-objects">DvGeneralUploadError Objects</a>
@@ -85,7 +245,7 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#ldc-objects">Ldc Objects</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#__init__">__init__</a>
+    <li class="toctree-l4"><a class="reference internal" href="#__init___4">__init__</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#ldcjson">ldcJson</a>
     </li>
@@ -112,30 +272,6 @@
     <li class="toctree-l4"><a class="reference internal" href="#make_dv_json">make_dv_json</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#upload_metadata">upload_metadata</a>
-    </li>
-        </ul>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utilsdvdata">dataverse_utils.dvdata</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#study-objects">Study Objects</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#__init___1">__init__</a>
-    </li>
-        </ul>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#file-objects">File Objects</a>
-        <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#__init___2">__init__</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#download_file">download_file</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#del_tempfile">del_tempfile</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#produce_digest">produce_digest</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#verify">verify</a>
     </li>
         </ul>
     </li>
@@ -185,6 +321,480 @@
 <p>Generalized dataverse utilities. Note that
 <code>import dataverse_utils</code> is the equivalent of
 <code>import dataverse_utils.dataverse_utils</code></p>
+<p><a id="dataverse_utils.dvdata"></a></p>
+<h2 id="dataverse_utilsdvdata">dataverse_utils.dvdata<a class="headerlink" href="#dataverse_utilsdvdata" title="Permanent link">&para;</a></h2>
+<p>Dataverse studies and files</p>
+<p><a id="dataverse_utils.dvdata.Study"></a></p>
+<h3 id="study-objects">Study Objects<a class="headerlink" href="#study-objects" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class Study(dict)
+</code></pre>
+<p>Dataverse record. Dataverse study records are pure metadata so this
+is represented with a dictionary.</p>
+<p><a id="dataverse_utils.dvdata.Study.__init__"></a></p>
+<h5 id="__init__">__init__<a class="headerlink" href="#__init__" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def __init__(pid: str, url: str, key: str, **kwargs)
+</code></pre>
+<p>pid : str
+    Record persistent identifier: hdl or doi
+url : str
+    Base URL to host Dataverse instance
+key : str
+    Dataverse API key with downloader privileges</p>
+<p><a id="dataverse_utils.dvdata.Study.get_version"></a></p>
+<h5 id="get_version">get_version<a class="headerlink" href="#get_version" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">@classmethod
+def get_version(cls, url: str, timeout: int = 100) -&gt; float
+</code></pre>
+<p>Returns a float representing a Dataverse version number.
+Floating point value composed of:
+float(f&rsquo;{major_version}.{minor_verson:03d}{patch:03d}&rsquo;)
+ie, version 5.9.2 would be 5.009002
+url : str
+    URL of base Dataverse instance. eg: &lsquo;https://abacus.library.ubc.ca&rsquo;
+timeout : int
+    Request timeout in seconds</p>
+<p><a id="dataverse_utils.dvdata.Study.set_version"></a></p>
+<h5 id="set_version">set_version<a class="headerlink" href="#set_version" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def set_version(url: str, timeout: int = 100) -&gt; None
+</code></pre>
+<p>Sets self[&lsquo;target_version&rsquo;] to appropriate integer value <em>AND</em>
+formats self[&lsquo;upload_json&rsquo;] to correct JSON format</p>
+<p>url : str
+    URL of <em>target</em> Dataverse instance
+timeout : int
+    request timeout in seconds</p>
+<p><a id="dataverse_utils.dvdata.Study.fix_licence"></a></p>
+<h5 id="fix_licence">fix_licence<a class="headerlink" href="#fix_licence" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def fix_licence() -&gt; None
+</code></pre>
+<p>With Dataverse v5.10+, a licence type of &lsquo;NONE&rsquo; is now forbidden.
+Now, as per <a href="https://guides.dataverse.org/en/5.14/api/sword.html        ?highlight=invalid%20license">https://guides.dataverse.org/en/5.14/api/sword.html        ?highlight=invalid%20license</a>,
+non-standard licences may be replaced with None.</p>
+<p>This function edits the same Study object <em>in place</em>, so returns nothing.</p>
+<p><a id="dataverse_utils.dvdata.Study.production_location"></a></p>
+<h5 id="production_location">production_location<a class="headerlink" href="#production_location" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def production_location() -&gt; None
+</code></pre>
+<p>Changes &ldquo;multiple&rdquo; to True where typeName == &lsquo;productionPlace&rsquo; in
+Study[&lsquo;upload_json&rsquo;] Changes are done
+<em>in place</em>.
+This change came into effect with Dataverse v5.13</p>
+<p><a id="dataverse_utils.dvdata.File"></a></p>
+<h3 id="file-objects">File Objects<a class="headerlink" href="#file-objects" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class File(dict)
+</code></pre>
+<p>Class representing a file on a Dataverse instance</p>
+<p><a id="dataverse_utils.dvdata.File.__init__"></a></p>
+<h5 id="__init___1">__init__<a class="headerlink" href="#__init___1" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def __init__(url: str, key: str, **kwargs)
+</code></pre>
+<p>url : str
+    Base URL to host Dataverse instance
+key : str
+    Dataverse API key with downloader privileges
+id : int or str
+    File identifier; can be a file ID or PID
+args : list
+kwargs : dict</p>
+<p>To initialize correctly, pass a value from Study[&lsquo;file_info&rsquo;].</p>
+<p>Eg: File(&lsquo;https://test.invalid&rsquo;, &lsquo;ABC123&rsquo;, **Study_instance[&lsquo;file_info&rsquo;][0])</p>
+<p><a id="dataverse_utils.dvdata.File.download_file"></a></p>
+<h5 id="download_file">download_file<a class="headerlink" href="#download_file" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def download_file()
+</code></pre>
+<p>Downloads the file to a temporary location. Data will be in the ORIGINAL format,
+not Dataverse-processed TSVs</p>
+<p><a id="dataverse_utils.dvdata.File.del_tempfile"></a></p>
+<h5 id="del_tempfile">del_tempfile<a class="headerlink" href="#del_tempfile" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def del_tempfile()
+</code></pre>
+<p>Delete tempfile if it exists</p>
+<p><a id="dataverse_utils.dvdata.File.produce_digest"></a></p>
+<h5 id="produce_digest">produce_digest<a class="headerlink" href="#produce_digest" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def produce_digest(prot: str = 'md5', blocksize: int = 2**16) -&gt; str
+</code></pre>
+<p>Returns hex digest for object</p>
+<pre class="codehilite"><code>fname : str
+   Path to a file object
+
+prot : str
+   Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
+      'sha384', 'sha512', 'blake2b', 'blake2s', 'md5'.
+      Default: 'md5'
+
+blocksize : int
+   Read block size in bytes
+</code></pre>
+
+<p><a id="dataverse_utils.dvdata.File.verify"></a></p>
+<h5 id="verify">verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def verify() -&gt; None
+</code></pre>
+<p>Compares checksum with stated checksum</p>
+<p><a id="dataverse_utils.scripts.dv_record_copy"></a></p>
+<h2 id="dataverse_utilsscriptsdv_record_copy">dataverse_utils.scripts.dv_record_copy<a class="headerlink" href="#dataverse_utilsscriptsdv_record_copy" title="Permanent link">&para;</a></h2>
+<p>Copies a dataverse record to collection
+OR copies a record to an existing PID.</p>
+<p>That way all you have to do
+is edit a few fields in the GUI instead of
+painfully editing JSON or painfully using the
+Dataverse GUI.</p>
+<p><a id="dataverse_utils.scripts.dv_record_copy.parsley"></a></p>
+<h5 id="parsley">parsley<a class="headerlink" href="#parsley" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parsley() -&gt; argparse.ArgumentParser()
+</code></pre>
+<p>Parses the arguments from the command line.</p>
+<p>Returns argparse.ArgumentParser</p>
+<p><a id="dataverse_utils.scripts.dv_record_copy.main"></a></p>
+<h5 id="main">main<a class="headerlink" href="#main" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main()
+</code></pre>
+<p>You know what this does</p>
+<p><a id="dataverse_utils.scripts.dv_study_migrator"></a></p>
+<h2 id="dataverse_utilsscriptsdv_study_migrator">dataverse_utils.scripts.dv_study_migrator<a class="headerlink" href="#dataverse_utilsscriptsdv_study_migrator" title="Permanent link">&para;</a></h2>
+<p>Copies an entire record and migrates it <em>including the data</em></p>
+<p><a id="dataverse_utils.scripts.dv_study_migrator.parsley"></a></p>
+<h5 id="parsley_1">parsley<a class="headerlink" href="#parsley_1" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parsley() -&gt; argparse.ArgumentParser()
+</code></pre>
+<p>Parses the arguments from the command line.</p>
+<p>Returns argparse.ArgumentParser</p>
+<p><a id="dataverse_utils.scripts.dv_study_migrator.upload_file_to_target"></a></p>
+<h5 id="upload_file_to_target">upload_file_to_target<a class="headerlink" href="#upload_file_to_target" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def upload_file_to_target(indict: dict, pid, source_url, source_key,
+                          target_url, target_key)
+</code></pre>
+<p>Uploads a single file with metadata to a dataverse record</p>
+<p><a id="dataverse_utils.scripts.dv_study_migrator.remove_target_files"></a></p>
+<h5 id="remove_target_files">remove_target_files<a class="headerlink" href="#remove_target_files" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def remove_target_files(record: dataverse_utils.dvdata.Study,
+                        timeout: int = 100)
+</code></pre>
+<p>Removes all files from a dataverse record.
+    record: dataverse_utils.dvdata.Study
+    timeout: int
+        Timeout in seconds</p>
+<p><a id="dataverse_utils.scripts.dv_study_migrator.main"></a></p>
+<h5 id="main_1">main<a class="headerlink" href="#main_1" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main()
+</code></pre>
+<p>Run this, obviously</p>
+<p><a id="dataverse_utils.scripts.dv_ldc_uploader"></a></p>
+<h2 id="dataverse_utilsscriptsdv_ldc_uploader">dataverse_utils.scripts.dv_ldc_uploader<a class="headerlink" href="#dataverse_utilsscriptsdv_ldc_uploader" title="Permanent link">&para;</a></h2>
+<p>Auto download/upload LDC metadata and files.</p>
+<p>python3 uploadme.py LDC20201S01 . . . LDC2021T21 apikey</p>
+<p><a id="dataverse_utils.scripts.dv_ldc_uploader.parse"></a></p>
+<h5 id="parse">parse<a class="headerlink" href="#parse" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parse() -&gt; argparse.ArgumentParser()
+</code></pre>
+<p>Parses the arguments from the command line.</p>
+<p>Returns argparse.ArgumentParser</p>
+<p><a id="dataverse_utils.scripts.dv_ldc_uploader.upload_meta"></a></p>
+<h5 id="upload_meta">upload_meta<a class="headerlink" href="#upload_meta" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def upload_meta(ldccat: str,
+                url: str,
+                key: str,
+                dvs: str,
+                verbose: bool = False,
+                certchain: str = None) -&gt; str
+</code></pre>
+<p>Uploads metadata to target dataverse collection. Returns persistentId.</p>
+<p>ldccat : str
+    Linguistic Data Consortium catalogue number
+url : str
+    URL to base instance of Dataverse installation
+key : str
+    API key
+dvs : str
+    Target Dataverse collection short name
+certchain : str
+    Path to LDC .PEM certificate chain</p>
+<p><a id="dataverse_utils.scripts.dv_ldc_uploader.main"></a></p>
+<h5 id="main_2">main<a class="headerlink" href="#main_2" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main() -&gt; None
+</code></pre>
+<p>Uploads metadata and data to Dataverse collection/study respectively</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date"></a></p>
+<h2 id="dataverse_utilsscriptsdv_pg_facet_date">dataverse_utils.scripts.dv_pg_facet_date<a class="headerlink" href="#dataverse_utilsscriptsdv_pg_facet_date" title="Permanent link">&para;</a></h2>
+<p>Reads the date from a Dataverse study and forces the facet sidebar to use that
+date by manually updating the Dataverse Postgres database.</p>
+<p>This <em>must</em> be run on the server that hosts a Dataverse installation,
+and the user must supply, at a minimum, the database password and
+a persistent ID to be read, as well as a date type.</p>
+<p>Requires two non-standard python libraries: psycopg2
+(use psycopg2-binary to avoid installing from source) and requests.</p>
+<p>Psycopg2 is not part of the requirements for dataverse_utils
+because it is only used for the server portion of these utilities,
+and hence useless for them.</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.parsely"></a></p>
+<h5 id="parsely">parsely<a class="headerlink" href="#parsely" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parsely() -&gt; argparse.ArgumentParser
+</code></pre>
+<p>Command line argument parser</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.parse_dtype"></a></p>
+<h5 id="parse_dtype">parse_dtype<a class="headerlink" href="#parse_dtype" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parse_dtype(dtype) -&gt; str
+</code></pre>
+<p>Returns correctly formatted date type string for Dataverse API</p>
+<hr />
+<p>dtype : str
+    One of the allowable values from the parser</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.write_old"></a></p>
+<h5 id="write_old">write_old<a class="headerlink" href="#write_old" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def write_old(data) -&gt; None
+</code></pre>
+<p>Writes older data to a tsv file. Assumes 4 values per item:
+id, authority, identifier, publicationdate.</p>
+<h2 id="publicationdate-is-assumed-to-be-a-datetimedatetime-instance">publicationdate is assumed to be a datetime.datetime instance.<a class="headerlink" href="#publicationdate-is-assumed-to-be-a-datetimedatetime-instance" title="Permanent link">&para;</a></h2>
+<p><strong>Arguments</strong>:</p>
+<p>data : list
+  Postqres query output list (ie, data = cursor.fetchall())</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.write_sql"></a></p>
+<h5 id="write_sql">write_sql<a class="headerlink" href="#write_sql" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def write_sql(data) -&gt; None
+</code></pre>
+<p>Write SQL to file</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.get_datetime"></a></p>
+<h5 id="get_datetime">get_datetime<a class="headerlink" href="#get_datetime" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def get_datetime(datestr) -&gt; (datetime.datetime, str)
+</code></pre>
+<p>Return datetime from poorly formatted Dataverse dates string</p>
+<hr />
+<p>datestr : str
+    Dataverse date returned by API</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.fetch_date_api"></a></p>
+<h5 id="fetch_date_api">fetch_date_api<a class="headerlink" href="#fetch_date_api" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def fetch_date_api(url, key, pid, dtype) -&gt; str
+</code></pre>
+<p>Returns the requested date string from the Dataverse study record</p>
+<hr />
+<p>url : str
+    Base URL of Dataverse installation
+key :str
+    API key for Dataverse user
+pid : str
+    Persistent identifier for Dataverse study
+dtype : str
+    Date type required</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.reindex"></a></p>
+<h5 id="reindex">reindex<a class="headerlink" href="#reindex" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def reindex(pid) -&gt; dict
+</code></pre>
+<p>Reindexes study in place. Localhost access only.</p>
+<hr />
+<p>pid : str
+    PersistentId for Dataverse study</p>
+<p><a id="dataverse_utils.scripts.dv_pg_facet_date.main"></a></p>
+<h5 id="main_3">main<a class="headerlink" href="#main_3" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main()
+</code></pre>
+<p>The heart of the application</p>
+<p><a id="dataverse_utils.scripts.dv_release"></a></p>
+<h2 id="dataverse_utilsscriptsdv_release">dataverse_utils.scripts.dv_release<a class="headerlink" href="#dataverse_utilsscriptsdv_release" title="Permanent link">&para;</a></h2>
+<p>Bulk release script for Dataverse.</p>
+<p>This is almost identical to the dryad2dataverse bulk
+releaser except that the defaults are changed to
+https://abacus.library.ubc.ca</p>
+<p><a id="dataverse_utils.scripts.dv_release.argp"></a></p>
+<h5 id="argp">argp<a class="headerlink" href="#argp" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def argp()
+</code></pre>
+<p>Parses the arguments from the command line.</p>
+<p>Returns arparse.ArgumentParser</p>
+<p><a id="dataverse_utils.scripts.dv_release.Dverse"></a></p>
+<h3 id="dverse-objects">Dverse Objects<a class="headerlink" href="#dverse-objects" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class Dverse()
+</code></pre>
+<p>An object representing a Dataverse installation</p>
+<p><a id="dataverse_utils.scripts.dv_release.Dverse.__init__"></a></p>
+<h5 id="__init___2">__init__<a class="headerlink" href="#__init___2" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def __init__(dvurl, apikey, dvs)
+</code></pre>
+<p>Intializes Dataverse installation object.</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>dvurl</code>: str. URL to base Dataverse installation
+(eg. &lsquo;https://abacus.library.ubc.ca&rsquo;)</li>
+<li><code>apikey</code>: str. API key for Dataverse user</li>
+<li><code>dv</code>: str. Short name of target Dataverse collection (eg. &lsquo;statcan&rsquo;)</li>
+</ul>
+<p><a id="dataverse_utils.scripts.dv_release.Dverse.study_list"></a></p>
+<h5 id="study_list">study_list<a class="headerlink" href="#study_list" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">@property
+def study_list() -&gt; list
+</code></pre>
+<p>Returns a list of all studies (published or not) in
+the Dataverse collection</p>
+<p><a id="dataverse_utils.scripts.dv_release.Dverse.unreleased"></a></p>
+<h5 id="unreleased">unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">@property
+def unreleased(all_stud: list = None) -&gt; list
+</code></pre>
+<p>Finds only unreleased studies from a list of studies</p>
+<p><strong>Arguments</strong>:</p>
+<ul>
+<li><code>all_stud</code>: list. List of Dataverse studies. Defaults to output of
+Dverse.get_study_list()</li>
+</ul>
+<p><a id="dataverse_utils.scripts.dv_release.Study"></a></p>
+<h3 id="study-objects_1">Study Objects<a class="headerlink" href="#study-objects_1" title="Permanent link">&para;</a></h3>
+<pre><code class="language-python">class Study()
+</code></pre>
+<p>Instance representing a Dataverse study</p>
+<p><a id="dataverse_utils.scripts.dv_release.Study.__init__"></a></p>
+<h5 id="__init___3">__init__<a class="headerlink" href="#__init___3" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def __init__(**kwargs)
+</code></pre>
+<p>:kwarg dvurl: str. Base URL for Dataverse instance
+:kwarg apikey: str. API key for Dataverse user
+:kwarg pid: str. Persistent identifier for study
+:kwarg stime: int. Time between file lock checks. Default 10
+:kwarg verbose: Verbose output. Default False</p>
+<p><a id="dataverse_utils.scripts.dv_release.Study.status_ok"></a></p>
+<h5 id="status_ok">status_ok<a class="headerlink" href="#status_ok" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def status_ok()
+</code></pre>
+<p>Checks to see if study has a lock. Returns True if OK to continue, else False.</p>
+<p><a id="dataverse_utils.scripts.dv_release.Study.release_me"></a></p>
+<h5 id="release_me">release_me<a class="headerlink" href="#release_me" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def release_me(interactive=False)
+</code></pre>
+<p>Releases study and waits until it&rsquo;s unlocked before returning to the function</p>
+<p><a id="dataverse_utils.scripts.dv_release.main"></a></p>
+<h5 id="main_4">main<a class="headerlink" href="#main_4" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main()
+</code></pre>
+<p>The primary function. Will release all unreleased studies in the
+the target Dataverse collection, or selected studies as required.</p>
+<p><a id="dataverse_utils.scripts.dv_del"></a></p>
+<h2 id="dataverse_utilsscriptsdv_del">dataverse_utils.scripts.dv_del<a class="headerlink" href="#dataverse_utilsscriptsdv_del" title="Permanent link">&para;</a></h2>
+<p>Dataverse Bulk Deleter
+Deletes unpublished studies at the command line</p>
+<p><a id="dataverse_utils.scripts.dv_del.delstudy"></a></p>
+<h5 id="delstudy">delstudy<a class="headerlink" href="#delstudy" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def delstudy(dvurl, key, pid)
+</code></pre>
+<p>Deletes Dataverse study</p>
+<p>dvurl : str
+    Dataverse installation base URL
+key : str
+    Dataverse user API key
+pid : str
+    Dataverse collection study persistent identifier</p>
+<p><a id="dataverse_utils.scripts.dv_del.conf"></a></p>
+<h5 id="conf">conf<a class="headerlink" href="#conf" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def conf(tex)
+</code></pre>
+<p>Confirmation dialogue checker. Returns true if &ldquo;Y&rdquo; or &ldquo;y&rdquo;</p>
+<p><a id="dataverse_utils.scripts.dv_del.getsize"></a></p>
+<h5 id="getsize">getsize<a class="headerlink" href="#getsize" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def getsize(dvurl, pid, key)
+</code></pre>
+<p>Returns size of Dataverse study. Mostly here for debugging.
+dvurl : str
+    Dataverse installation base URL
+pid : str
+    Dataverse collection study persistent identifier
+key : str
+    Dataverse user API key</p>
+<p><a id="dataverse_utils.scripts.dv_del.parsley"></a></p>
+<h5 id="parsley_2">parsley<a class="headerlink" href="#parsley_2" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parsley() -&gt; argparse.ArgumentParser
+</code></pre>
+<p>Argument parser as separate function</p>
+<p><a id="dataverse_utils.scripts.dv_del.main"></a></p>
+<h5 id="main_5">main<a class="headerlink" href="#main_5" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main()
+</code></pre>
+<p>Command line bulk deleter</p>
+<p><a id="dataverse_utils.scripts.dv_replace_licence"></a></p>
+<h2 id="dataverse_utilsscriptsdv_replace_licence">dataverse_utils.scripts.dv_replace_licence<a class="headerlink" href="#dataverse_utilsscriptsdv_replace_licence" title="Permanent link">&para;</a></h2>
+<p>Replace all licence in a study with one read from an external
+markdown file. This requires using a different API, the
+&ldquo;semantic metadata api&rdquo;
+https://guides.dataverse.org/en/5.6/developers/
+dataset-semantic-metadata-api.html</p>
+<p><a id="dataverse_utils.scripts.dv_replace_licence.parsley"></a></p>
+<h5 id="parsley_3">parsley<a class="headerlink" href="#parsley_3" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parsley() -&gt; argparse.ArgumentParser()
+</code></pre>
+<p>parse the command line</p>
+<p><a id="dataverse_utils.scripts.dv_replace_licence.replace_licence"></a></p>
+<h5 id="replace_licence">replace_licence<a class="headerlink" href="#replace_licence" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def replace_licence(hdl, lic, key, url='https://abacus.library.ubc.ca')
+</code></pre>
+<p>Replace the licence for a dataverse study with
+persistent ID hdl.</p>
+<hr />
+<p>hdl : str
+    Dataverse persistent ID
+lic : str
+    Licence text in Markdown format
+key : str
+    Dataverse API key
+url : str
+    Dataverse installation base URL</p>
+<p><a id="dataverse_utils.scripts.dv_replace_licence.republish"></a></p>
+<h5 id="republish">republish<a class="headerlink" href="#republish" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def republish(hdl, key, url='https://abacus.library.ubc.ca')
+</code></pre>
+<p>Republish study without updating version</p>
+<hr />
+<p>hdl : str
+    Persistent Id
+key : str
+    Dataverse API key
+url : str
+    Dataverse installation base URL</p>
+<p><a id="dataverse_utils.scripts.dv_replace_licence.print_stat"></a></p>
+<h5 id="print_stat">print_stat<a class="headerlink" href="#print_stat" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def print_stat(rjson)
+</code></pre>
+<p>Prints error status to stdout</p>
+<p><a id="dataverse_utils.scripts.dv_replace_licence.main"></a></p>
+<h5 id="main_6">main<a class="headerlink" href="#main_6" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main()
+</code></pre>
+<p>Main script function</p>
+<p><a id="dataverse_utils.scripts.dv_upload_tsv"></a></p>
+<h2 id="dataverse_utilsscriptsdv_upload_tsv">dataverse_utils.scripts.dv_upload_tsv<a class="headerlink" href="#dataverse_utilsscriptsdv_upload_tsv" title="Permanent link">&para;</a></h2>
+<p>Uploads data sets to a dataverse installation from the
+contents of a TSV (tab separated value)
+file. Metadata, file tags, paths, etc are all read
+from the TSV.</p>
+<p><a id="dataverse_utils.scripts.dv_upload_tsv.parse"></a></p>
+<h5 id="parse_1">parse<a class="headerlink" href="#parse_1" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parse() -&gt; argparse.ArgumentParser()
+</code></pre>
+<p>Parses the arguments from the command line.</p>
+<p>Returns argparse.ArgumentParser</p>
+<p><a id="dataverse_utils.scripts.dv_upload_tsv.main"></a></p>
+<h5 id="main_7">main<a class="headerlink" href="#main_7" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main() -&gt; None
+</code></pre>
+<p>Uploads data to an already existing Dataverse study</p>
+<p><a id="dataverse_utils.scripts.dv_manifest_gen"></a></p>
+<h2 id="dataverse_utilsscriptsdv_manifest_gen">dataverse_utils.scripts.dv_manifest_gen<a class="headerlink" href="#dataverse_utilsscriptsdv_manifest_gen" title="Permanent link">&para;</a></h2>
+<p>Creates a file manifest in tab separated value format
+which can be used with other dataverse_util library utilities
+and functions to upload files complete with metadata.</p>
+<p><a id="dataverse_utils.scripts.dv_manifest_gen.parse"></a></p>
+<h5 id="parse_2">parse<a class="headerlink" href="#parse_2" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def parse() -&gt; argparse.ArgumentParser()
+</code></pre>
+<p>Parses the arguments from the command line.</p>
+<p>Returns argparse.ArgumentParser</p>
+<p><a id="dataverse_utils.scripts.dv_manifest_gen.quotype"></a></p>
+<h5 id="quotype">quotype<a class="headerlink" href="#quotype" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def quotype(quote: str) -&gt; int
+</code></pre>
+<p>Parse quotation type for csv parser.</p>
+<p>returns csv quote constant.</p>
+<p><a id="dataverse_utils.scripts.dv_manifest_gen.main"></a></p>
+<h5 id="main_8">main<a class="headerlink" href="#main_8" title="Permanent link">&para;</a></h5>
+<pre><code class="language-python">def main() -&gt; None
+</code></pre>
+<p>The main function call</p>
 <p><a id="dataverse_utils.dataverse_utils"></a></p>
 <h2 id="dataverse_utilsdataverse_utils">dataverse_utils.dataverse_utils<a class="headerlink" href="#dataverse_utilsdataverse_utils" title="Permanent link">&para;</a></h2>
 <p>A collection of Dataverse utilities for file and metadata
@@ -457,7 +1067,7 @@ website page.</p>
 </code></pre>
 <p>An LDC item (eg, LDC2021T01)</p>
 <p><a id="dataverse_utils.ldc.Ldc.__init__"></a></p>
-<h5 id="__init__">__init__<a class="headerlink" href="#__init__" title="Permanent link">&para;</a></h5>
+<h5 id="__init___4">__init__<a class="headerlink" href="#__init___4" title="Permanent link">&para;</a></h5>
 <pre><code class="language-python">def __init__(ldc, cert=None)
 </code></pre>
 <p>Returns a dict with keys created from an LDC catalogue web
@@ -574,77 +1184,6 @@ def find_block_index(dvjson, key)
   api key</p>
 <p>dv : str
   Dataverse to which it is being uploaded</p>
-<p><a id="dataverse_utils.dvdata"></a></p>
-<h2 id="dataverse_utilsdvdata">dataverse_utils.dvdata<a class="headerlink" href="#dataverse_utilsdvdata" title="Permanent link">&para;</a></h2>
-<p>Dataverse studies and files</p>
-<p><a id="dataverse_utils.dvdata.Study"></a></p>
-<h3 id="study-objects">Study Objects<a class="headerlink" href="#study-objects" title="Permanent link">&para;</a></h3>
-<pre><code class="language-python">class Study(dict)
-</code></pre>
-<p>Dataverse record. Dataverse study records are pure metadata so this
-is represented with a dictionary.</p>
-<p><a id="dataverse_utils.dvdata.Study.__init__"></a></p>
-<h5 id="__init___1">__init__<a class="headerlink" href="#__init___1" title="Permanent link">&para;</a></h5>
-<pre><code class="language-python">def __init__(pid: str, url: str, key: str, **kwargs)
-</code></pre>
-<p>pid : str
-    Record persistent identifier: hdl or doi
-url : str
-    Base URL to host Dataverse instance
-key : str
-    Dataverse API key with downloader privileges</p>
-<p><a id="dataverse_utils.dvdata.File"></a></p>
-<h3 id="file-objects">File Objects<a class="headerlink" href="#file-objects" title="Permanent link">&para;</a></h3>
-<pre><code class="language-python">class File(dict)
-</code></pre>
-<p>Class representing a file on a Dataverse instance</p>
-<p><a id="dataverse_utils.dvdata.File.__init__"></a></p>
-<h5 id="__init___2">__init__<a class="headerlink" href="#__init___2" title="Permanent link">&para;</a></h5>
-<pre><code class="language-python">def __init__(url: str, key: str, **kwargs)
-</code></pre>
-<p>url : str
-    Base URL to host Dataverse instance
-key : str
-    Dataverse API key with downloader privileges
-id : int or str
-    File identifier; can be a file ID or PID
-args : list
-kwargs : dict</p>
-<p>To initialize correctly, pass a value from Study[&lsquo;file_info&rsquo;].</p>
-<p>Eg: File(&lsquo;https://test.invalid&rsquo;, &lsquo;ABC123&rsquo;, **Study_instance[&lsquo;file_info&rsquo;][0])</p>
-<p><a id="dataverse_utils.dvdata.File.download_file"></a></p>
-<h5 id="download_file">download_file<a class="headerlink" href="#download_file" title="Permanent link">&para;</a></h5>
-<pre><code class="language-python">def download_file()
-</code></pre>
-<p>Downloads the file to a temporary location. Data will be in the ORIGINAL format,
-not Dataverse-processed TSVs</p>
-<p><a id="dataverse_utils.dvdata.File.del_tempfile"></a></p>
-<h5 id="del_tempfile">del_tempfile<a class="headerlink" href="#del_tempfile" title="Permanent link">&para;</a></h5>
-<pre><code class="language-python">def del_tempfile()
-</code></pre>
-<p>Delete tempfile if it exists</p>
-<p><a id="dataverse_utils.dvdata.File.produce_digest"></a></p>
-<h5 id="produce_digest">produce_digest<a class="headerlink" href="#produce_digest" title="Permanent link">&para;</a></h5>
-<pre><code class="language-python">def produce_digest(prot: str = 'md5', blocksize: int = 2**16) -&gt; str
-</code></pre>
-<p>Returns hex digest for object</p>
-<pre class="codehilite"><code>fname : str
-   Path to a file object
-
-prot : str
-   Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
-      'sha384', 'sha512', 'blake2b', 'blake2s', 'md5'.
-      Default: 'md5'
-
-blocksize : int
-   Read block size in bytes
-</code></pre>
-
-<p><a id="dataverse_utils.dvdata.File.verify"></a></p>
-<h5 id="verify">verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h5>
-<pre><code class="language-python">def verify() -&gt; None
-</code></pre>
-<p>Compares checksum with stated checksum</p>
               
             </div>
           </div><footer>
