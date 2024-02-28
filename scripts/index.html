@@ -384,10 +384,18 @@ options:
 <p>If uploading a tsv which includes mimetypes, be aware that mimetypes for zip files will be ignored to circumvent Dataverse&rsquo;s automatic unzipping feature.</p>
 <p>The rationale for manually specifiying mimetypes is to enable the use of previews which require a specific mimetype to function, but Dataverse does not correctly detect the type. For example, the GeoJSON file previewer requires a mimetype of <code>application/geo+json</code>, but the detection of this mimetype is not supported until Dataverse v5.9. By manually setting the mimetype, the previewer can be used by earlier Dataverse versions.</p>
 <p><strong>Usage</strong></p>
-<pre><code class="language-nohighlight">usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-t TRUNCATE] [--version] [tsv]
+<pre><code class="language-nohighlight">usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-n] [-t TRUNCATE] [--version] tsv
 
-Uploads data sets to an *existing* Dataverse study from the contents of a TSV (tab separated value) file. Metadata, file tags, paths, etc are all read from the TSV. JSON output from the
-Dataverse API is printed to stdout during the process.
+Uploads data sets to an *existing* Dataverse study
+from the contents of a TSV (tab separated value)
+file. Metadata, file tags, paths, etc are all read
+from the TSV.
+
+JSON output from the Dataverse API is printed to stdout during
+the process.
+
+By default, files will be unrestricted but the utility will ask
+for confirmation before uploading.
 
 positional arguments:
   tsv                   TSV file to upload
@@ -398,10 +406,20 @@ options:
   -k KEY, --key KEY     API key
   -u URL, --url URL     Dataverse installation base url. defaults to &quot;https://abacus.library.ubc.ca&quot;
   -r, --restrict        Restrict files after upload.
+  -n, --no-confirm      Don't confirm non-restricted status
   -t TRUNCATE, --truncate TRUNCATE
-                        Left truncate file path. As Dataverse studies can retain directory structure, you can set an arbitrary starting point by removing the leftmost portion. Eg: if the
-                        TSV has a file path of /home/user/Data/file.txt, setting --truncate to &quot;/home/user&quot; would have file.txt in the Data directory in the Dataverse study. The file is
-                        still loaded from the path in the spreadsheet. Defaults to no truncation.
+
+                        Left truncate file path. As Dataverse studies 
+                        can retain directory structure, you can set 
+                        an arbitrary starting point by removing the 
+                        leftmost portion. Eg: if the TSV has a file 
+                        path of /home/user/Data/file.txt, setting 
+                        --truncate to &quot;/home/user&quot; would have file.txt 
+                        in the Data directory in the Dataverse study. 
+                        The file is still loaded from the path in the 
+                        spreadsheet. 
+
+                        Defaults to no truncation.
   --version             Show version number and exit
 </code></pre>
 <p><a name='footnote' /></p>
