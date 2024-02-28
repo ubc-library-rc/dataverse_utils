@@ -336,10 +336,18 @@ The rationale for manually specifiying mimetypes is to enable the use of preview
 **Usage**
 
 ```nohighlight
-usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-t TRUNCATE] [--version] [tsv]
+usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-n] [-t TRUNCATE] [--version] tsv
 
-Uploads data sets to an *existing* Dataverse study from the contents of a TSV (tab separated value) file. Metadata, file tags, paths, etc are all read from the TSV. JSON output from the
-Dataverse API is printed to stdout during the process.
+Uploads data sets to an *existing* Dataverse study
+from the contents of a TSV (tab separated value)
+file. Metadata, file tags, paths, etc are all read
+from the TSV.
+
+JSON output from the Dataverse API is printed to stdout during
+the process.
+
+By default, files will be unrestricted but the utility will ask
+for confirmation before uploading.
 
 positional arguments:
   tsv                   TSV file to upload
@@ -350,10 +358,20 @@ options:
   -k KEY, --key KEY     API key
   -u URL, --url URL     Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
   -r, --restrict        Restrict files after upload.
+  -n, --no-confirm      Don't confirm non-restricted status
   -t TRUNCATE, --truncate TRUNCATE
-                        Left truncate file path. As Dataverse studies can retain directory structure, you can set an arbitrary starting point by removing the leftmost portion. Eg: if the
-                        TSV has a file path of /home/user/Data/file.txt, setting --truncate to "/home/user" would have file.txt in the Data directory in the Dataverse study. The file is
-                        still loaded from the path in the spreadsheet. Defaults to no truncation.
+                        
+                        Left truncate file path. As Dataverse studies 
+                        can retain directory structure, you can set 
+                        an arbitrary starting point by removing the 
+                        leftmost portion. Eg: if the TSV has a file 
+                        path of /home/user/Data/file.txt, setting 
+                        --truncate to "/home/user" would have file.txt 
+                        in the Data directory in the Dataverse study. 
+                        The file is still loaded from the path in the 
+                        spreadsheet. 
+                        
+                        Defaults to no truncation.
   --version             Show version number and exit
 ```
 
