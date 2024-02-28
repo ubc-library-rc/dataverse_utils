@@ -7,10 +7,11 @@ from the TSV.
 '''
 
 import argparse
+import sys
 
 import dataverse_utils as du
 
-VERSION = (0, 3, 0)
+VERSION = (0, 4, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -24,10 +25,11 @@ def parse() -> argparse.ArgumentParser():
                    'file. Metadata, file tags, paths, etc are all read '
                    'from the TSV. '
                    'JSON output from the Dataverse API is printed to stdout during '
-                   'the process.')
+                   'the process.'
+                   'By default, files will be unrestricted but ask for '
+                   'confirmation before uploading.')
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('tsv', help='TSV file to upload',
-                        nargs='?')
+    parser.add_argument('tsv', help='TSV file to upload')
     parser.add_argument('-p', '--pid',
                         help='Dataverse study persistent identifier (DOI/handle)',
                         required=True)
@@ -37,7 +39,9 @@ def parse() -> argparse.ArgumentParser():
                         help=('Dataverse installation base url. '
                               'defaults to "https://abacus.library.ubc.ca"'))
     parser.add_argument('-r', '--restrict', action='store_true', dest='rest',
-                        help=('Restrict files after upload.'))
+                        help='Restrict files after upload.')
+    parser.add_argument('-n', '--no-confirm', action='store_true', dest='nc',
+                        help='Don\'t confirm non-restricted status')
     parser.add_argument('-t', '--truncate', default='',
                         help=('Left truncate file path. As Dataverse studies '
                               'can retain directory structure, you can set '
@@ -60,8 +64,14 @@ def main() -> None:
     '''
     parser = parse()
     args = parser.parse_args()
-    print(args)
-    with open(args.tsv, newline='') as fil:
+    if not args.nc and not args.rest:
+        print('message here')
+        conf = input('File will be unrestricted. Continue (y/n)? ')
+        if conf.lower() == 'n' or conf.lower() == 'no':
+            print('Transfer aborted')
+            sys.exit()
+
+    with open(args.tsv, newline='', encoding='utf-8') as fil:
         du.upload_from_tsv(fil, hdl=args.pid,
                            dv=args.url, apikey=args.key,
                            trunc=args.truncate, rest=args.rest)
