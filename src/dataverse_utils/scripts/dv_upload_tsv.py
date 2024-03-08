@@ -76,7 +76,6 @@ def main() -> None:
     parser = parse()
     args = parser.parse_args()
     if not args.nc and not args.rest:
-        print('message here')
         conf = input('File will be unrestricted. Continue (y/n)? ')
         if conf.lower() == 'n' or conf.lower() == 'no':
             print('Transfer aborted')
