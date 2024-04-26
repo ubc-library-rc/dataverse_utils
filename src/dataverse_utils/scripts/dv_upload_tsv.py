@@ -12,7 +12,7 @@ import textwrap
 
 import dataverse_utils as du
 
-VERSION = (0, 4, 2)
+VERSION = (0, 4, 3)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -76,7 +76,7 @@ def main() -> None:
     parser = parse()
     args = parser.parse_args()
     if not args.nc and not args.rest:
-        conf = input('File will be unrestricted. Continue (y/n)? ')
+        conf = input('File(s) will be unrestricted. Continue (y/n)? ')
         if conf.lower() == 'n' or conf.lower() == 'no':
             print('Transfer aborted')
             sys.exit()
