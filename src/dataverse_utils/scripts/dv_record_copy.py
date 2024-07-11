@@ -10,7 +10,7 @@ Dataverse GUI.
 import argparse
 import requests
 
-VERSION = (0, 1, 1)
+VERSION = (0, 1, 2)
 __version__ = '.'.join([str(x) for x in VERSION])
 TIMEOUT = 100
 
@@ -41,7 +41,8 @@ def parsley() -> argparse.ArgumentParser():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--collection',
                         help=('Short name of target Dataverse collection (eg: ldc). '
-                              'Defaults to "ldc"'),
+                              'Defaults to "statcan-public"'),
+                        default='statcan-public'
                         )
     group.add_argument('-r', '--replace',
                         help=('Replace metadata data in record with this PID'),
