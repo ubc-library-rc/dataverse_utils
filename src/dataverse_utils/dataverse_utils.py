@@ -374,16 +374,19 @@ def upload_file(fpath, hdl, **kwargs):
         label : str
             OPTIONAL
             If included in kwargs, this value will be used for the label
-        timeout = int
+        timeout : int
             OPTIONAL
             Timeout in seconds
+        override : bool
+            OPTIONAL
+            Ignore NOTAB (ie, NOTAB = [])
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
     #Does the file need to be renamed post hoc?
     #I don't think this can be fixed. Goddamitsomuch.
     dvurl = kwargs['dv'].strip('\\ /')
-    if os.path.splitext(fpath)[1].lower() in NOTAB:
+    if os.path.splitext(fpath)[1].lower() in NOTAB and not kwargs.get('override'):
         file_name_clean = os.path.basename(fpath)
         #file_name = os.path.basename(fpath) + '.NOPROCESS'
         # using .NOPROCESS doesn't seem to work?
@@ -404,17 +407,15 @@ def upload_file(fpath, hdl, **kwargs):
     dv4_meta = {'label' : kwargs.get('label', file_name_clean),
                 'description' : kwargs.get('descr', ''),
                 'directoryLabel': kwargs.get('dirlabel', ''),
-                'categories': kwargs.get('tags', [])}
+                'categories': kwargs.get('tags', []),
+                'mimetype' : mime}
     fpath = os.path.abspath(fpath)
     fields = {'file': (file_name, open(fpath, 'rb'), mime)}#pylint: disable=consider-using-with
-    #fields.update({'jsonData' : f'{dv4_meta}'})
     fields.update({'jsonData' : json.dumps(dv4_meta)})
     multi = MultipartEncoder(fields=fields) # use multipart streaming for large files
     headers = {'X-Dataverse-key' : kwargs.get('apikey'),
                'Content-type' : multi.content_type}
     params = {'persistentId' : hdl}
-
-    #print(multi)
 
     LOGGER.info('Uploading %s to %s', fpath, hdl)
     upload = requests.post(f"{dvurl}/api/datasets/:persistentId/add",
@@ -569,7 +570,10 @@ def upload_from_tsv(fil, hdl, **kwargs):
                   'rest': kwargs.get('rest', False)}
         if mimetype:
             params['mimetype'] = mimetype
-        upload_file(row['file'], hdl, **params)
+        #So that you can pass everything all at once, params
+        #is merged onto kwargs. This is for easier upgradability
+        kwargs.update(params)
+        upload_file(row['file'], hdl, **kwargs)
 
 if __name__ == '__main__':
     import doctest

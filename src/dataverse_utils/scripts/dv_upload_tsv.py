@@ -12,7 +12,7 @@ import textwrap
 
 import dataverse_utils as du
 
-VERSION = (0, 4, 3)
+VERSION = (0, 5, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -64,7 +64,20 @@ def parse() -> argparse.ArgumentParser():
 
                             Defaults to no truncation.
                             '''))
-    parser.add_argument('--version', action='version',
+    parser.add_argument('-o', '--override', action='store_true',
+                        help=textwrap.dedent('''
+                            
+                            Disables replacement of mimetypes for Dataverse-
+                            processable files. That is, files such as Excel,
+                            SPSS, etc, will have their actual mimetypes sent
+                            instead of 'application/octet-stream'.
+                            Useful when mimetypes are specified in the TSV
+                            file and the upload mimetype is not 
+                            the expected result.
+
+                            '''))
+
+    parser.add_argument('-v', '--version', action='version',
                         version='%(prog)s '+__version__,
                         help='Show version number and exit')
     return parser
@@ -84,7 +97,8 @@ def main() -> None:
     with open(args.tsv, newline='', encoding='utf-8') as fil:
         du.upload_from_tsv(fil, hdl=args.pid,
                            dv=args.url, apikey=args.key,
-                           trunc=args.truncate, rest=args.rest)
+                           trunc=args.truncate, rest=args.rest,
+                           override = args.override)
 
 if __name__ == '__main__':
     main()
