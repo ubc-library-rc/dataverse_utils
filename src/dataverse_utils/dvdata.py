@@ -107,8 +107,38 @@ class Study(dict): #pylint: disable=too-few-public-methods
         getjson.raise_for_status()
         return getjson.json()['data']['latestVersion']
 
+    def __add_email(self, upjson):
+        '''
+        Adds contact information if it's not there. Fills with dummy data
+        '''
+        for n, v in enumerate((upjson['datasetVersion']
+                              ['metadataBlocks']['citation']['fields'])):
+            if v['typeName'] == 'datasetContact':
+                contact_no = n
+        for _x in (upjson['datasetVersion']['metadataBlocks']
+                  ['citation']['fields'][contact_no]['value']):
+            if not _x.get('datasetContactEmail'):
+                _x['datasetContactEmail'] = {'typeName':'datasetContactEmail',
+                                              'multiple': False,
+                                              'typeClass':'primitive',
+                                              'value': 'suppressed_value@test.invalid'}
+        return upjson
+
     @property
     def _upload_json(self)->dict:
+        '''
+        A Dataverse JSON record with with PIDs and other information stripped
+        suitable for upload as a new Dataverse study record.
+        '''
+        upj = {'datasetVersion': {'license': self['orig_json']['license'],
+                                     'termsOfUse': self['orig_json'].get('termsOfUse',''),
+                                     'metadataBlocks': self['orig_json']['metadataBlocks']
+                                     }
+                  }
+        return self.__add_email(upj)
+
+    @property
+    def _oldupload_json(self)->dict:
         '''
         A Dataverse JSON record with with PIDs and other information stripped
         suitable for upload as a new Dataverse study record.
@@ -118,7 +148,6 @@ class Study(dict): #pylint: disable=too-few-public-methods
                                      'metadataBlocks': self['orig_json']['metadataBlocks']
                                      }
                   }
-
     def _get_file_pids(self)->list:
         '''
         Returns a list of file ids representing the file
