@@ -55,7 +55,8 @@ def _make_info(dv_url, study, apikey) -> tuple:
 def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many-arguments
              inc_header=True,
              mime=False,
-             quotype=csv.QUOTE_MINIMAL) -> str:
+             quotype=csv.QUOTE_MINIMAL,
+             **kwargs) -> str:
     '''
     Recurses the tree for files and produces tsv output with
     with headers 'file', 'description', 'tags'.
@@ -93,6 +94,11 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many
         csv.QUOTE_NONNUMERIC / 2
         csv.QUOTE_NONE / 3
 
+    path: bool
+        If true include a 'path' field so that you can type
+        in a custom path instead of actually structuring
+        your data
+
     '''
     if start_dir.endswith(os.sep):
         #start_dir += os.sep
@@ -109,6 +115,8 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many
     headers = ['file', 'description', 'tags']
     if mime:
         headers.append('mimetype')
+    if kwargs.get('path'):
+        headers.insert(1, 'path')
     outf = io.StringIO(newline='')
     tsv_writer = csv.writer(outf, delimiter='\t',
                             quoting=quotype
@@ -169,9 +177,10 @@ def dump_tsv(start_dir, filename, in_list=None,
     def_tag= kwargs.get('def_tag', 'Data')
     inc_header =kwargs.get('inc_header', True)
     mime = kwargs.get('mime', False)
+    path = kwargs.get('path', False)
     quotype = kwargs.get('quotype', csv.QUOTE_MINIMAL)
 
-    dumper = make_tsv(start_dir, in_list, def_tag, inc_header, mime, quotype)
+    dumper = make_tsv(start_dir, in_list, def_tag, inc_header, mime, quotype, path=path)
     with open(filename, 'w', newline='', encoding='utf-8') as tsvfile:
         tsvfile.write(dumper)
 
@@ -371,15 +380,23 @@ def upload_file(fpath, hdl, **kwargs):
             Mimetype of file. Useful if using File Previewers. Mimetype for zip files
             (application/zip) will be ignored to circumvent Dataverse's automatic
             unzipping function.
+
         label : str
             OPTIONAL
             If included in kwargs, this value will be used for the label
+
         timeout : int
             OPTIONAL
             Timeout in seconds
+
         override : bool
             OPTIONAL
             Ignore NOTAB (ie, NOTAB = [])
+
+        timeout = int
+            OPTIONAL
+            Timeout in seconds
+
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -556,7 +573,12 @@ def upload_from_tsv(fil, hdl, **kwargs):
         if num == 0:
             continue
         #dirlabel = file_path(row[0], './')
-        dirlabel = file_path(row['file'], kwargs.get('trunc', ''))
+        if row.get('path'):
+            #Explicit separate path because that way you can organize
+            #on upload
+            dirlabel = row.get('path')
+        else:
+            dirlabel = file_path(row['file'], kwargs.get('trunc', ''))
         tags = row['tags'].split(',')
         tags = [x.strip() for x in tags]
         descr = row['description']

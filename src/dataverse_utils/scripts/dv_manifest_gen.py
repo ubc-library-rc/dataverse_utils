@@ -16,7 +16,7 @@ import sys
 
 import dataverse_utils as du
 
-VERSION = (0, 4, 0)
+VERSION = (0, 5, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -71,6 +71,9 @@ def parse() -> argparse.ArgumentParser():
     parser.add_argument('-m', '--mime',
                         help=('Include autodetected mimetypes'),
                         action='store_true')
+    parser.add_argument('-p', '--path',
+                        help=('Include an optional path column for custom file paths'),
+                        action='store_true')
     parser.add_argument('--version', action='version',
                         version='%(prog)s '+__version__,
                         help='Show version number and exit')
@@ -124,13 +127,15 @@ def main() -> None:
                     def_tag=args.tag,
                     inc_header=args.inc_header,
                     quotype=args.quote,
-                    mime=args.mime)
+                    mime=args.mime,
+                    path=args.path)
     else:
         print(du.make_tsv(os.getcwd(), in_list=f_list,
                           def_tag=args.tag,
                           inc_header=args.inc_header,
                           quotype=args.quote,
-                          mime=args.mime))
+                          mime=args.mime,
+                          path=args.path))
 
 if __name__ == '__main__':
     main()
