@@ -6,6 +6,7 @@ and functions to upload files complete with metadata.
 '''
 
 import argparse
+import glob
 import os
 import pathlib
 #pathlib new for Python 3.5
@@ -16,7 +17,7 @@ import sys
 
 import dataverse_utils as du
 
-VERSION = (0, 5, 0)
+VERSION = (0, 5, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -100,27 +101,28 @@ def main() -> None:
     args.quote = quotype(args.quote)
     if  args.quote == -1:
         parser.error('Invalid quotation type')
-    f_list = []
 
-    if not args.files:
-        args.files = [str(x) for x in pathlib.Path('./').glob('*')]
-    if args.show_hidden:
-        args.files +=  [str(x) for x in pathlib.Path('./').glob('.*')]
-    for fil in args.files:
-        finder = pathlib.Path(fil).expanduser()
-        if args.recursive and finder.is_dir():
-            f_list += list(finder.rglob('*'))
+    f_list = []
+    for file in args.files:
+        if not args.recursive:
+            f_list += glob.glob(file,
+                      include_hidden=args.show_hidden)
         else:
-            f_list += list(finder.parent.glob(finder.name))
-    #Set comprehension strips out duplicates
-    #Strip out hidden files and directories
-    if args.show_hidden:
-        f_list = {str(x) for x in f_list if x.is_file()}
-    else:
-        f_list = {str(x) for x in f_list if x.is_file() and not re.search(r'^\.[Aa9-Zz9]*', str(x))}
+            f_list += glob.glob(file+'/**', recursive=True,
+                                include_hidden=args.show_hidden)
+    if not f_list and not args.files:
+        if not args.recursive:
+            f_list += glob.glob('./*', include_hidden=args.show_hidden)
+        else:
+            f_list += glob.glob('./**', recursive=True,
+                                include_hidden=args.show_hidden)
+    f_list = [pathlib.Path(_) for _ in f_list]
+    f_list = [_ for _ in f_list if _.stem != '' and _.exists() and _.is_file()]
     if not f_list:
+        #nothing to do
         print('Nothing matching these criteria. No manifest generated')
         sys.exit()
+
     if args.filename:
         du.dump_tsv(os.getcwd(), filename=args.filename,
                     in_list=f_list,

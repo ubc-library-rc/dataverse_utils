@@ -118,18 +118,21 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many
     if kwargs.get('path'):
         headers.insert(1, 'path')
     outf = io.StringIO(newline='')
-    tsv_writer = csv.writer(outf, delimiter='\t',
-                            quoting=quotype
-                            )
+    tsv_writer = csv.DictWriter(outf, delimiter='\t',
+                                quoting=quotype,
+                                fieldnames=headers,
+                                extrasaction='ignore')
     if inc_header:
-        tsv_writer.writerow(headers)
+        tsv_writer.writeheader()
     for row in in_list:
-        desc = os.path.splitext(os.path.basename(row))[0]
-        if mime:
-            mtype = mimetypes.guess_type(row)[0]
-            tsv_writer.writerow([row, desc, def_tag, mtype])
-        else:
-            tsv_writer.writerow([row, desc, def_tag])
+        #the columns
+        r = {}
+        r['file'] = row
+        r['description'] = os.path.splitext(os.path.basename(row))[0]
+        r['mimetype'] = mimetypes.guess_type(row)[0]
+        r['tags'] = def_tag
+        r['path'] =  ''
+        tsv_writer.writerow(r)
     outf.seek(0)
     outfile = outf.read()
     outf.close()
