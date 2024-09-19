@@ -57,7 +57,14 @@ There are two main methods of use for this utility:
 
 2. If a TSV file with file information is upplied via the `-t` or `--tsv` switch, the utility will upload a single LDC study and upload the contents of the tsv file to the created record.
 
-**Important note**
+### Important note
+
+**2024-09 Update**
+
+The problem listed below seems to have resolved itself by September 2024. It's not clear whether this was a `certifi` issue or an issue with LDC's certificates. In any case, if you are having problems with LDC website, use the `-c` switch and follow the procedure below.
+
+---
+
 As of early 2023, the LDC website is not supported by `certifi`. You will need to manually supply a certificate chain to use the utility.
 
 To obtain the certificate chain (in Firefox) perform the following steps:
@@ -112,7 +119,7 @@ Using stdout and a redirect will also save time. First dump a file as normal. Ad
 **Usage**
 
 ```nohighlight
-usage: dv_manifest_gen [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [--version] [files ...]
+usage: dv_manifest_gen [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [-p] [--version] [files ...]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
@@ -133,6 +140,7 @@ options:
                         min
   -a, --show-hidden     Include hidden files.
   -m, --mime            Include autodetected mimetypes
+  -p, --path            Include an optional path column for custom file paths
   --version             Show version number and exit
 ```
 
@@ -202,20 +210,19 @@ Copies an existing Dataverse study metadata record to a target collection, or re
 ```nohighlight
 usage: dv_record_copy [-h] [-u URL] -k KEY (-c COLLECTION | -r REPLACE) [-v] pid
 
-Record duplicator for Dataverse. This utility will download a Dataverse record And then upload the study level metadata
-into a new record in a user-specified collection. Please note that this utility was built with the Abacus repository
-(https://abacus.library.ubc.ca) in mind, so many of the defaults are specific to that Dataverse installation.
+Record duplicator for Dataverse. This utility will download a Dataverse record And then upload the study level metadata into a new record in a user-specified collection. Please note that
+this utility was built with the Abacus repository (https://abacus.library.ubc.ca) in mind, so many of the defaults are specific to that Dataverse installation.
 
 positional arguments:
-  pid                   PID of original dataverse recordseparated by spaces. eg. "LDC2012T19 LDC2011T07". Case is
-                        ignored, so "ldc2012T19" will also work.
+  pid                   PID of original dataverse recordseparated by spaces. eg. "hdl:11272.1/AB2/NOMATH hdl:11272.1/AB2/HANDLE". Case is ignored, so "hdl:11272.1/ab2/handle" will also
+                        work.
 
 options:
   -h, --help            show this help message and exit
   -u URL, --url URL     Dataverse installation base URL. Defaults to "https://abacus.library.ubc.ca"
   -k KEY, --key KEY     API key
   -c COLLECTION, --collection COLLECTION
-                        Short name of target Dataverse collection (eg: ldc). Defaults to "ldc"
+                        Short name of target Dataverse collection (eg: ldc). Defaults to "statcan-public"
   -r REPLACE, --replace REPLACE
                         Replace metadata data in record with this PID
   -v, --version         Show version number and exit
@@ -336,7 +343,7 @@ The rationale for manually specifiying mimetypes is to enable the use of preview
 **Usage**
 
 ```nohighlight
-usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-n] [-t TRUNCATE] [--version] tsv
+usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-n] [-t TRUNCATE] [-o] [-v] tsv
 
 Uploads data sets to an *existing* Dataverse study
 from the contents of a TSV (tab separated value)
@@ -361,18 +368,28 @@ options:
   -n, --no-confirm      Don't confirm non-restricted status
   -t TRUNCATE, --truncate TRUNCATE
                         
-                        Left truncate file path. As Dataverse studies 
-                        can retain directory structure, you can set 
-                        an arbitrary starting point by removing the 
-                        leftmost portion. Eg: if the TSV has a file 
-                        path of /home/user/Data/file.txt, setting 
-                        --truncate to "/home/user" would have file.txt 
-                        in the Data directory in the Dataverse study. 
-                        The file is still loaded from the path in the 
-                        spreadsheet. 
+                        Left truncate file path. As Dataverse studies
+                        can retain directory structure, you can set
+                        an arbitrary starting point by removing the
+                        leftmost portion. Eg: if the TSV has a file
+                        path of /home/user/Data/file.txt, setting
+                        --truncate to "/home/user" would have file.txt
+                        in the Data directory in the Dataverse study.
+                        The file is still loaded from the path in the
+                        spreadsheet.
                         
                         Defaults to no truncation.
-  --version             Show version number and exit
+  -o, --override        
+                        
+                        Disables replacement of mimetypes for Dataverse-
+                        processable files. That is, files such as Excel,
+                        SPSS, etc, will have their actual mimetypes sent
+                        instead of 'application/octet-stream'.
+                        Useful when mimetypes are specified in the TSV
+                        file and the upload mimetype is not 
+                        the expected result.
+                        
+  -v, --version         Show version number and exit
 ```
 
 <a name='footnote' />

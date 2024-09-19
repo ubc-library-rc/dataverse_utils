@@ -1,5 +1,4 @@
 # API Reference
-
 <a id="dataverse_utils"></a>
 
 ## dataverse\_utils
@@ -849,7 +848,8 @@ def make_tsv(start_dir,
              def_tag='Data',
              inc_header=True,
              mime=False,
-             quotype=csv.QUOTE_MINIMAL) -> str
+             quotype=csv.QUOTE_MINIMAL,
+             **kwargs) -> str
 ```
 
 Recurses the tree for files and produces tsv output with
@@ -889,6 +889,11 @@ Returns tsv as string.
   csv.QUOTE_ALL / 1
   csv.QUOTE_NONNUMERIC / 2
   csv.QUOTE_NONE / 3
+  
+- `path` - bool
+  If true include a 'path' field so that you can type
+  in a custom path instead of actually structuring
+  your data
 
 <a id="dataverse_utils.dataverse_utils.dump_tsv"></a>
 
@@ -1115,9 +1120,19 @@ Uploads file to Dataverse study and sets file metadata and tags.
   Mimetype of file. Useful if using File Previewers. Mimetype for zip files
   (application/zip) will be ignored to circumvent Dataverse's automatic
   unzipping function.
+  
   label : str
   OPTIONAL
   If included in kwargs, this value will be used for the label
+  
+  timeout : int
+  OPTIONAL
+  Timeout in seconds
+  
+  override : bool
+  OPTIONAL
+  Ignore NOTAB (ie, NOTAB = [])
+  
   timeout = int
   OPTIONAL
   Timeout in seconds
