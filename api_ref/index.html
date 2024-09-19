@@ -8,7 +8,7 @@
     <title>API reference - dataverse_utils</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
@@ -17,12 +17,11 @@
         var mkdocs_page_url = null;
       </script>
     
-    <script src="../js/jquery-3.6.0.min.js" defer></script>
     <!--[if lt IE 9]>
       <script src="../js/html5shiv.min.js"></script>
     <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -305,8 +304,8 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-      <li>API reference</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">API reference</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -816,7 +815,8 @@ manipulation</p>
              def_tag='Data',
              inc_header=True,
              mime=False,
-             quotype=csv.QUOTE_MINIMAL) -&gt; str
+             quotype=csv.QUOTE_MINIMAL,
+             **kwargs) -&gt; str
 </code></pre>
 <p>Recurses the tree for files and produces tsv output with
 with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.</p>
@@ -837,14 +837,22 @@ with headers &lsquo;file&rsquo;, &lsquo;description&rsquo;, &lsquo;tags&rsquo;.<
 <p>mime : bool
   Include automatically determined mimetype</p>
 <ul>
-<li><code>quotype</code> - int
+<li>
+<p><code>quotype</code> - int
   integer value or csv quote type.
   Default = csv.QUOTE_MINIMAL
   Acceptable values:
   csv.QUOTE_MINIMAL / 0
   csv.QUOTE_ALL / 1
   csv.QUOTE_NONNUMERIC / 2
-  csv.QUOTE_NONE / 3</li>
+  csv.QUOTE_NONE / 3</p>
+</li>
+<li>
+<p><code>path</code> - bool
+  If true include a &lsquo;path&rsquo; field so that you can type
+  in a custom path instead of actually structuring
+  your data</p>
+</li>
 </ul>
 <p><a id="dataverse_utils.dataverse_utils.dump_tsv"></a></p>
 <h5 id="dump_tsv">dump_tsv<a class="headerlink" href="#dump_tsv" title="Permanent link">&para;</a></h5>
@@ -997,11 +1005,17 @@ Requires superuser API key.</p>
   OPTIONAL
   Mimetype of file. Useful if using File Previewers. Mimetype for zip files
   (application/zip) will be ignored to circumvent Dataverse&rsquo;s automatic
-  unzipping function.
-  label : str
+  unzipping function.</p>
+<p>label : str
   OPTIONAL
-  If included in kwargs, this value will be used for the label
-  timeout = int
+  If included in kwargs, this value will be used for the label</p>
+<p>timeout : int
+  OPTIONAL
+  Timeout in seconds</p>
+<p>override : bool
+  OPTIONAL
+  Ignore NOTAB (ie, NOTAB = [])</p>
+<p>timeout = int
   OPTIONAL
   Timeout in seconds</p>
 <p><a id="dataverse_utils.dataverse_utils.restrict_file"></a></p>
@@ -1219,14 +1233,15 @@ def find_block_index(dvjson, key)
     
   </span>
 </div>
-    <script>var base_url = '..';</script>
-    <script src="../js/theme_extra.js" defer></script>
-    <script src="../js/theme.js" defer></script>
-      <script src="../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>

@@ -8,7 +8,7 @@
     <title>Console utilities - dataverse_utils</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
     
       <script>
         // Current page data
@@ -17,12 +17,11 @@
         var mkdocs_page_url = null;
       </script>
     
-    <script src="../js/jquery-3.6.0.min.js" defer></script>
     <!--[if lt IE 9]>
       <script src="../js/html5shiv.min.js"></script>
     <![endif]-->
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script> 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
@@ -50,6 +49,10 @@
     <li class="toctree-l2"><a class="reference internal" href="#dv_del">dv_del</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#dv_ldc_uploader">dv_ldc_uploader</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#important-note">Important note</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#dv_manifest_gen">dv_manifest_gen</a>
     </li>
@@ -99,8 +102,8 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-      <li>Console utilities</li>
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Console utilities</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -154,8 +157,11 @@ options:
 <p>If a TSV file with file information is upplied via the <code>-t</code> or <code>--tsv</code> switch, the utility will upload a single LDC study and upload the contents of the tsv file to the created record.</p>
 </li>
 </ol>
-<p><strong>Important note</strong>
-As of early 2023, the LDC website is not supported by <code>certifi</code>. You will need to manually supply a certificate chain to use the utility.</p>
+<h3 id="important-note">Important note<a class="headerlink" href="#important-note" title="Permanent link">&para;</a></h3>
+<p><strong>2024-09 Update</strong></p>
+<p>The problem listed below seems to have resolved itself by September 2024. It&rsquo;s not clear whether this was a <code>certifi</code> issue or an issue with LDC&rsquo;s certificates. In any case, if you are having problems with LDC website, use the <code>-c</code> switch and follow the procedure below.</p>
+<hr />
+<p>As of early 2023, the LDC website is not supported by <code>certifi</code>. You will need to manually supply a certificate chain to use the utility.</p>
 <p>To obtain the certificate chain (in Firefox) perform the following steps:</p>
 <ol>
 <li>Select Tools/Page Info</li>
@@ -196,7 +202,7 @@ options:
 <p>Tags may be separated by commas, eg: &ldquo;Data, SAS, June 2021&rdquo;.</p>
 <p>Using stdout and a redirect will also save time. First dump a file as normal. Add other files to the end with different information using the exclude header switch <code>-x</code> and different tags along with output redirection <code>&gt;&gt;</code>.</p>
 <p><strong>Usage</strong></p>
-<pre><code class="language-nohighlight">usage: dv_manifest_gen [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [--version] [files ...]
+<pre><code class="language-nohighlight">usage: dv_manifest_gen [-h] [-f FILENAME] [-t TAG] [-x] [-r] [-q QUOTE] [-a] [-m] [-p] [--version] [files ...]
 
 Creates a file manifest in tab separated value format which can then be edited and used for file uploads to a Dataverse collection. Files can be edited to add file descriptions and
 comma-separated tags that will be automatically attached to metadata using products using the dataverse_utils library. Will dump to stdout unless -f or --filename is used. Using the
@@ -217,6 +223,7 @@ options:
                         min
   -a, --show-hidden     Include hidden files.
   -m, --mime            Include autodetected mimetypes
+  -p, --path            Include an optional path column for custom file paths
   --version             Show version number and exit
 </code></pre>
 <h2 id="dv_pg_facet_date">dv_pg_facet_date<a class="headerlink" href="#dv_pg_facet_date" title="Permanent link">&para;</a></h2>
@@ -272,20 +279,19 @@ THIS WILL EDIT YOUR POSTGRESQL DATABASE DIRECTLY. USE AT YOUR OWN RISK.
 <p><strong>Usage</strong></p>
 <pre><code class="language-nohighlight">usage: dv_record_copy [-h] [-u URL] -k KEY (-c COLLECTION | -r REPLACE) [-v] pid
 
-Record duplicator for Dataverse. This utility will download a Dataverse record And then upload the study level metadata
-into a new record in a user-specified collection. Please note that this utility was built with the Abacus repository
-(https://abacus.library.ubc.ca) in mind, so many of the defaults are specific to that Dataverse installation.
+Record duplicator for Dataverse. This utility will download a Dataverse record And then upload the study level metadata into a new record in a user-specified collection. Please note that
+this utility was built with the Abacus repository (https://abacus.library.ubc.ca) in mind, so many of the defaults are specific to that Dataverse installation.
 
 positional arguments:
-  pid                   PID of original dataverse recordseparated by spaces. eg. &quot;LDC2012T19 LDC2011T07&quot;. Case is
-                        ignored, so &quot;ldc2012T19&quot; will also work.
+  pid                   PID of original dataverse recordseparated by spaces. eg. &quot;hdl:11272.1/AB2/NOMATH hdl:11272.1/AB2/HANDLE&quot;. Case is ignored, so &quot;hdl:11272.1/ab2/handle&quot; will also
+                        work.
 
 options:
   -h, --help            show this help message and exit
   -u URL, --url URL     Dataverse installation base URL. Defaults to &quot;https://abacus.library.ubc.ca&quot;
   -k KEY, --key KEY     API key
   -c COLLECTION, --collection COLLECTION
-                        Short name of target Dataverse collection (eg: ldc). Defaults to &quot;ldc&quot;
+                        Short name of target Dataverse collection (eg: ldc). Defaults to &quot;statcan-public&quot;
   -r REPLACE, --replace REPLACE
                         Replace metadata data in record with this PID
   -v, --version         Show version number and exit
@@ -384,7 +390,7 @@ options:
 <p>If uploading a tsv which includes mimetypes, be aware that mimetypes for zip files will be ignored to circumvent Dataverse&rsquo;s automatic unzipping feature.</p>
 <p>The rationale for manually specifiying mimetypes is to enable the use of previews which require a specific mimetype to function, but Dataverse does not correctly detect the type. For example, the GeoJSON file previewer requires a mimetype of <code>application/geo+json</code>, but the detection of this mimetype is not supported until Dataverse v5.9. By manually setting the mimetype, the previewer can be used by earlier Dataverse versions.</p>
 <p><strong>Usage</strong></p>
-<pre><code class="language-nohighlight">usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-n] [-t TRUNCATE] [--version] tsv
+<pre><code class="language-nohighlight">usage: dv_upload_tsv [-h] -p PID -k KEY [-u URL] [-r] [-n] [-t TRUNCATE] [-o] [-v] tsv
 
 Uploads data sets to an *existing* Dataverse study
 from the contents of a TSV (tab separated value)
@@ -409,18 +415,28 @@ options:
   -n, --no-confirm      Don't confirm non-restricted status
   -t TRUNCATE, --truncate TRUNCATE
 
-                        Left truncate file path. As Dataverse studies 
-                        can retain directory structure, you can set 
-                        an arbitrary starting point by removing the 
-                        leftmost portion. Eg: if the TSV has a file 
-                        path of /home/user/Data/file.txt, setting 
-                        --truncate to &quot;/home/user&quot; would have file.txt 
-                        in the Data directory in the Dataverse study. 
-                        The file is still loaded from the path in the 
-                        spreadsheet. 
+                        Left truncate file path. As Dataverse studies
+                        can retain directory structure, you can set
+                        an arbitrary starting point by removing the
+                        leftmost portion. Eg: if the TSV has a file
+                        path of /home/user/Data/file.txt, setting
+                        --truncate to &quot;/home/user&quot; would have file.txt
+                        in the Data directory in the Dataverse study.
+                        The file is still loaded from the path in the
+                        spreadsheet.
 
                         Defaults to no truncation.
-  --version             Show version number and exit
+  -o, --override        
+
+                        Disables replacement of mimetypes for Dataverse-
+                        processable files. That is, files such as Excel,
+                        SPSS, etc, will have their actual mimetypes sent
+                        instead of 'application/octet-stream'.
+                        Useful when mimetypes are specified in the TSV
+                        file and the upload mimetype is not 
+                        the expected result.
+
+  -v, --version         Show version number and exit
 </code></pre>
 <p><a name='footnote' /></p>
 <h2 id="notes-for-windows-users">Notes for Windows users<a class="headerlink" href="#notes-for-windows-users" title="Permanent link">&para;</a></h2>
@@ -460,14 +476,15 @@ options:
     
   </span>
 </div>
-    <script>var base_url = '..';</script>
-    <script src="../js/theme_extra.js" defer></script>
-    <script src="../js/theme.js" defer></script>
-      <script src="../search/main.js" defer></script>
-    <script defer>
-        window.onload = function () {
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);
-        };
+        });
     </script>
 
 </body>
