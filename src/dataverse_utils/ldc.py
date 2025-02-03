@@ -3,6 +3,7 @@ Creates dataverse JSON from Linguistic Data Consortium
 website page.
 
 '''
+import copy
 import os
 #import re
 import time
@@ -14,8 +15,9 @@ from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup as bs
 import dryad2dataverse.serializer as ds
 
+#pylint: disable=invalid-name
 with open(os.path.dirname(os.path.abspath(__file__))+os.sep
-          +'data'+os.sep+'LDC_EULA_general.md') as lic:
+          +'data'+os.sep+'LDC_EULA_general.md', encoding='utf-8') as lic:
     mark = markdown.Markdown()
     LIC_NAME = lic.readline()[2:].strip()
     lic.seek(0)
@@ -25,6 +27,7 @@ class Ldc(ds.Serializer):
     '''
     An LDC item (eg, LDC2021T01)
     '''
+    #pylint: disable=super-init-not-called, arguments-differ
     def __init__(self, ldc, cert=None):
         '''
         Returns a dict with keys created from an LDC catalogue web
@@ -53,6 +56,7 @@ class Ldc(ds.Serializer):
                            HTTPAdapter(max_retries=ds.constants.RETRY_STRATEGY))
         if self.cert:
             self.cert = os.path.expanduser(self.cert)
+        self.__fixdesc = None
 
     @property
     def ldcJson(self):
@@ -90,7 +94,7 @@ class Ldc(ds.Serializer):
         return False
 
     @property
-    def fileJson(self, timeout=45):
+    def fileJson(self):
         '''
         Returns False: No attached files possible at LDC
         '''
@@ -105,6 +109,10 @@ class Ldc(ds.Serializer):
 
     @property
     def oversize(self, maxsize=None):
+        '''
+        Make sure file is not too big for the Dataverse instance
+        '''
+        #pylint: disable=property-with-parameters
         if not maxsize:
             maxsize = ds.constants.MAX_UPLOAD
 
@@ -112,11 +120,12 @@ class Ldc(ds.Serializer):
     def id(self):
         return self.ldc
 
-    def fetch_record(self, url=None, timeout=45):
+    def fetch_record(self, timeout=45):
         '''
         Downloads record from LDC website
         '''
-        interim = self.session.get(f'https://catalog.ldc.upenn.edu/{self.ldc}', verify=self.cert)
+        interim = self.session.get(f'https://catalog.ldc.upenn.edu/{self.ldc}',
+                                   verify=self.cert, timeout=timeout)
         interim.raise_for_status()
         self.ldcHtml = interim.text
 
@@ -133,10 +142,11 @@ class Ldc(ds.Serializer):
         tbody = soup.find('tbody')#new
         data = [x.text.strip() for x in tbody.find_all('td')]#new
         #data = [x.text.strip() for x in soup.find_all('td')]#original
-        LDC_dict = {data[x][:data[x].find('\n')].strip(): data[x+1].strip() for x in range(0, len(data), 2)}
+        LDC_dict = {data[x][:data[x].find('\n')].strip(): data[x+1].strip()
+                    for x in range(0, len(data), 2)}
         #Related Works appears to have an extra 'Hide' at the end
         if LDC_dict.get('Related Works:'):
-            LDC_dict['Related Works'] = list(set([x.strip() for x in LDC_dict['Related Works:'].split('\n')]))
+            LDC_dict['Related Works'] = (x.strip() for x in LDC_dict['Related Works:'].split('\n'))
             del LDC_dict['Related Works:'] #remove the renamed key
         LDC_dict['Linguistic Data Consortium'] = LDC_dict['LDC Catalog No.']
         del LDC_dict['LDC Catalog No.']#This key must be renamed for consistency
@@ -144,6 +154,9 @@ class Ldc(ds.Serializer):
         #Other metadata probably has HTML in it, so we keep as much as possible
         other_meta = soup.find_all('div')
         alldesc = [x for x in other_meta if x.attrs.get('itemprop') == 'description']
+        #sometimes they format pages oddly and we can use this for a
+        #quick and dirty fix
+        self.__fixdesc = copy.deepcopy(alldesc)
         #sections use h3, so split on these
         #24 Jan 23 Apparently, this is all done manually so some of them sometime use h4.
         #Because reasons.
@@ -172,18 +185,40 @@ class Ldc(ds.Serializer):
                 #convert to markdown
                 content = markdownify.markdownify(content)
                 tab.name = 'pre'
-                tab.string = content #There is not much documentation on the difference between tab.string and tab.content
+                tab.string = content #There is not much documentation on the
+                                     #difference between tab.string and tab.content
             #That was relatively easy
             LDC_dict[key] = str(subsoup)
-
+        LDC_dict['Introduction'] = LDC_dict.get('Introduction',
+                                                self.__no_intro())
         return LDC_dict
+
+    def __no_intro(self)->str:
+        '''
+        Makes an introduction even if they forgot to include the word "Introduction"
+        '''
+        #self.__fixdesc is set in make_ldc_json
+        intro = [x for x in self.__fixdesc if
+                 self.__fixdesc[0]['itemprop']=='description'][0]
+        while intro.find('div'): #nested?, not cleaning properly
+            intro.find('div').unwrap() # remove the div tag
+        intro = str(intro)
+        #Normally, there's an <h3>Introduction</h3> but sometimes there's not
+        #Assumes that the first section up to "<h" is an intro.
+        #You know what they say about assuming
+        intro = intro[:intro.find('<h')]
+        start = intro.find('<div')
+        if start != -1:
+            end = intro.find('>',start)+1
+            intro = intro.replace(intro[start:end], '').strip()
+        return intro
 
     @staticmethod
     def name_parser(name):
         '''
         Returns lastName/firstName JSON snippet from name
 
-        ----------------------------------------
+        -----------------/-----------------------
         Parameters:
 
         name : str
@@ -219,7 +254,7 @@ class Ldc(ds.Serializer):
         dryad['keywords'] = ['Linguistics']
 
         #Dataverse accepts only ISO formatted date
-        
+
         try:
             releaseDate = time.strptime(ldc['Release Date'], '%B %d, %Y')
             releaseDate = time.strftime('%Y-%m-%d', releaseDate)
@@ -249,7 +284,7 @@ class Ldc(ds.Serializer):
             ldc = self.ldcJson
         note_fields = ['DCMI Type(s)',
                        'Sample Type',
-                       'Sample Rate', 
+                       'Sample Rate',
                        'Application(s)',
                        'Language(s)',
                        'Language ID(s)']
@@ -283,7 +318,8 @@ class Ldc(ds.Serializer):
         key : str
            key for which to find list index
         '''
-        for num, item in enumerate(dvjson['datasetVersion']['metadataBlocks']['citation']['fields']):
+        for num, item in enumerate(dvjson['datasetVersion']
+                                   ['metadataBlocks']['citation']['fields']):
             if item['typeName'] == key:
                 return num
         return None
@@ -326,7 +362,8 @@ class Ldc(ds.Serializer):
         p_name = super()._convert_generic(inJson={'producerName': 'Linguistic Data Consortium'},
                                           dryField='producerName',
                                           dvField='producerName')
-        p_affil = super()._convert_generic(inJson={'producerAffiliation': 'University of Pennsylvania'},
+        p_affil = super()._convert_generic(inJson={'producerAffiliation':
+                                                   'University of Pennsylvania'},
                                            dryField='producerName',
                                            dvField='producerName')
         p_url = super()._convert_generic(inJson={'producerURL': 'https://www.ldc.upenn.edu/'},
@@ -346,7 +383,8 @@ class Ldc(ds.Serializer):
         s_name = super()._convert_generic(inJson={'seriesName': 'LDC'},
                                           dryField='seriesName',
                                           dvField='seriesName')
-        s_info = super()._convert_generic(inJson={'seriesInformation': 'Linguistic Data Consortium'},
+        s_info = super()._convert_generic(inJson={'seriesInformation':
+                                                  'Linguistic Data Consortium'},
                                           dryField='seriesInformation',
                                           dvField='seriesInformation')
         s_name.update(s_info)
@@ -362,9 +400,14 @@ class Ldc(ds.Serializer):
 
         #Fix keyword labels that are hardcoded for Dryad
         #There should be only one keyword block
-        keyword_field = [(x, y) for x, y in enumerate(dvjson['datasetVersion']['metadataBlocks']['citation']['fields']) if y.get('typeName') == 'keyword'][0]
-        key_pos = [x for x, y in enumerate(keyword_field[1]['value']) if y['keywordVocabulary']['value'] == 'Dryad'][0]
-        dvjson['datasetVersion']['metadataBlocks']['citation']['fields'][keyword_field[0]]['value'][key_pos]['keywordVocabulary']['value'] = 'Linguistic Data Consortium'
+        keyword_field = [(x, y) for x, y in enumerate(dvjson['datasetVersion']['metadataBlocks']
+                                                      ['citation']['fields'])
+                                                        if y.get('typeName') == 'keyword'][0]
+        key_pos = [x for x, y in enumerate(keyword_field[1]['value'])
+                   if y['keywordVocabulary']['value'] == 'Dryad'][0]
+        dvjson['datasetVersion']['metadataBlocks']['citation']\
+                ['fields'][keyword_field[0]]['value'][key_pos]\
+                ['keywordVocabulary']['value'] = 'Linguistic Data Consortium'
 
         #The first keyword field is hardcoded in by dryad2dataverse.serializer
         #So I think it needs to be deleted
@@ -376,14 +419,17 @@ class Ldc(ds.Serializer):
         #Notes
         note_index = Ldc.find_block_index(dvjson, 'notesText')
         if note_index:
-            dvjson['datasetVersion']['metadataBlocks']['citation']['fields'][note_index]['value'] = self._make_note()
+            dvjson['datasetVersion']['metadataBlocks']['citation']\
+                ['fields'][note_index]['value'] = self._make_note()
         else:
             notes = super()._typeclass('notesText', False, 'primitive')
             notes['value'] = self._make_note()
             dvjson['datasetVersion']['metadataBlocks']['citation']['fields'].append(notes)
 
         #Deletes unused "publication" fields: rewrite to make it a function call.
-        keyword_field = [(x, y) for x, y in enumerate(dvjson['datasetVersion']['metadataBlocks']['citation']['fields']) if y.get('typeName') == 'publication'][0] #ibid
+        keyword_field = [(x, y) for x, y in enumerate(dvjson['datasetVersion']
+                                                      ['metadataBlocks']['citation']['fields'])
+                         if y.get('typeName') == 'publication'][0] #ibid
         del dvjson['datasetVersion']['metadataBlocks']['citation']['fields'][keyword_field[0]]
 
         #And now the licence:
@@ -396,7 +442,7 @@ class Ldc(ds.Serializer):
         Uploads metadata to dataverse
 
         Returns json from connection attempt.
-        
+
         ----------------------------------------
         Parameters:
 
