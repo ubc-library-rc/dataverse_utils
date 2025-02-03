@@ -13,34 +13,42 @@ With these utilities you can:
 
 **Get your copy today!**
 
+### Important note
+
+These are _console_ utilities, meaning that they will run in a command prompt window, PowerShell, bash, zshell etc. If the sentence you just read is gibberish to you, then these utilities are probably not for you. While they don't require any programming knowledge to use, you will still need to be able to [install Python](https://python.org). 
+
 Source code (and this documentation) is available at the Github repository <https://github.com/ubc-library-rc/dataverse_utils>, and the user-friendly version of the documentation is at <https://ubc-library-rc.github.io/dataverse_utils>. Presumably you know this already otherwise you wouldn't be reading this.
 
 ## Installation
 
-Any installation will require the use of the command line/command prompt.
+Any installation will require the use of the command line/command prompt (see above).
 
-The easiest installation is with `pip`:
+The easiest installation is with [pipx](https://pipx.pypa.io/latest/installation/). `pipx` will allow you to run these utilities as separate utilities isolated completely from the rest of your Python installation[s]. 
+
+This should work for any platform which supports `pipx`
+
+If course, you can also use Python's bundled `pip` utility, but `pipx` is generally easier. 
 
 ```nohighlight
-pip install dataverse_utils
+pipx install dataverse_utils
 ```
 
 There is also a *server specific version* if you need to use the **dv_facet_date** utility. This can *only* be run on a server hosting a Dataverse instance, so for the vast majority of users it will be unusable.
 
-This can also be installed with `pip`:
+This can also be installed with `pipx`:
 
 ```nohighlight
-pip install 'dataverse_utils[server]'
+pipx install 'dataverse_utils[server]'
 ```
 
-Note the extra quotes. You can install the server version if you want to, but it's useless without server access.
+Note the extra quotes. You can install the server version even if you don't have server access, but there's no reason to.
 
 ### Upgrading
 
 Just as easy as installation:
 
 ```nohighlight
-pip install --upgrade dataverse_utils
+pipx upgrade dataverse_utils
 ```
 
 Other methods of installing Python packages can be found at <https://packaging.python.org/tutorials/installing-packages/>.
@@ -71,10 +79,9 @@ There are eight (8) console utilities currently available.
 
 * **dv_release.py**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
 
-* **dv_replace_licences**: Replaces the licence associated with a PID with text from a Markdown file. Also available as **dv_replace_licenses** for those using American English.
+* **dv_replace_licence**: Replaces the licence associated with a PID with text from a Markdown file. Also available as **dv_replace_license** for those using American English.
 
 * **dv_upload_tsv.py**: Takes a tsv file in the format from *dv_manifest_gen.py* and does all the uploading and metadata entry.
-
 
 More information about these can be found on the [console utilities page](scripts.md).
 

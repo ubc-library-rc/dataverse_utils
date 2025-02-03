@@ -8,13 +8,15 @@ nav:
   - Windows notes: windows.md
   - Credits: credits.md
 
+extra_css:
+  - css/extra.css
 markdown_extensions:
   - smarty
   - toc:
       permalink: True
   - codehilite:
       guess_lang: False
-      linenums: False 
+      linenums: False
       use_pygments: False
   - attr_list
 

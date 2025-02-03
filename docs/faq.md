@@ -4,7 +4,7 @@
 
 ## 1. I'm using Windows and the scripts don't seem to be working/recognized by [choice of command line interface here]
 
-There are (at least) four different ways to get some sort of command line access. The traditional command line, PowerShell, via SSH and Git bash. That's not even including the linux subsystem.
+There are (at least) four different ways to get some sort of command line access (actually a lot more than four but these are common). The traditional command line, PowerShell, via SSH and Git Bash. That's not even including the linux subsystem. Each of these may not be share the same environment as any other. 
 
 The document on [Windows script troubles](windows.md) gives common solutions.
 
