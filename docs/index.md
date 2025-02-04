@@ -87,7 +87,9 @@ More information about these can be found on the [console utilities page](script
 
 ### Python package: dataverse_utils
 
-This package contains a variety of utility functions which, for the most part, allow uploads of files and associated metadata without having to touch the Dataverse GUI or to have complex JSON attached.
+If you want to use the Python package directly, you should install with `pip` instead of `pipx` although, to be fair, you don't **have** to. It will just make your life much easier. If you have no interest in using `dataverse_utils` code in your own code, you can safely ignore this section.
+
+The package contains a variety of utility functions which, for the most part, allow uploads of files and associated metadata without having to touch the Dataverse GUI or to have complex JSON attached.
 
 For example, the `upload_file` requires no JSON attachments:
 
