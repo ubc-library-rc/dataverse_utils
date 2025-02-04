@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="css/extra.css" rel="stylesheet" />
     
       <script>
         // Current page data
@@ -40,8 +41,10 @@
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href=".">Overview</a>
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Overview</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#important-note">Important note</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#upgrading">Upgrading</a>
@@ -120,20 +123,24 @@
 <li>and more!</li>
 </ul>
 <p><strong>Get your copy today!</strong></p>
+<h3 id="important-note">Important note<a class="headerlink" href="#important-note" title="Permanent link">&para;</a></h3>
+<p>These are <em>console</em> utilities, meaning that they will run in a command prompt window, PowerShell, bash, zshell etc. If the sentence you just read is gibberish to you, then these utilities are probably not for you. While they don&rsquo;t require any programming knowledge to use, you will still need to be able to <a href="https://python.org">install Python</a>. </p>
 <p>Source code (and this documentation) is available at the Github repository <a href="https://github.com/ubc-library-rc/dataverse_utils">https://github.com/ubc-library-rc/dataverse_utils</a>, and the user-friendly version of the documentation is at <a href="https://ubc-library-rc.github.io/dataverse_utils">https://ubc-library-rc.github.io/dataverse_utils</a>. Presumably you know this already otherwise you wouldn&rsquo;t be reading this.</p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>Any installation will require the use of the command line/command prompt.</p>
-<p>The easiest installation is with <code>pip</code>:</p>
-<pre><code class="language-nohighlight">pip install dataverse_utils
+<p>Any installation will require the use of the command line/command prompt (see above).</p>
+<p>The easiest installation is with <a href="https://pipx.pypa.io/latest/installation/">pipx</a>. <code>pipx</code> will allow you to run these utilities as separate utilities isolated completely from the rest of your Python installation[s]. </p>
+<p>This should work for any platform which supports <code>pipx</code></p>
+<p>If course, you can also use Python&rsquo;s bundled <code>pip</code> utility, but <code>pipx</code> is generally easier. </p>
+<pre><code class="language-nohighlight">pipx install dataverse_utils
 </code></pre>
 <p>There is also a <em>server specific version</em> if you need to use the <strong>dv_facet_date</strong> utility. This can <em>only</em> be run on a server hosting a Dataverse instance, so for the vast majority of users it will be unusable.</p>
-<p>This can also be installed with <code>pip</code>:</p>
-<pre><code class="language-nohighlight">pip install 'dataverse_utils[server]'
+<p>This can also be installed with <code>pipx</code>:</p>
+<pre><code class="language-nohighlight">pipx install 'dataverse_utils[server]'
 </code></pre>
-<p>Note the extra quotes. You can install the server version if you want to, but it&rsquo;s useless without server access.</p>
+<p>Note the extra quotes. You can install the server version even if you don&rsquo;t have server access, but there&rsquo;s no reason to.</p>
 <h3 id="upgrading">Upgrading<a class="headerlink" href="#upgrading" title="Permanent link">&para;</a></h3>
 <p>Just as easy as installation:</p>
-<pre><code class="language-nohighlight">pip install --upgrade dataverse_utils
+<pre><code class="language-nohighlight">pipx upgrade dataverse_utils
 </code></pre>
 <p>Other methods of installing Python packages can be found at <a href="https://packaging.python.org/tutorials/installing-packages/">https://packaging.python.org/tutorials/installing-packages/</a>.</p>
 <h3 id="downloading-the-source-code">Downloading the source code<a class="headerlink" href="#downloading-the-source-code" title="Permanent link">&para;</a></h3>
@@ -163,7 +170,7 @@
 <p><strong>dv_release.py</strong>: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.</p>
 </li>
 <li>
-<p><strong>dv_replace_licences</strong>: Replaces the licence associated with a PID with text from a Markdown file. Also available as <strong>dv_replace_licenses</strong> for those using American English.</p>
+<p><strong>dv_replace_licence</strong>: Replaces the licence associated with a PID with text from a Markdown file. Also available as <strong>dv_replace_license</strong> for those using American English.</p>
 </li>
 <li>
 <p><strong>dv_upload_tsv.py</strong>: Takes a tsv file in the format from <em>dv_manifest_gen.py</em> and does all the uploading and metadata entry.</p>
@@ -171,7 +178,8 @@
 </ul>
 <p>More information about these can be found on the <a href="scripts/">console utilities page</a>.</p>
 <h3 id="python-package-dataverse_utils">Python package: dataverse_utils<a class="headerlink" href="#python-package-dataverse_utils" title="Permanent link">&para;</a></h3>
-<p>This package contains a variety of utility functions which, for the most part, allow uploads of files and associated metadata without having to touch the Dataverse GUI or to have complex JSON attached.</p>
+<p>If you want to use the Python package directly, you should install with <code>pip</code> instead of <code>pipx</code> although, to be fair, you don&rsquo;t <strong>have</strong> to. It will just make your life much easier. If you have no interest in using <code>dataverse_utils</code> code in your own code, you can safely ignore this section.</p>
+<p>The package contains a variety of utility functions which, for the most part, allow uploads of files and associated metadata without having to touch the Dataverse GUI or to have complex JSON attached.</p>
 <p>For example, the <code>upload_file</code> requires no JSON attachments:</p>
 <pre><code>dataverse_utils.upload_file('/path/to/file.ext',
                             dv='https://targetdataverse.invalid'
@@ -254,6 +262,6 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 </html>
 
 <!--
-MkDocs version : 1.5.3
-Build Date UTC : 2024-09-19 22:26:53.598083+00:00
+MkDocs version : 1.6.1
+Build Date UTC : 2025-02-04 16:15:33.720572+00:00
 -->
