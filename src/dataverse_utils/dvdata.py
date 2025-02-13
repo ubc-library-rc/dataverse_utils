@@ -6,6 +6,8 @@ import tempfile
 import hashlib
 import os
 import logging
+import pathlib
+import sys
 import traceback
 
 import requests
@@ -111,6 +113,7 @@ class Study(dict): #pylint: disable=too-few-public-methods
         '''
         Adds contact information if it's not there. Fills with dummy data
         '''
+        #pylint: disable=possibly-used-before-assignment
         for n, v in enumerate((upjson['datasetVersion']
                               ['metadataBlocks']['citation']['fields'])):
             if v['typeName'] == 'datasetContact':
@@ -334,3 +337,124 @@ class File(dict):
         self['verified'] = False
         self['downloaded_checksum'] = _hash
         return False
+
+class FileInfo(dict):
+    '''
+
+    An object representing all of a dataverse study's files.
+    Easily parseable as a dict.
+
+    data_chunk : dict
+        Metadata block;  the JSON output of a call to
+        [server]/api/datasets/:persistentId/versions
+    server: str
+        Base URL of dataverse server (like 'https://abacus.library.ubc.ca')
+    '''
+    #Should this be incorporated into the above class? Probably.
+    def __init__(self, **kwargs)->None:
+        '''
+        Required keyword parameters:
+
+        url : str
+            Base URL of dataverse installation
+        pid : str
+            Handle or DOI of study
+
+        Optional keyword parameters:
+
+        apikey : str
+            Dataverse API key; required for DRAFT or restricted material
+        timeout : int
+            Optional timeout in seconds
+        '''
+        self.kwargs = kwargs
+        self['version_list'] = []
+        self.dv = None
+        self._get_json()
+        self._get_all_files()
+        self['headers'] = list(self[self['current_version']][0].keys())
+
+    def _get_json(self) -> None:
+        '''
+        Get study file json
+        '''
+        try:
+            params = {'persistentId': self.kwargs['pid'],
+                      'X-Dataverse-key' : self.kwargs.get('apikey')}
+            self.dv = requests.get(f'{self.kwargs["url"]}/api/datasets/:persistentId/versions',
+                                   params=params,
+                                   timeout=self.kwargs.get('timeout', 100))
+            self.dv.raise_for_status()
+
+        except (requests.RequestException, requests.ConnectionError,
+                requests.HTTPError, requests.TooManyRedirects,
+                requests.ConnectTimeout, requests.ReadTimeout,
+                requests.Timeout, requests.JSONDecodeError) as err:
+            print(f'Connection error: {err}')
+
+    def _get_all_files(self):
+        '''
+        Iterates over self.data_chunk. to produce a list of files
+        in self['files']
+        '''
+        try:
+            for num, version in enumerate(self.dv.json()['data']):
+                self._get_version_files(version, current=num)
+
+        except KeyError as err:
+            print(f'JSON parsing error: {err}')
+            print('Offending JSON:')
+            print(self.dv.json())
+            sys.exit()
+
+    def _get_version_files(self, flist: list, current=1)->None:
+        '''
+        Set version number and assign file info a version key
+
+        flist : list
+            list of file metadata for a particular version
+        current: int
+            Value of zero represents most current version
+
+        '''
+        ver_info = f"{flist['versionNumber']}.{flist['versionMinorNumber']}"
+        if current == 0:
+            self['current_version'] = ver_info
+        self['version_list'].append(ver_info)
+        self[ver_info] = []
+        for fil in flist['files']:
+            self[ver_info].append(self._get_file_info(fil,
+                                                     ver_info=ver_info,
+                                                     state_info=flist['versionState']))
+
+    def _get_file_info(self, file:dict, **kwargs)->dict:
+        '''
+        Returns a dict of required info from a chunk of dataverse study
+        version metadata
+
+        file : dict
+            The dict containing one file's metadata
+        ---
+        Keyword arguments
+        version_info: str
+            Version info string
+        state_info : str
+            Publication state
+        '''
+        # headers = ['file', 'description', 'pidURL','downloadURL', 'version', 'state']
+        #breakpoint()
+        file_name = file['dataFile'].get('originalFileName', file['label'])
+        filepath = pathlib.Path(file.get('directoryLabel', ''), file_name)
+        description = file.get('description', '')
+        try:
+            pid_url = file['dataFile']['pidURL']
+        except KeyError:
+            pid_url = f'{self.kwargs["url"]}/file.xhtml?fileId={file["dataFile"]["id"]}'
+        fid = file['dataFile']['id']
+        download_url = f'{self.kwargs["url"]}/api/access/datafile/{fid}?format=original'
+        out = {'file': str(filepath).strip(),
+               'description': description.strip(),
+               'pid_url': pid_url, 'download_url':download_url,
+               'version': kwargs['ver_info'],
+               'state' : kwargs['state_info']}
+        return out

@@ -7,15 +7,16 @@ import csv
 import io
 #Dataverse/Glassfish can sometimes partially crash and the
 #API doesn't return JSON correctly, so:
-import json #for errors only
+import json
 import logging
 import mimetypes
 import os
 import time
+
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import requests
 
-LOGGER = logging.getLogger('__name__')
+LOGGER = logging.getLogger(__name__)
 
 #A list of extensions which disable tabular processing
 NOTAB = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta', '.rdata', '.xlsx']
