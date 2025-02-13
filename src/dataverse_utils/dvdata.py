@@ -379,11 +379,12 @@ class FileInfo(dict):
         Get study file json
         '''
         try:
-            params = {'persistentId': self.kwargs['pid'],
-                      'X-Dataverse-key' : self.kwargs.get('apikey')}
+            headers={'X-Dataverse-key' : self.kwargs.get('apikey')}
+            params = {'persistentId': self.kwargs['pid']}
             self.dv = requests.get(f'{self.kwargs["url"]}/api/datasets/:persistentId/versions',
                                    params=params,
-                                   timeout=self.kwargs.get('timeout', 100))
+                                   timeout=self.kwargs.get('timeout', 100),
+                                   headers=headers)
             self.dv.raise_for_status()
 
         except (requests.RequestException, requests.ConnectionError,
@@ -417,7 +418,10 @@ class FileInfo(dict):
             Value of zero represents most current version
 
         '''
-        ver_info = f"{flist['versionNumber']}.{flist['versionMinorNumber']}"
+        if flist['versionState'] == 'DRAFT':
+            ver_info='DRAFT'
+        else:
+            ver_info = f"{flist['versionNumber']}.{flist['versionMinorNumber']}"
         if current == 0:
             self['current_version'] = ver_info
         self['version_list'].append(ver_info)
