@@ -7,7 +7,6 @@ import hashlib
 import os
 import logging
 import pathlib
-import sys
 import traceback
 
 import requests
@@ -386,12 +385,20 @@ class FileInfo(dict):
                                    timeout=self.kwargs.get('timeout', 100),
                                    headers=headers)
             self.dv.raise_for_status()
+        except (requests.exceptions.RequestException,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError,
+                requests.exceptions.TooManyRedirects,
+                requests.exceptions.ConnectTimeout,
+                requests.exceptions.ReadTimeout,
+                requests.exceptions.Timeout,
+                requests.exceptions.JSONDecodeError,
+                requests.exceptions.InvalidSchema) as err:
 
-        except (requests.RequestException, requests.ConnectionError,
-                requests.HTTPError, requests.TooManyRedirects,
-                requests.ConnectTimeout, requests.ReadTimeout,
-                requests.Timeout, requests.JSONDecodeError) as err:
-            print(f'Connection error: {err}')
+            err.add_note(f'Connection error: {"\n".join((str(x) for x in err.args))}')
+            msg = '\n'.join(getattr(err, '__notes__', []))
+            LOGGER.critical(msg)
+            raise err
 
     def _get_all_files(self):
         '''
@@ -402,12 +409,20 @@ class FileInfo(dict):
             for num, version in enumerate(self.dv.json()['data']):
                 self._get_version_files(version, current=num)
 
-        except KeyError as err:
-            print(f'JSON parsing error: {err}')
-            print('Offending JSON:')
-            print(self.dv.json())
-            sys.exit()
+        except AttributeError as err:
+            err.add_note('No JSON present')
+            #LOGGER.exception('FileInfo AttributeError: %s', err)
+            #LOGGER.exception(traceback.format_exc())
+            raise err
 
+        except KeyError as err:
+            err.add_note(f'JSON parsing error: {err}')
+            err.add_note('Offending JSON:')
+            err.add_note(f'{self.dv.json()}')
+            msg = '\n'.join(getattr(err, '__notes__', []))
+            LOGGER.exception('FileInfo KeyError: %s', msg)
+            #LOGGER.exception(traceback.format_exc())
+            raise err
     def _get_version_files(self, flist: list, current=1)->None:
         '''
         Set version number and assign file info a version key
@@ -446,7 +461,6 @@ class FileInfo(dict):
             Publication state
         '''
         # headers = ['file', 'description', 'pidURL','downloadURL', 'version', 'state']
-        #breakpoint()
         file_name = file['dataFile'].get('originalFileName', file['label'])
         filepath = pathlib.Path(file.get('directoryLabel', ''), file_name)
         description = file.get('description', '')

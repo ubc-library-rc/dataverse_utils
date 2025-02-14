@@ -5,10 +5,11 @@ import argparse
 import csv
 import io
 import json
+import sys
 import textwrap
-from dataverse_utils.dvdata import FileInfo
+import dataverse_utils.dvdata as dd
 
-VERSION  = (0, 1, 0)
+VERSION  = (0, 1, 1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
@@ -51,6 +52,7 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
+
 def main()->None:
     '''
     The primary function
@@ -58,9 +60,25 @@ def main()->None:
     sepchar = {'tsv' : '\t',
                'csv' : ','}
     args = parse().parse_args()
-    file_information = FileInfo(url=args.url, pid=args.pid, apikey=args.key)
-    #breakpoint()
+    if not args.url.lower().startswith('http'):
+        args.url = f'https://{args.url}'
     output = io.StringIO(newline='')
+    try:
+        file_information = dd.FileInfo(url=args.url, pid=args.pid, apikey=args.key)
+
+    except (dd.requests.exceptions.RequestException,
+            dd.requests.exceptions.ConnectionError,
+            dd.requests.exceptions.HTTPError,
+            dd.requests.exceptions.TooManyRedirects,
+            dd.requests.exceptions.ConnectTimeout,
+            dd.requests.exceptions.ReadTimeout,
+            dd.requests.exceptions.Timeout,
+            dd.requests.exceptions.JSONDecodeError,
+            dd.requests.exceptions.InvalidSchema,
+            AttributeError, KeyError):
+        sys.exit()
+
+
     if args.out != 'json':
         writer = csv.DictWriter(output, delimiter=sepchar[args.out],
                                 quoting=csv.QUOTE_MINIMAL,
