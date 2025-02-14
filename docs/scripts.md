@@ -106,6 +106,41 @@ options:
   --version             Show version number and exit
 ```
 
+## dv_list_files
+
+This utility will produce a csv, tsv or JSON output showing the
+
+* path/name of a file
+* description
+* the file download page URL
+* the API URL to download the file
+* the version of the file (ie, the study version)
+* the state of the version.
+
+Unless specified, the most current version is shown. If an API key is supplied and a draft version exists, then the most current version is considered the draft version.
+
+```nohighlight
+
+usage: dv_list_files [-h] [-u URL] [-o {csv,tsv,json}] [-a] [-k KEY] [-f FILE] [-v] pid
+
+This will parse a Dataverse record and show the path, filename, descriptions
+and download information for a Dataverse record. An API key is required
+for DRAFT versions.
+
+positional arguments:
+  pid                   Dataverse study persistent identifier (DOI/handle)
+
+options:
+  -h, --help            show this help message and exit
+  -u, --url URL         Dataverse installation base url. Defaults to "https://abacus.library.ubc.ca"
+  -o, --output {csv,tsv,json}
+                        Output format. One of  csv, tsv, or json. Default tsv because descriptions often contain commas
+  -a, --all             Show info for *all* versions, not just most current
+  -k, --key KEY         API key; required for restricted or draft data sets
+  -f, --file FILE       Dump output to FILE
+  -v, --version         Show version number and exit
+```
+
 ##  dv_manifest_gen
 
 Not technically a Dataverse-specific script, this utility will generate a tab-separated value output. The file consists of 3 columns: **file, description and tags**, and optionally a **mimetype** column.

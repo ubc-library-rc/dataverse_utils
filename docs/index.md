@@ -1,6 +1,6 @@
 # Dataverse utilities
 
-This is a generalized set of utilities which help with managing [Dataverse](https://dataverse.org) repositories. This has *nothing* to do with the Microsoft product of the same name. Despite being written as they were required, that doesn't mean they're not useful or user-friendly. 
+This is a generalized set of utilities which help with managing [Dataverse](https://dataverse.org) repositories. This has *nothing* to do with the Microsoft product of the same name. 
 
 With these utilities you can:
 
@@ -27,7 +27,6 @@ The easiest installation is with [pipx](https://pipx.pypa.io/latest/installation
 
 This should work for any platform which supports `pipx`
 
-If course, you can also use Python's bundled `pip` utility, but `pipx` is generally easier. 
 
 ```nohighlight
 pipx install dataverse_utils
@@ -65,23 +64,25 @@ If you have [mkdocs](https://www.mkdocs.org) installed, you can view the documen
 
 ### Console utilities 
 
-There are eight (8) console utilities currently available.
+There are nine (9) console utilities currently available.
 
-* **dv_del.py**: Bulk (unpublished) file deletion utility
+* **dv_del**: Bulk (unpublished) file deletion utility
 
-* **dv_ldc_uploader.py**: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. **As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain**. Don't worry, that's not as hard as it sounds.
+* **dv_ldc_uploader**: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. **As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain**. Don't worry, that's not as hard as it sounds.
 
-* **dv_manifest_gen.py**: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.
+* **dv_list_files**: Lists all the files in a dataverse record, potentially including all versions and draft versions.
 
-* **dv_pg_facet_date.py**: A server-based tool which updates the publication date facet and performs a study reindex.
+* **dv_manifest_gen**: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.
 
-* **dv_record_copy.py**: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.
+* **dv_pg_facet_date**: A server-based tool which updates the publication date facet and performs a study reindex.
 
-* **dv_release.py**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
+* **dv_record_copy**: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.
+
+* **dv_release**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
 
 * **dv_replace_licence**: Replaces the licence associated with a PID with text from a Markdown file. Also available as **dv_replace_license** for those using American English.
 
-* **dv_upload_tsv.py**: Takes a tsv file in the format from *dv_manifest_gen.py* and does all the uploading and metadata entry.
+* **dv_upload_tsv**: Takes a tsv file in the format from *dv_manifest_gen.py* and does all the uploading and metadata entry.
 
 More information about these can be found on the [console utilities page](scripts.md).
 

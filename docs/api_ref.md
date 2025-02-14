@@ -183,6 +183,73 @@ def verify() -> None
 
 Compares checksum with stated checksum
 
+<a id="dataverse_utils.dvdata.FileInfo"></a>
+
+### FileInfo Objects
+
+```python
+class FileInfo(dict)
+```
+
+An object representing all of a dataverse study's files.
+Easily parseable as a dict.
+
+data_chunk : dict
+    Metadata block;  the JSON output of a call to
+    [server]/api/datasets/:persistentId/versions
+server: str
+    Base URL of dataverse server (like 'https://abacus.library.ubc.ca')
+
+<a id="dataverse_utils.dvdata.FileInfo.__init__"></a>
+
+##### \_\_init\_\_
+
+```python
+def __init__(**kwargs) -> None
+```
+
+Required keyword parameters:
+
+url : str
+    Base URL of dataverse installation
+pid : str
+    Handle or DOI of study
+
+Optional keyword parameters:
+
+apikey : str
+    Dataverse API key; required for DRAFT or restricted material
+timeout : int
+    Optional timeout in seconds
+
+<a id="dataverse_utils.scripts.dv_list_files"></a>
+
+## dataverse\_utils.scripts.dv\_list\_files
+
+Utility to dump [selected] file information for a particular dataverse record.
+
+<a id="dataverse_utils.scripts.dv_list_files.parse"></a>
+
+##### parse
+
+```python
+def parse() -> argparse.ArgumentParser()
+```
+
+Parses the arguments from the command line.
+
+Returns argparse.ArgumentParser
+
+<a id="dataverse_utils.scripts.dv_list_files.main"></a>
+
+##### main
+
+```python
+def main() -> None
+```
+
+The primary function
+
 <a id="dataverse_utils.scripts.dv_record_copy"></a>
 
 ## dataverse\_utils.scripts.dv\_record\_copy
@@ -1315,7 +1382,7 @@ Boolean indicating embargo status
 
 ```python
 @property
-def fileJson(timeout=45)
+def fileJson()
 ```
 
 Returns False: No attached files possible at LDC
@@ -1331,12 +1398,23 @@ def files()
 
 Returns None. No files possible
 
+<a id="dataverse_utils.ldc.Ldc.oversize"></a>
+
+##### oversize
+
+```python
+@property
+def oversize(maxsize=None)
+```
+
+Make sure file is not too big for the Dataverse instance
+
 <a id="dataverse_utils.ldc.Ldc.fetch_record"></a>
 
 ##### fetch\_record
 
 ```python
-def fetch_record(url=None, timeout=45)
+def fetch_record(timeout=45)
 ```
 
 Downloads record from LDC website
@@ -1363,7 +1441,7 @@ def name_parser(name)
 
 Returns lastName/firstName JSON snippet from name
 
-----------------------------------------
+-----------------/-----------------------
 
 **Arguments**:
 

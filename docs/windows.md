@@ -1,8 +1,20 @@
 # Running the dataverse_utils console utilities under Windows
 
+## Using pipx
+
+If you are only interested in the command line utilities and don't care at all about the rest of the product (which is probably most people), install everything using [pipx](https://pipx.pypa.io/latest/installation/)
+
+This will make your life much simpler.
+
+`pipx install dataverse_utils`
+
+You may (or may not) want or need to install for whatever shell you use (bash, command prompt, etc). Depending on what you're using one shell may be isolated from another. See the lengthy explanation below if necessary.
+
+## Possibly, but not necessarily, outdated explanations
+
 On Mac and Linux, running the scripts supplied with `dataverse_utils` is straightforward. They're available at the command line, which means that you can simply run them by (for example):
 
-`$ dv_manifest_gen.py` followed by switches and variables as normal.
+`$ dv_manifest_gen` followed by switches and variables as normal.
 
 Doing this results in output to the terminal window. **This is not necessarily the case in Windows**.
 
@@ -15,15 +27,11 @@ Commonly used shells on Windows include, but are not limited to:
 * Git bash
 * Cygwin
 
-If the utilities are not functioning the way you are expecting, make sure that Python and the install location is in your PATH.
-
-As of version 0.8.3 the installation has been updated to use newer packaging standards which will ideally reduce the frequency of installation problems. 
-
-Also as of v0.8.3, the .py suffix has been removed from the console utilities. This means if you are forced to run a command manually, it would be run with `python [utilityname]` **not** `python [utilityname.py]`
+If the utilities are not functioning the way you are expecting, make sure that the pipx install location is in your PATH for whatever shell you are using.
 
 ## Troubleshooting 
 
-These are (likely deprecated) notes from testing on a variety of Windows installations. If you're luckly, a solution can be found below.
+These are (deprecated) notes from testing on a variety of Windows installations. If you're lucky, a solution can be found below.
 
 This test case uses a new installation of <https://python.org> Python, v.3.9.6, installed in Windows using the GUI, so it's as basic a Windows installation as you can get.
 
