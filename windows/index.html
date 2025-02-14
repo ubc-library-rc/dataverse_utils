@@ -59,6 +59,10 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Windows notes</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#using-pipx">Using pipx</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#possibly-but-not-necessarily-outdated-explanations">Possibly, but not necessarily, outdated explanations</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#windows-terminal-type">Windows Terminal type</a>
@@ -104,8 +108,14 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="running-the-dataverse_utils-console-utilities-under-windows">Running the dataverse_utils console utilities under Windows<a class="headerlink" href="#running-the-dataverse_utils-console-utilities-under-windows" title="Permanent link">&para;</a></h1>
+<h2 id="using-pipx">Using pipx<a class="headerlink" href="#using-pipx" title="Permanent link">&para;</a></h2>
+<p>If you are only interested in the command line utilities and don&rsquo;t care at all about the rest of the product (which is probably most people), install everything using <a href="https://pipx.pypa.io/latest/installation/">pipx</a></p>
+<p>This will make your life much simpler.</p>
+<p><code>pipx install dataverse_utils</code></p>
+<p>You may (or may not) want or need to install for whatever shell you use (bash, command prompt, etc). Depending on what you&rsquo;re using one shell may be isolated from another. See the lengthy explanation below if necessary.</p>
+<h2 id="possibly-but-not-necessarily-outdated-explanations">Possibly, but not necessarily, outdated explanations<a class="headerlink" href="#possibly-but-not-necessarily-outdated-explanations" title="Permanent link">&para;</a></h2>
 <p>On Mac and Linux, running the scripts supplied with <code>dataverse_utils</code> is straightforward. They&rsquo;re available at the command line, which means that you can simply run them by (for example):</p>
-<p><code>$ dv_manifest_gen.py</code> followed by switches and variables as normal.</p>
+<p><code>$ dv_manifest_gen</code> followed by switches and variables as normal.</p>
 <p>Doing this results in output to the terminal window. <strong>This is not necessarily the case in Windows</strong>.</p>
 <p>Whether or not the utility appears on the Windows command line will likely depend on the shell you installed it with:</p>
 <p>Commonly used shells on Windows include, but are not limited to:</p>
@@ -115,11 +125,9 @@
 <li>Git bash</li>
 <li>Cygwin</li>
 </ul>
-<p>If the utilities are not functioning the way you are expecting, make sure that Python and the install location is in your PATH.</p>
-<p>As of version 0.8.3 the installation has been updated to use newer packaging standards which will ideally reduce the frequency of installation problems. </p>
-<p>Also as of v0.8.3, the .py suffix has been removed from the console utilities. This means if you are forced to run a command manually, it would be run with <code>python [utilityname]</code> <strong>not</strong> <code>python [utilityname.py]</code></p>
+<p>If the utilities are not functioning the way you are expecting, make sure that the pipx install location is in your PATH for whatever shell you are using.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<p>These are (likely deprecated) notes from testing on a variety of Windows installations. If you&rsquo;re luckly, a solution can be found below.</p>
+<p>These are (deprecated) notes from testing on a variety of Windows installations. If you&rsquo;re lucky, a solution can be found below.</p>
 <p>This test case uses a new installation of <a href="https://python.org">https://python.org</a> Python, v.3.9.6, installed in Windows using the GUI, so it&rsquo;s as basic a Windows installation as you can get.</p>
 <p>In this instance, <code>dataverse_utils</code> were installed using pip from the PowerShell, ie <code>pip install git+https://github.com/ubc-library-rc/dataverse_utils</code>. However, pip should be pip regardless of which console you use to install.</p>
 <p>Here&rsquo;s a handy guide to show the results of how/if the command line scripts run. This example uses <code>dv_manifest.gen.py</code>, but appears to be generally applicable to any scripts configured with setuptools.setup()  (ie, <code>setuptools.setup(scripts=[whatever]</code>). If this means nothing to you because you&rsquo;re not distributing your own Python packages,, just skip to the table below.</p>

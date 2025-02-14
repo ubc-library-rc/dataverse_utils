@@ -112,7 +112,7 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="dataverse-utilities">Dataverse utilities<a class="headerlink" href="#dataverse-utilities" title="Permanent link">&para;</a></h1>
-<p>This is a generalized set of utilities which help with managing <a href="https://dataverse.org">Dataverse</a> repositories. This has <em>nothing</em> to do with the Microsoft product of the same name. Despite being written as they were required, that doesn&rsquo;t mean they&rsquo;re not useful or user-friendly. </p>
+<p>This is a generalized set of utilities which help with managing <a href="https://dataverse.org">Dataverse</a> repositories. This has <em>nothing</em> to do with the Microsoft product of the same name. </p>
 <p>With these utilities you can:</p>
 <ul>
 <li>Upload your data sets from a tab-separated-value spreadsheet</li>
@@ -130,7 +130,6 @@
 <p>Any installation will require the use of the command line/command prompt (see above).</p>
 <p>The easiest installation is with <a href="https://pipx.pypa.io/latest/installation/">pipx</a>. <code>pipx</code> will allow you to run these utilities as separate utilities isolated completely from the rest of your Python installation[s]. </p>
 <p>This should work for any platform which supports <code>pipx</code></p>
-<p>If course, you can also use Python&rsquo;s bundled <code>pip</code> utility, but <code>pipx</code> is generally easier. </p>
 <pre><code class="language-nohighlight">pipx install dataverse_utils
 </code></pre>
 <p>There is also a <em>server specific version</em> if you need to use the <strong>dv_facet_date</strong> utility. This can <em>only</em> be run on a server hosting a Dataverse instance, so for the vast majority of users it will be unusable.</p>
@@ -149,31 +148,34 @@
 <p>If you have <a href="https://www.mkdocs.org">mkdocs</a> installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the <em>downloaded source files</em> by running <code>mkdocs serve</code>.</p>
 <h2 id="the-components">The components<a class="headerlink" href="#the-components" title="Permanent link">&para;</a></h2>
 <h3 id="console-utilities">Console utilities<a class="headerlink" href="#console-utilities" title="Permanent link">&para;</a></h3>
-<p>There are eight (8) console utilities currently available.</p>
+<p>There are nine (9) console utilities currently available.</p>
 <ul>
 <li>
-<p><strong>dv_del.py</strong>: Bulk (unpublished) file deletion utility</p>
+<p><strong>dv_del</strong>: Bulk (unpublished) file deletion utility</p>
 </li>
 <li>
-<p><strong>dv_ldc_uploader.py</strong>: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. <strong>As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain</strong>. Don&rsquo;t worry, that&rsquo;s not as hard as it sounds.</p>
+<p><strong>dv_ldc_uploader</strong>: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. <strong>As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain</strong>. Don&rsquo;t worry, that&rsquo;s not as hard as it sounds.</p>
 </li>
 <li>
-<p><strong>dv_manifest_gen.py</strong>: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.</p>
+<p><strong>dv_list_files</strong>: Lists all the files in a dataverse record, potentially including all versions and draft versions.</p>
 </li>
 <li>
-<p><strong>dv_pg_facet_date.py</strong>: A server-based tool which updates the publication date facet and performs a study reindex.</p>
+<p><strong>dv_manifest_gen</strong>: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.</p>
 </li>
 <li>
-<p><strong>dv_record_copy.py</strong>: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.</p>
+<p><strong>dv_pg_facet_date</strong>: A server-based tool which updates the publication date facet and performs a study reindex.</p>
 </li>
 <li>
-<p><strong>dv_release.py</strong>: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.</p>
+<p><strong>dv_record_copy</strong>: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.</p>
+</li>
+<li>
+<p><strong>dv_release</strong>: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.</p>
 </li>
 <li>
 <p><strong>dv_replace_licence</strong>: Replaces the licence associated with a PID with text from a Markdown file. Also available as <strong>dv_replace_license</strong> for those using American English.</p>
 </li>
 <li>
-<p><strong>dv_upload_tsv.py</strong>: Takes a tsv file in the format from <em>dv_manifest_gen.py</em> and does all the uploading and metadata entry.</p>
+<p><strong>dv_upload_tsv</strong>: Takes a tsv file in the format from <em>dv_manifest_gen.py</em> and does all the uploading and metadata entry.</p>
 </li>
 </ul>
 <p>More information about these can be found on the <a href="scripts/">console utilities page</a>.</p>
@@ -263,5 +265,5 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-02-04 16:15:33.720572+00:00
+Build Date UTC : 2025-02-14 23:51:22.710564+00:00
 -->
