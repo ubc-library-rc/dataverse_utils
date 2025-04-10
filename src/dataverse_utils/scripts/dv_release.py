@@ -15,11 +15,11 @@ from urllib3.util import Retry
 
 RETRY_STRATEGY = Retry(total=10,
                        status_forcelist=[429, 500, 502, 503, 504],
-                       method_whitelist=['HEAD', 'GET', 'OPTIONS',
+                       allowed_methods=['HEAD', 'GET', 'OPTIONS',
                                          'POST', 'PUT'],
                        backoff_factor=1)
 
-VERSION = (0, 1, 1)
+VERSION = (0, 1, 2)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 def argp():
