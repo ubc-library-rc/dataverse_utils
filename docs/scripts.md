@@ -293,6 +293,10 @@ options:
 
 This will replace the text in a record with the text Markdown file. Text is converted to HTML. Optionally, the record can be republished without incrementing the version (ie, with `type=updatecurrent`.
 
+**Deprecation warning**
+
+`dv_replace_license` will be removed in future releases to conform to Canadian English standards.
+
 ```nohighlight
 usage: dv_replace_licence [-h] [-u URL] -l LIC -k KEY [-r] [--version] studies [studies ...]
 
