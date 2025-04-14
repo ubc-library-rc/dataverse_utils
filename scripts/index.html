@@ -353,6 +353,8 @@ options:
 </code></pre>
 <h2 id="dv_replace_licencse">dv_replace_licen[cs]e<a class="headerlink" href="#dv_replace_licencse" title="Permanent link">&para;</a></h2>
 <p>This will replace the text in a record with the text Markdown file. Text is converted to HTML. Optionally, the record can be republished without incrementing the version (ie, with <code>type=updatecurrent</code>.</p>
+<p><strong>Deprecation warning</strong></p>
+<p><code>dv_replace_license</code> will be removed in future releases to conform to Canadian English standards.</p>
 <pre><code class="language-nohighlight">usage: dv_replace_licence [-h] [-u URL] -l LIC -k KEY [-r] [--version] studies [studies ...]
 
 Replaces the licence text in a Dataverse study and [optionally] republishes it as the same version. Superuser privileges are required for republishing as the version is not incremented.
