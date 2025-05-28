@@ -109,6 +109,7 @@ def write_old(data) -> None:
     id, authority, identifier, publicationdate.
 
     publicationdate is assumed to be a datetime.datetime instance.
+
     ------
     Parameters:
 

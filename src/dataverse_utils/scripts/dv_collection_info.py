@@ -54,18 +54,6 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
-def main2():
-    '''
-    You know what this is
-    '''
-    args = parse().parse_args()
-    print(args)
-    if args.output:
-        print(args.output)
-
-    if 'all' in [x.lower() for x in args.fields]:
-        print('ALLLLL')
-
 def main():
     '''
     You know what this is

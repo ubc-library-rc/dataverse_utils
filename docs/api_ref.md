@@ -1,4 +1,5 @@
 # API Reference
+
 <a id="dataverse_utils"></a>
 
 ## dataverse\_utils
@@ -221,6 +222,184 @@ apikey : str
     Dataverse API key; required for DRAFT or restricted material
 timeout : int
     Optional timeout in seconds
+
+<a id="dataverse_utils.collections"></a>
+
+## dataverse\_utils.collections
+
+Utilities for recursively analysing a Dataverse collection
+
+<a id="dataverse_utils.collections.StudyMetadata"></a>
+
+### StudyMetadata Objects
+
+```python
+class StudyMetadata(dict)
+```
+
+The metadata container for a single study
+
+<a id="dataverse_utils.collections.StudyMetadata.__init__"></a>
+
+##### \_\_init\_\_
+
+```python
+def __init__(study_meta: dict, **kwargs) -> None
+```
+
+Takes the requests.json() output of a call to {url}/api/datasets/:persistentId.
+
+The result is a dict with only one level, instead of 13.
+
+------------------------------------------
+study_meta : dict
+    Dataverse Native JSON from API call
+
+kwargs : dict
+    Anything else you want to include in the dictionary, like, say
+    collection. That way you can have any info you want in the output.
+
+<a id="dataverse_utils.collections.StudyMetadata.extract_metadata"></a>
+
+##### extract\_metadata
+
+```python
+def extract_metadata() -> None
+```
+
+Convenience function for parsing the study metadata of the latest version.
+Results are written to DvCollection.ez as a dict.
+
+<a id="dataverse_utils.collections.StudyMetadata.extract_field_metadata"></a>
+
+##### extract\_field\_metadata
+
+```python
+def extract_field_metadata(field) -> None
+```
+
+Extract the metadata from a single field and make it into a human-readable dict.
+Output updates self.ez
+
+<a id="dataverse_utils.collections.DvCollection"></a>
+
+### DvCollection Objects
+
+```python
+class DvCollection()
+```
+
+Metadata for an *entire* dataverse collection, recursively.
+
+<a id="dataverse_utils.collections.DvCollection.__init__"></a>
+
+##### \_\_init\_\_
+
+```python
+def __init__(url: str, coll: str, key=None, **kwargs) -> None
+```
+
+All you need to start recursively crawling.
+
+------------------------------------------
+
+**Arguments**:
+
+  
+  coll : str
+  short collection name or id number
+  
+  url : str
+  base URL of Dataverse collection. Eg: https://borealisdata.ca or
+  borealisdata.ca
+  
+  key : str
+  API key (optional, only use if you want to see hidden material)
+  
+  Optional kwargs : dict
+  timeout : int
+  retry timeout in seconds
+
+<a id="dataverse_utils.collections.DvCollection.get_collections"></a>
+
+##### get\_collections
+
+```python
+def get_collections(coll: str = None, output=None) -> list
+```
+
+Get a listing of all dataverses in a collection
+
+------------------------------------------
+
+**Arguments**:
+
+  
+  coll : str
+  Collection short name or id
+
+<a id="dataverse_utils.collections.DvCollection.get_studies"></a>
+
+##### get\_studies
+
+```python
+def get_studies(root: str = None, **kwargs) -> list
+```
+
+return [(pid, title)..(pid_n, title_n)] of a collection
+
+------------------------------------------
+
+**Arguments**:
+
+  
+  root : str
+  Short name or id of *top* level of tree. Default self.coll
+
+<a id="dataverse_utils.collections.DvCollection.get_collection_listing"></a>
+
+##### get\_collection\_listing
+
+```python
+def get_collection_listing(coll_id, **kwargs) -> list
+```
+
+return a listing of studies in a collection, with pid
+
+------------------------------------------
+
+**Arguments**:
+
+  
+  coll_id : str
+  Short name or id of a dataverse collection
+
+<a id="dataverse_utils.collections.DvCollection.get_study_info"></a>
+
+##### get\_study\_info
+
+```python
+def get_study_info(pid, **kwargs) -> StudyMetadata
+```
+
+Returns a StudyMetadata instance so that you can preserve
+your sanity trying to see what's in Dataverse's JSON.
+
+------------------------------------------
+
+**Arguments**:
+
+  
+  pid : str
+  Persistent ID of a Dataverse study
+  
+  kwargs : dict
+  
+  verbose : bool
+  If True, print pid to stdout. [any kwarg except 'verbose']
+  any other information you need to include with the study.
+  For example: the collection shortname as a parameter you
+  call "collection". Or "Bob", if you want.
 
 <a id="dataverse_utils.scripts.dv_list_files"></a>
 
@@ -447,6 +626,7 @@ Writes older data to a tsv file. Assumes 4 values per item:
 id, authority, identifier, publicationdate.
 
 publicationdate is assumed to be a datetime.datetime instance.
+
 ------
 
 **Arguments**:
@@ -877,6 +1057,35 @@ def main() -> None
 ```
 
 The main function call
+
+<a id="dataverse_utils.scripts.dv_collection_info"></a>
+
+## dataverse\_utils.scripts.dv\_collection\_info
+
+Recursively parses a dataverse collection and
+outputs study metadata for the latest version
+
+<a id="dataverse_utils.scripts.dv_collection_info.parse"></a>
+
+##### parse
+
+```python
+def parse() -> argparse.ArgumentParser()
+```
+
+Parses the arguments from the command line.
+
+Returns argparse.ArgumentParser
+
+<a id="dataverse_utils.scripts.dv_collection_info.main"></a>
+
+##### main
+
+```python
+def main()
+```
+
+You know what this is
 
 <a id="dataverse_utils.dataverse_utils"></a>
 

@@ -19,6 +19,34 @@ Note that these programs have been primarily tested on Linux and MacOS, with [Wi
 
 In alphabetical order:
 
+## dv_collection_info
+
+A recursive file metadata utility. You can specify the head of a tree and the harvester will harvest the \[latest\]  study metadata and output it as a spreadsheet. An API key is not required for publicly accessible data.
+
+```nohighlight
+usage: dv_collection_info [-h] [-u URL] -c COLLECTION [-k KEY] [-d DELIMITER] [-f [FIELDS ...]] [-o OUTPUT] [--verbose] [-v]
+
+Recursively parses a dataverse collection and
+outputs study metadata for the latest version.
+
+If analyzing publicly available collections, a
+dataverse API key for the target system is not
+required.
+
+options:
+  -h, --help            show this help message and exit
+  -u, --url URL         Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
+  -c, --collection COLLECTION
+                        Dataverse collection shortname or id at the top of the tree
+  -k, --key KEY         API key
+  -d, --delimiter DELIMITER
+                        Delimiter for output spreadsheet. Default: tab (\t)
+  -f, --fields [FIELDS ...]
+                        Record metadata fields to output. For all fields, use "all". Default: title, author.
+  -o, --output OUTPUT   Output file name.
+  --verbose             Verbose output. See what's happening.
+  -v, --version         Show version number and exit
+```
 ## dv_del
 
 This is bulk deletion utility for unpublished studies (or even single studies). It's useful when your automated procedures have gone wrong, or if you don't feel like navigating through many menus.
