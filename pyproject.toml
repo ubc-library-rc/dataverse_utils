@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.16.4"
+version = "0.17.0"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -41,6 +41,7 @@ pydoc-markdown = ">=4.8.2"
 mkdocs = ">=1.6.1"
 
 [project.scripts]
+dv_collection_info = 'dataverse_utils.scripts.dv_collection_info:main'
 dv_del = 'dataverse_utils.scripts.dv_del:main'
 dv_ldc_uploader = 'dataverse_utils.scripts.dv_ldc_uploader:main'
 dv_manifest_gen = 'dataverse_utils.scripts.dv_manifest_gen:main'

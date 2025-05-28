@@ -5,5 +5,5 @@ Generalized dataverse utilities. Note that
 '''
 from dataverse_utils.dataverse_utils import *
 
-VERSION = (0,16,4)
+VERSION = (0,17,0)
 __version__ = '.'.join([str(x) for x in VERSION])
