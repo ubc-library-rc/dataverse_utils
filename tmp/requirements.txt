@@ -5,7 +5,7 @@ git+git://github.com/ubc-library-rc/dryad2dataverse@master#egg=dryad2dataverse
 idna==2.10
 importlib-metadata==4.5.0
 Markdown==3.3.4
-markdownify==0.9.4 
+markdownify==0.14.1 
 requests==2.25.1
 requests-toolbelt==0.9.1
 soupsieve==2.2.1
