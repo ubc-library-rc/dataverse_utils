@@ -191,6 +191,9 @@ class Ldc(ds.Serializer):
             LDC_dict[key] = str(subsoup)
         LDC_dict['Introduction'] = LDC_dict.get('Introduction',
                                                 self.__no_intro())
+        #LDC puts http in front of their DOI identifier
+        if LDC_dict.get('DOI'):
+            LDC_dict['DOI'] = LDC_dict['DOI'].strip('https://doi.org/')
         return LDC_dict
 
     def __no_intro(self)->str:
