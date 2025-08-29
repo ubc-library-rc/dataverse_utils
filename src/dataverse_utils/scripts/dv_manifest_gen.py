@@ -1,4 +1,3 @@
-#!python
 '''
 Creates a file manifest in tab separated value format
 which can be used with other dataverse_util library utilities
@@ -9,16 +8,12 @@ import argparse
 import glob
 import os
 import pathlib
-#pathlib new for Python 3.5
-#https://docs.python.org/3/library/pathlib.html
-import re
+#import re
 import sys
 
 
 import dataverse_utils as du
 
-VERSION = (0, 5, 1)
-__version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
     '''
@@ -76,7 +71,7 @@ def parse() -> argparse.ArgumentParser():
                         help=('Include an optional path column for custom file paths'),
                         action='store_true')
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 

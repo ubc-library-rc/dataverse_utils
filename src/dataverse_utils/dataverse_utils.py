@@ -11,13 +11,13 @@ import json
 import logging
 import mimetypes
 import os
+#import sys
 import time
 
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 import requests
-
+from requests_toolbelt.multipart.encoder import MultipartEncoder
+import dataverse_utils
 LOGGER = logging.getLogger(__name__)
-
 #A list of extensions which disable tabular processing
 NOTAB = ['.sav', '.por', '.zip', '.csv', '.tsv', '.dta', '.rdata', '.xlsx']
 
@@ -50,6 +50,7 @@ def _make_info(dv_url, study, apikey) -> tuple:
     if dv_url.endswith('/'):
         dv_url = dv_url[:-1]
     headers = {'X-Dataverse-key': apikey}
+    headers.update(dataverse_utils.UAHEADER)
     params = {'persistentId': study}
     return (dv_url, headers, params)
 
@@ -436,6 +437,7 @@ def upload_file(fpath, hdl, **kwargs):
     multi = MultipartEncoder(fields=fields) # use multipart streaming for large files
     headers = {'X-Dataverse-key' : kwargs.get('apikey'),
                'Content-type' : multi.content_type}
+    headers.update(dataverse_utils.UAHEADER)
     params = {'persistentId' : hdl}
 
     LOGGER.info('Uploading %s to %s', fpath, hdl)
@@ -508,6 +510,7 @@ def restrict_file(**kwargs):
             On True, restrict. Default True
     '''
     headers = {'X-Dataverse-key': kwargs['apikey']}
+    headers.update(dataverse_utils.UAHEADER)
     #Requires a true/false *string* for the API.
     if kwargs.get('rest', True):
         rest = 'true'

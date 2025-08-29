@@ -7,10 +7,8 @@ import io
 import json
 import sys
 import textwrap
+import dataverse_utils as du
 import dataverse_utils.dvdata as dd
-
-VERSION  = (0, 1, 1)
-__version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
     '''
@@ -48,7 +46,7 @@ def parse() -> argparse.ArgumentParser():
     parser.add_argument('-f', '--file',
                         help='Dump output to FILE')
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 

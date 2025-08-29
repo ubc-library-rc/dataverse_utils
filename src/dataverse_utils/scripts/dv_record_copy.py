@@ -9,9 +9,8 @@ Dataverse GUI.
 '''
 import argparse
 import requests
+import dataverse_utils as du
 
-VERSION = (0, 1, 2)
-__version__ = '.'.join([str(x) for x in VERSION])
 TIMEOUT = 100
 
 def parsley() -> argparse.ArgumentParser():
@@ -31,7 +30,8 @@ def parsley() -> argparse.ArgumentParser():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('pid',
                         help=('PID of original dataverse record'
-                              'separated by spaces. eg. "hdl:11272.1/AB2/NOMATH hdl:11272.1/AB2/HANDLE". '
+                              'separated by spaces. eg. '
+                              '"hdl:11272.1/AB2/NOMATH hdl:11272.1/AB2/HANDLE". '
                               'Case is ignored, so "hdl:11272.1/ab2/handle" will also work.'))
     parser.add_argument('-u', '--url', default='https://abacus.library.ubc.ca',
                         help=('Dataverse installation base URL. '
@@ -48,7 +48,7 @@ def parsley() -> argparse.ArgumentParser():
                         help=('Replace metadata data in record with this PID'),
                         )
     parser.add_argument('-v','--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 
@@ -60,8 +60,10 @@ def _download_original(url: str, pid : str, key: str) -> dict:
     '''
     #curl -H "X-Dataverse-key:$API_TOKEN" /
     #$SERVER_URL/api/datasets/:persistentId/?persistentId=$PERSISTENT_IDENTIFIER
+    headers = {'X-Dataverse-key':key}
+    headers.update(du.UAHEADER)
     getjson = requests.get(url+'/api/datasets/:persistentId',
-                           headers={'X-Dataverse-key':key},
+                           headers=headers,
                            params = {'persistentId': pid},
                            timeout = TIMEOUT)
     getjson.raise_for_status()

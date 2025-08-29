@@ -10,9 +10,8 @@ import argparse
 import json
 import markdown
 import requests
+import dataverse_utils as du
 
-VERSION = (0, 1, 1)
-__version__ = '.'.join([str(x) for x in VERSION])
 TIMEOUT = 100
 
 def parsley() -> argparse.ArgumentParser() :
@@ -40,7 +39,7 @@ def parsley() -> argparse.ArgumentParser() :
                         help='Republish study without incrementing version',
                         action='store_true')
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 
@@ -63,6 +62,7 @@ def replace_licence(hdl, lic, key,
 
     headers={'X-Dataverse-key' : key,
              'Content-Type': 'application/ld+json'}
+    headers.update(du.UAHEADER)
     params = {'persistentId': hdl, 'replace': 'true'}
     data = {'dvcore:termsOfUse' : markdown.markdown(lic),
             '@context' : {'dvcore' : 'https://dataverse.org/schema/core#'}}
@@ -89,6 +89,7 @@ def republish(hdl, key, url='https://abacus.library.ubc.ca'):
         Dataverse installation base URL
     '''
     headers = {'X-Dataverse-key' : key}
+    headers.update(du.UAHEADER)
     params = {'persistentId' : hdl, 'type':'updatecurrent'}
     req = requests.post(f'{url}/api/datasets/:persistentId/actions/:publish',
                         headers=headers, params=params,

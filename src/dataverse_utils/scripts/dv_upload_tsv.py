@@ -1,4 +1,3 @@
-#!python
 '''
 Uploads data sets to a dataverse installation from the
 contents of a TSV (tab separated value)
@@ -11,9 +10,6 @@ import sys
 import textwrap
 
 import dataverse_utils as du
-
-VERSION = (0, 5, 0)
-__version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
     '''
@@ -78,7 +74,7 @@ def parse() -> argparse.ArgumentParser():
                             '''))
 
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 

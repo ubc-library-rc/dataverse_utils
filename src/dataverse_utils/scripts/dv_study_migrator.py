@@ -8,9 +8,6 @@ import requests
 import dataverse_utils
 import dataverse_utils.dvdata
 
-VERSION = (0, 4, 1)
-__version__ = '.'.join([str(x) for x in VERSION])
-
 def parsley() -> argparse.ArgumentParser():
     '''
     Parses the arguments from the command line.
@@ -73,7 +70,7 @@ def parsley() -> argparse.ArgumentParser():
                        help=replac[1:]
                         )
     parser.add_argument('-v','--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=dataverse_utils.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 
@@ -132,6 +129,8 @@ def main():
     args = parsley().parse_args()
     args.source_url = args.source_url.strip('/ ')
     args.target_url = args.target_url.strip('/ ')
+    target_headers={'X-Dataverse-key': args.target_key}
+    target_headers.update(dataverse_utils.UAHEADER)
 
     studs = [dataverse_utils.dvdata.Study(x, args.source_url, args.source_key)
              for x in args.pids]
@@ -142,7 +141,7 @@ def main():
         for stud in studs:
             upload = requests.post(f'{args.target_url}/api/dataverses/{args.collection}/datasets',
                                    json=stud['upload_json'],
-                                   headers={'X-Dataverse-key': args.target_key},
+                                   headers=target_headers,
                                    timeout=args.timeout)
             try:
                 upload.raise_for_status()
@@ -171,7 +170,7 @@ def main():
             upload = requests.put(f'{args.target_url}/api/datasets/:persistentId/versions/:draft',
                                    json={'metadataBlocks': rec[1]['upload_json']\
                                                            ['datasetVersion']['metadataBlocks']},
-                                   headers={'X-Dataverse-key' : args.target_key},
+                                   headers=target_headers,
                                    params={'persistentId' : rec[0]},
                                    timeout=args.timeout)
             try:

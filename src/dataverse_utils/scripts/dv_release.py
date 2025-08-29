@@ -1,4 +1,3 @@
-#!python
 '''
 Bulk release script for Dataverse.
 
@@ -13,14 +12,13 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
+import dataverse_utils as du
+
 RETRY_STRATEGY = Retry(total=10,
                        status_forcelist=[429, 500, 502, 503, 504],
                        allowed_methods=['HEAD', 'GET', 'OPTIONS',
                                          'POST', 'PUT'],
                        backoff_factor=1)
-
-VERSION = (0, 1, 2)
-__version__ = '.'.join([str(x) for x in VERSION])
 
 def argp():
     '''
@@ -53,7 +51,7 @@ def argp():
                              'or doi:10.80240/FK2/NWRABI. Multiple values OK'),
                        nargs='+')
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 
@@ -71,7 +69,8 @@ class Dverse():
         :param dv: str. Short name of target Dataverse collection (eg. 'statcan')
         '''
         self.dvurl = dvurl.strip('/')
-        self.apikey = apikey
+        self.headers = {'X-Dataverse-key' : apikey}
+        self.headers.update(du.UAHEADER)
         self.dvs = dvs
         self.hdl = None
         self.sess = requests.Session()
@@ -85,7 +84,7 @@ class Dverse():
         the Dataverse collection
         '''
         slist = self.sess.get(f'{self.dvurl}/api/dataverses/{self.dvs}/contents',
-                              headers={'X-Dataverse-key':self.apikey})
+                              headers=self.headers)
         data = slist.json()['data']
         self.hdl = data[-1]['protocol']
         return [x['storageIdentifier'].replace('file://', f'{self.hdl}:') for x in data
@@ -105,7 +104,7 @@ class Dverse():
         for stud in all_stud:
             data = self.sess.get(f'{self.dvurl}/api/datasets/:persistentId/versions',
                                  params={'persistentId':stud},
-                                 headers={'X-Dataverse-key':self.apikey})
+                                 headers=self.headers)
             most_recent = data.json()['data'][-1]
             if most_recent['versionState'] == 'DRAFT':
                 unreleased.append(most_recent['datasetPersistentId'])
@@ -124,7 +123,8 @@ class Study():
         #super().__init__(kwargs['dvurl'], kwargs['apikey'], kwargs['dv'])
 
         self.dvurl = kwargs.get('dvurl')
-        self.apikey = kwargs.get('apikey')
+        self.headers = {'X-Dataverse-key' : kwargs.get('apikey')}
+        self.headers.update(du.UAHEADER)
         self.pid = kwargs.get('pid')
         self.stime = kwargs.get('stime', 10)
         self.verbose = kwargs.get('verbose', False)
@@ -142,7 +142,7 @@ class Study():
 
         lock = self.sess.get(f'{self.dvurl}/api/datasets/:persistentId/locks',
                              params={'persistentId':self.pid},
-                             headers={'X-Dataverse-key':self.apikey})
+                             headers=self.headers)
         if self.verbose:
             lock_stat = lock.json()['data']
             if lock_stat:
@@ -166,7 +166,7 @@ class Study():
 
         release = self.sess.post(f'{self.dvurl}/api/datasets/:persistentId/actions/:publish',
                                  params={'persistentId':self.pid, 'type':'major'},
-                                 headers={'X-Dataverse-key': self.apikey})
+                                 headers=self.headers)
         self.status = release.json()
 
         if self.verbose:
