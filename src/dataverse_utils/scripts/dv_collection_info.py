@@ -46,8 +46,8 @@ def parse() -> argparse.ArgumentParser():
                         default=['title', 'author'])
     parser.add_argument('-o', '--output', help='Output file name.',
                        required=False)
-    parser.add_argument('--verbose', help='Verbose output. See what\'s happening.',
-                        action='store_true',)
+    #parser.add_argument('--verbose', help='Verbose output. See what\'s happening.',
+    #                    action='store_true',)
     parser.add_argument('-v', '--version', action='version',
                         version='%(prog)s ' +
                                 '.'.join([str(x) for x in VERSION]),
@@ -61,7 +61,7 @@ def main():
     args = parse().parse_args()
     coll_me  = dvc.DvCollection(args.url, args.collection, args.key)
     coll_me.get_collections()
-    coll_me.get_studies(verbose=args.verbose)
+    coll_me.get_studies()
     if 'all' in [x.lower() for x in args.fields]:
         fieldnames = sorted(list(set(q for x in coll_me.studies for q in x.keys())))
     else:
@@ -74,8 +74,8 @@ def main():
                             extrasaction='ignore')
     writer.writeheader()
     for row in coll_me.studies:
-        #instant data cleanup. Why is this even in the metadata?
         writer.writerow({k:v.replace('\t',' ').replace('\r\n', ' ').replace('\n',' ')
+                         if isinstance(v, str) else v
                          for k, v in row.items()})
     out.seek(0)
     if args.output:
