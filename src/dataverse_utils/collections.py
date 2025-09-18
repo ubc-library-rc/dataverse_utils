@@ -1,10 +1,17 @@
 '''
 Utilities for recursively analysing a Dataverse collection
 '''
-
+import io
 import logging
+import string
+import warnings
 import requests
 from urllib3.util import Retry
+
+#README
+import bs4
+
+import markdownify
 
 LOGGER = logging.getLogger(__name__)
 RETRY = Retry(total=10,
@@ -56,7 +63,7 @@ class DvCollection:
                            requests.adapters.HTTPAdapter(max_retries=self.retry_strategy))
         self.collections = None
         self.studies = None
-    
+
     def __clean_url(self, badurl:str):
         '''
         Sanitize URL
@@ -86,9 +93,9 @@ class DvCollection:
         --------------------
         coll : str
             Collection short name or id
-        
+
         --------------------
-        
+
         '''
         if not output:
             output = []
@@ -107,7 +114,6 @@ class DvCollection:
         for dv in dvs:
             LOGGER.debug('%s/api/dataverses/%s/contents', self.url, dv[1])
             LOGGER.debug('recursive')
-            #breakpoint()
             self.get_collections(dv[1], output)
         self.collections = output
         return output
@@ -175,29 +181,15 @@ class StudyMetadata(dict):
     '''
     The metadata container for a single study
     '''
-#    def __init__(self, study_meta:dict):
-#        '''
-#        Takes the requests.json() output of a call to {url}/api/datasets/:persistentId.
-#
-#        The result is a dict with only one level, instead of 13.
-#        ---
-#        study_meta : dict
-#            Dataverse Native JSON from API call
-#        ---
-#        '''
-#        self.study_meta  = study_meta
-#        self.extract_metadata()
-#        self.__files = None
-
     def __init__(self, **kwargs):
         '''
         kwargs: At least one of:
 
             study_meta: dict
                 The dataverse study metadata JSON
-        
+
             OR
-            
+
             url:  str
                 Base URL to dataverse instance
             pid: str
@@ -206,7 +198,7 @@ class StudyMetadata(dict):
             Optionally:
                 key: str
                 Dataverse instance API key (needed for unpublished studies)
-            
+
         '''
         self.kwargs = kwargs
         self.study_meta  = kwargs.get('study_meta')
@@ -385,12 +377,154 @@ class StudyMetadata(dict):
         self['study_version'] = self.study_meta['data']['latestVersion']['versionState']
         return
 
+class ReadmeCreator:
+    '''
+    Make a formatted README document out of study metadata
+    '''
+    #TODO: Should this even be in this file? Separate? Completely separate?
+
+    def __init__(self, study_metadata_obj: StudyMetadata, **kwargs):
+        '''
+        Send in StudyMetadata dict to create a nicely formatted README document
+        '''
+        self.meta = study_metadata_obj
+        self.kwargs = kwargs
+        self.h1 = ['title', 'dsDescription', 'licence', 'termsOfUse']
+        self.h2 =[]
+        warnings.filterwarnings('ignore', category=bs4.MarkupResemblesLocatorWarning)
+        #These values are the first part of the keys that need
+        #concatenation to make them more legible.
+        self.concat = ['author', 'datasetContact','otherId', 'keyword', 'topic', 'publication',
+                       'producer', 'production', 'distributor', 'series', 'software',
+                       'dsDescription']
+
+    def __major_headings(self, inkey:str)->str:
+        '''
+        Markdownify some of the fields headings
+        '''
+        if inkey in self.h1:
+            return f'# {inkey}\n\n'
+        if inkey in self.h2:
+            return f'## {inkey}\n\n'
+        return inkey
+
+    def __html_to_md(self, inval)->str:
+        '''
+        Convert any HTML to markdown, or as much as possible
+        '''
+        if isinstance(inval, str):
+            return markdownify.markdownify(inval)
+        return str(inval)
+
+
+    @property
+    def readme_md(self)->str:
+        '''
+        Generate a markdown readme string
+        '''
+        metatmp = self.meta.copy()
+        neworder = self.reorder_fields(metatmp)
+        addme = self.concatenator(metatmp)
+        metatmp.update(addme)
+        out = {_:None for _ in neworder} # A new dictionary with the correct order
+        for k, v in metatmp.items():
+            out[k]=v
+        #Now remove keys that should be gone
+        for rem in self.concat:
+            out = {k:v for k,v in out.items()
+                       if not (k.startswith(rem) and len(k) > len(rem))}
+
+        fout = '\n\n'.join([f'{self.rename_field(k)}: {self.__html_to_md(v)}'
+                            for k, v in out.items()])
+        #Way to put this in a "value" field, Harvard
+        fout = fout.replace('IsSupplementTo', 'Is supplement to')
+        return fout
+
+    def __create_fileout(self, out:dict):
+        '''
+        Better formatting. But how?  Is it worth it?
+        '''
+        #TODO pointless?
+        ffu = io.StringIO()
+        for k, v in out.items:
+            if k in self.h1:
+                ffu.write('# '+ v)
+
+    def reorder_fields(self, indict)->list:
+        '''
+        Create a new dictionary with the keys in the right order
+        '''
+        fieldlist = list(indict)
+        for val in self.concat:
+            pts = [n for n, x in enumerate(fieldlist) if x.startswith(val)]
+            if pts:
+                ins_point = min(pts)
+                fieldlist.insert(ins_point, val)
+        return fieldlist
+
+    def rename_field(self, instr:str)->str:
+        '''
+        Split and capitalize fields as required
+        eg: keywordValue -> Keyword Value
+        eg: termsOfUse -> Terms of Use
+        '''
+        noncap = ['A', 'Of', 'The']
+
+        wordsp = ''.join(map(lambda x: x if x not in string.ascii_uppercase
+                             else f' {x}', list(instr)))
+        wordsp = wordsp.split(' ')
+        #wordsp[0] = wordsp[0].capitalize()
+        #wordsp = ' '.join(map(lambda x: x if x not in noncap else x.lower(), wordsp))
+        wordsp = list(map(lambda x: x if x not in noncap else x.lower(), wordsp))
+        wordsp[0] = wordsp[0].capitalize()
+        wordsp = ' '.join(wordsp)
+        #because they can't even use camelCaseConsistently
+        fixthese ={'U R L': 'URL', 'U R I': 'URI', 'I D': 'ID', 'Ds': ''}
+        for k, v in fixthese.items():
+            wordsp = wordsp.replace(k, v)
+        return wordsp.strip()
+
+    def concatenator(self, meta):
+        '''Produce a concatenated dictionary with the key being just the prefix'''
+        #The keys are the first part of the fields that need concatenation
+        concat = {_:[] for _ in self.concat}
+
+        for k, v in meta.items():
+            for fk in concat:
+                if k.startswith(fk):
+                    if v:
+                        if concat[fk]:
+                            concat[fk].append(v.split(';'))
+                        else:
+                            concat[fk] = [v.split(';')]
+
+
+        outdict = {}
+        for ke, va in concat.items():
+            if va:
+                interim = self.max_zip(*va)
+                #print(interim)
+                interim = [' - '.join([y.strip() for y in _ if y]) for _ in interim ]
+                #interim = '; '.join(interim) # Should it be newline?
+                interim = '\n '.join(interim) # Should it be newline?
+                outdict[ke] = interim
+        return outdict
+
+    def max_zip(self, *args):
+        '''
+        Like zip, only uses the *maximum* length and appends None if not found
+        '''
+        length = max(map(len, args))
+        outlist=[]
+        for n in range(length):
+            vals = []
+            for arg in args:
+                try:
+                    vals.append(arg[n])
+                except IndexError:
+                    vals.append(None)
+            outlist.append(vals)
+        return outlist
+
 if __name__ == '__main__':
-    #set(q for x in x.studies for q in x.keys())
-    # with open('dv_output_test.tsv', mode='w', newline='\n', encoding='utf-8') as w:
-    #     writer=csv.DictWriter(w, fieldnames=sorted(list(set(q for x in x.studies
-    #                                                         for q in x.keys()))),
-    #delimiter='\t', quoting=csv.QUOTE_MINIMAL)
-    #     writer.writeheader()
-    #     writer.writerows(x.studies)
     pass
