@@ -1,10 +1,11 @@
 '''
 Utilities for recursively analysing a Dataverse collection
 '''
-import io
 import logging
 import string
 import warnings
+
+import markdown_pdf
 import requests
 from urllib3.util import Retry
 
@@ -86,7 +87,7 @@ class DvCollection:
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
-    def get_collections(self, coll:str=None, output=None, **kwargs):
+    def get_collections(self, coll:str=None, output=None, **kwargs):#! pylint:disable=unused-argument
         '''
         Get a listing of all dataverses in a collection
         So difficult
@@ -107,7 +108,6 @@ class DvCollection:
         x.raise_for_status()
         data = x.json().get('data')
         dvs =  [(_['title'], self.__get_shortname(_['id'])) for _ in data if _['type']=='dataverse']
-        #breakpoint()
         if not dvs:
             dvs = []
         output.extend(dvs)
@@ -267,9 +267,7 @@ class StudyMetadata(dict):
             if field['typeClass']=='primitive':
                 self.update({field['typeName']: field['value']})
             if field['typeClass'] == 'compound':
-                #breakpoint()
                 for v2 in field['value']:
-                    #breakpoint()
                     self.extract_field_metadata(field['value'][v2])
         if field['multiple']:
             if field['typeClass'] == 'compound':
@@ -278,7 +276,6 @@ class StudyMetadata(dict):
                     interim = {}
                     for insane_dict in field['value']:
                         for v3 in insane_dict.values():
-                            #breakpoint()
                             if interim.get(v3['typeName']):
                                 interim.update({v3['typeName']:
                                                 interim[v3['typeName']]+ [v3['value']]})
@@ -344,8 +341,7 @@ class StudyMetadata(dict):
                       'specialPermissions',
                       'restrictions',
                       'citationRequirements',
-                      'depositorRequirements',
-                      'conditions',
+                      'depositorRequirements', 'conditions',
                       'disclaimer',
                       'dataAccessPlace',
                       'originalArchive',
@@ -364,17 +360,17 @@ class StudyMetadata(dict):
             self['licence'] = self.study_meta['data']['latestVersion']['license'].get('name')
             link = self.study_meta['data']['latestVersion']['license'].get('uri')
             if link:
-                self['licence_link'] = link
+                self['licenceLink'] = link
 
     def __version(self):
         '''
         Obtain the current version and add it to self
         '''
         if self.study_meta['data']['latestVersion']['versionState'] == 'RELEASED':
-            self['study_version'] = (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
+            self['studyVersion'] = (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
                            f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
             return
-        self['study_version'] = self.study_meta['data']['latestVersion']['versionState']
+        self['studyVersion'] = self.study_meta['data']['latestVersion']['versionState']
         return
 
 class ReadmeCreator:
@@ -382,40 +378,47 @@ class ReadmeCreator:
     Make a formatted README document out of study metadata
     '''
     #TODO: Should this even be in this file? Separate? Completely separate?
-
+    #TODO: Add: DOI, current date, reorder geospatial metadata to be sane. Plus files
+    #Use pyreadstat, damage, pandas or all of the above to get file level metadata
     def __init__(self, study_metadata_obj: StudyMetadata, **kwargs):
         '''
         Send in StudyMetadata dict to create a nicely formatted README document
         '''
         self.meta = study_metadata_obj
         self.kwargs = kwargs
-        self.h1 = ['title', 'dsDescription', 'licence', 'termsOfUse']
-        self.h2 =[]
         warnings.filterwarnings('ignore', category=bs4.MarkupResemblesLocatorWarning)
         #These values are the first part of the keys that need
         #concatenation to make them more legible.
         self.concat = ['author', 'datasetContact','otherId', 'keyword', 'topic', 'publication',
                        'producer', 'production', 'distributor', 'series', 'software',
-                       'dsDescription']
-
-    def __major_headings(self, inkey:str)->str:
-        '''
-        Markdownify some of the fields headings
-        '''
-        if inkey in self.h1:
-            return f'# {inkey}\n\n'
-        if inkey in self.h2:
-            return f'## {inkey}\n\n'
-        return inkey
+                       'dsDescription', 'grant', 'contributor']
 
     def __html_to_md(self, inval)->str:
         '''
         Convert any HTML to markdown, or as much as possible
         '''
         if isinstance(inval, str):
+            #markdownify kwargs are here:
+            #https://github.com/matthewwithanm/python-markdownify
             return markdownify.markdownify(inval)
         return str(inval)
 
+    def make_md_heads(self, inkey:str)->str:
+        '''
+        Because we want the things to be nice
+        '''
+        section_heads = {'Title':'## ',
+                        'Description':'**Description**\n\n',
+                        'Licence': '### Licence\n\n',
+                        'Terms of Use': '### Terms of Use\n\n'}
+        if inkey in section_heads:
+            return section_heads[inkey]
+        multi = [self.rename_field(_) for _ in  self.concat]
+        if inkey in multi:
+            if inkey not in ['Series', 'Software', 'Production']:
+                return f'{inkey}(s):  \n'
+            return f'{inkey}:  \n'
+        return f'{inkey}: '
 
     @property
     def readme_md(self)->str:
@@ -434,21 +437,20 @@ class ReadmeCreator:
             out = {k:v for k,v in out.items()
                        if not (k.startswith(rem) and len(k) > len(rem))}
 
-        fout = '\n\n'.join([f'{self.rename_field(k)}: {self.__html_to_md(v)}'
-                            for k, v in out.items()])
-        #Way to put this in a "value" field, Harvard
-        fout = fout.replace('IsSupplementTo', 'Is supplement to')
-        return fout
+        fout = {self.rename_field(k): self.__fix_relation_type(self.__html_to_md(v))
+                for k, v in out.items()}
 
-    def __create_fileout(self, out:dict):
+        return '\n\n'.join(f'{self.make_md_heads(k)}{v}' for k, v in fout.items())
+
+    def __fix_relation_type(self, badstr:str)->str:
         '''
-        Better formatting. But how?  Is it worth it?
+        For some reason, Dataverse puts camelCase values in the 'values' field
+        for publication relation. This will make it more readable.
         '''
-        #TODO pointless?
-        ffu = io.StringIO()
-        for k, v in out.items:
-            if k in self.h1:
-                ffu.write('# '+ v)
+        fixthese = ['IsCitedBy', 'IsSupplementTo', 'IsSupplementedBy', 'IsReferencedBy']
+        for val in fixthese:
+            badstr=badstr.replace(val, self.rename_field(val))
+        return badstr
 
     def reorder_fields(self, indict)->list:
         '''
@@ -503,10 +505,12 @@ class ReadmeCreator:
         for ke, va in concat.items():
             if va:
                 interim = self.max_zip(*va)
-                #print(interim)
                 interim = [' - '.join([y.strip() for y in _ if y]) for _ in interim ]
                 #interim = '; '.join(interim) # Should it be newline?
-                interim = '\n '.join(interim) # Should it be newline?
+                #interim = '  \n'.join(interim) # Should it be newline?
+                interim= '<br/>'.join(interim)# Markdownify strips internal spaces
+                #if ke.startswith('keyw'):
+                #    breakpoint()
                 outdict[ke] = interim
         return outdict
 
@@ -525,6 +529,15 @@ class ReadmeCreator:
                     vals.append(None)
             outlist.append(vals)
         return outlist
+
+    def write_pdf(self, dest:str)->None:
+        '''
+        Make the PDF and save it at "dest"
+        '''
+        output = markdown_pdf.MarkdownPdf(toc_level=1)
+        content = markdown_pdf.Section(self.readme_md, toc=False)
+        output.add_section(content)
+        output.save(dest)
 
 if __name__ == '__main__':
     pass
