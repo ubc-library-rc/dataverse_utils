@@ -87,7 +87,7 @@ class DvCollection:
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
-    def get_collections(self, coll:str=None, output=None, **kwargs):#! pylint:disable=unused-argument
+    def get_collections(self, coll:str=None, output=None, **kwargs):# pylint:disable=unused-argument
         '''
         Get a listing of all dataverses in a collection
         So difficult
@@ -421,6 +421,30 @@ class ReadmeCreator:
         return f'{inkey}: '
 
     @property
+    def file_metadata_md(self):
+        '''
+        Produce pretty markdown for file metadata
+        '''
+        fmeta = []
+        for fil in self.meta.files:
+            fileout = {}
+            fileout['File'] = fil['filename']
+            for k, v in fil.items():
+                fileout[k.capitalize().replace('_',' ').replace('Pid', 'Persistent Identifier')] = v
+            fileout['Message digest'] = f'{fileout["Chk type"]}: {fileout["Chk digest"]}'
+            for rem in ['Chk type', 'Chk digest', 'Id', 'Has tab file', 'Study pid',
+                        'File label', 'Filename']:
+                del fileout[rem]
+            fmeta.append(fileout)
+
+    
+        outtmp = []
+        for li in fmeta:
+            outtmp.append('  \n'.join(f'{k}: {v}' for k, v in li.items()))
+        return '\n\n'.join(outtmp)
+        #return fmeta
+
+    @property
     def readme_md(self)->str:
         '''
         Generate a markdown readme string
@@ -440,7 +464,12 @@ class ReadmeCreator:
         fout = {self.rename_field(k): self.__fix_relation_type(self.__html_to_md(v))
                 for k, v in out.items()}
 
-        return '\n\n'.join(f'{self.make_md_heads(k)}{v}' for k, v in fout.items())
+
+        outstr =  '\n\n'.join(f'{self.make_md_heads(k)}{v}' for k, v in fout.items())
+        outstr += '\n\n## File information\n\n'
+        outstr += self.file_metadata_md
+
+        return outstr
 
     def __fix_relation_type(self, badstr:str)->str:
         '''
