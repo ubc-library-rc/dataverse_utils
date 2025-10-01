@@ -2,13 +2,17 @@
 Utilities for recursively analysing a Dataverse collection
 '''
 import logging
+import pathlib
 import string
+import tempfile
 import textwrap
+#import typing
 import traceback
 import warnings
 
 import markdown_pdf
 import requests
+import tqdm #Progress meter
 from urllib3.util import Retry
 
 #README
@@ -89,7 +93,7 @@ class DvCollection:
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
-    def get_collections(self, coll:str=None, output=None, **kwargs):# pylint:disable=unused-argument
+    def get_collections(self, coll:str=None, output=None, **kwargs):#pylint: disable=unused-argument
         '''
         Get a listing of all dataverses in a collection
         So difficult
@@ -207,7 +211,7 @@ class DvCollection:
                                 headers={'X-Dataverse-key':self.key})
         meta.raise_for_status()
         LOGGER.debug(pid)
-        return StudyMetadata(study_meta=meta.json())
+        return StudyMetadata(study_meta=meta.json(), key=self.key)
 
 class StudyMetadata(dict):
     '''
@@ -487,6 +491,9 @@ class ReadmeCreator:
             for rem in ['Chk type', 'Chk digest', 'Id', 'Has tab file', 'Study pid',
                         'File label', 'Filename']:
                 del fileout[rem]
+            #not everyone has a pid for the file
+            if not fileout.get('Persistent Identifier'):
+                del fileout['Persistent Identifier']
             fmeta.append(fileout)
 
 
@@ -660,10 +667,106 @@ class ReadmeCreator:
         '''
         Make the PDF and save it at "dest"
         '''
+        dest = pathlib.Path(dest).expanduser().absolute()
         output = markdown_pdf.MarkdownPdf(toc_level=1)
         content = markdown_pdf.Section(self.readme_md, toc=False)
         output.add_section(content)
         output.save(dest)
+
+    def write_md(self, dest:str)->None:
+        '''
+        Write markdown to file
+        '''
+        dest = pathlib.Path(dest).expanduser().absolute()
+        with open(file=dest, mode='w', encoding='utf=8') as f:
+            f.write(self.readme_md)
+
+class FileAnalysis(dict):
+    '''
+    Download and analyze a file from a dataverse installation and
+    produce useful metadata
+    '''
+
+    def __init__(self, url:str, key:str, **kwargs):
+        '''
+        Intialize the object. Minimum required:
+
+        url : str
+            Base url of dataverse installation
+
+        key : str
+            API key
+
+        --------
+        Mandatory keyword arguments
+
+        At least one of fid or pid:
+        fid : int
+            Integer file id
+        pid : str
+            Persistent ID of file
+
+        ----------
+        Optional keyword arguments
+        filename : str
+            File name (original)
+        filesize_bytes : int
+            File size in bytes
+
+        '''
+        self.url = self.__clean_url(url)
+        self.headers = {'X-Dataverse-key': key}
+        self.kwargs = kwargs
+        self.tempfile = None
+        self.session = requests.Session()
+        self.session.mount('https://',
+                           requests.adapters.HTTPAdapter(max_retries=RETRY))
+    def __del__(self):
+        '''
+        Cleanup
+        '''
+        self.session.close()
+        del self.tempfile
+
+    def __clean_url(self, badurl:str):
+        '''
+        Sanitize URL
+        --------
+        badurl: str
+            URL
+
+        -------
+        '''
+        clean = badurl.strip().strip('/')
+        if not clean.startswith('https://'):
+            clean = f'https://{clean}'
+        return clean
+
+    def download(self, block_size:int=1024)-> None:
+        '''
+        Download the file to a temporary location for analysis
+        '''
+        # pylint: disable=consider-using-with
+        self.tempfile = tempfile.NamedTemporaryFile(delete=True,
+                                                    delete_on_close=False)
+
+        if self.kwargs.get('pid'):
+            params={'persistentId':self.kwargs['pid']}
+            data = self.session.get(f'{self.url}/api/access/datafile/:persistentId',
+                                    headers=self.headers,
+                                    params=params,
+                                    stream=True)
+        else:
+            data = self.session.get(f'{self.url}/api/access/datafile/{self.kwargs["id"]}',
+                                    headers=self.headers,
+                                    stream=True)
+        data.raise_for_status()
+        filesize = self.kwargs.get('filesize_bytes',
+                                   data.headers.get('content-length', 9e9))
+        with tqdm.tqdm(total=filesize, unit='B', unit_scale=True) as t:
+            for _ in data.iter_content(block_size):
+                self.tempfile.file.write(_)
+                t.update(len(_))
 
 if __name__ == '__main__':
     pass
