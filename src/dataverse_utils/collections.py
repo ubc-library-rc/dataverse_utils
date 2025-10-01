@@ -3,6 +3,8 @@ Utilities for recursively analysing a Dataverse collection
 '''
 import logging
 import string
+import textwrap
+import traceback
 import warnings
 
 import markdown_pdf
@@ -83,7 +85,7 @@ class DvCollection:
         '''
         Get collection short name
         '''
-        shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}')
+        shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}', headers=self.headers)
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
@@ -105,9 +107,40 @@ class DvCollection:
         x = self.session.get(f'{self.url}/api/dataverses/{coll}/contents',
                                  headers=self.headers) if self.headers\
             else self.session.get(f'{self.url}/api/dataverses/{coll}/contents')
-        x.raise_for_status()
         data = x.json().get('data')
-        dvs =  [(_['title'], self.__get_shortname(_['id'])) for _ in data if _['type']=='dataverse']
+        #---
+        #Because it's possible that permissions errors can cause API read errors,
+        #we have this insane way of checking errors.
+        #I have no idea what kind of errors would be raised, so it has
+        #a bare except, which is bad. But what can you do?
+        dvs =[]
+        for _ in data:
+            if _['type'] == 'dataverse':
+                try:
+                    out=self.__get_shortname(_['id'])
+                    dvs.append((_['title'], out))
+                except Exception as e:
+
+                    obscure_error = f'''
+                                        An error has occured where a collection can be
+                                        identified by ID but its name cannot be determined.
+                                        This is (normally) caused by a configuration error where
+                                        administrator permissions are not correctly inherited by
+                                        the child collection.
+
+                                        Please check with the system administrator to determine
+                                        any exact issues.
+
+                                        Problematic collection id number: {_.get("id",
+                                        "not available")}'''
+                    print(50*'-')
+                    print(textwrap.dedent(obscure_error))
+                    print(e)
+                    LOGGER.error(textwrap.fill(textwrap.dedent(obscure_error).strip()))
+                    traceback.print_exc()
+                    print(50*'-')
+                    raise e
+        #---
         if not dvs:
             dvs = []
         output.extend(dvs)
@@ -149,7 +182,6 @@ class DvCollection:
                                   headers={'X-Dataverse-key':self.key}) if self.headers\
              else self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents')
         cl.raise_for_status()
-        #pids = [z['persistentUrl'] for z in cl.json()['data'] if z['type'] == 'dataset']
         pids = [f"{z['protocol']}:{z['authority']}/{z['identifier']}"
                 for z in cl.json()['data'] if z['type'] == 'dataset']
         out = [(self.get_study_info(pid), pid) for pid in pids]
@@ -233,6 +265,24 @@ class StudyMetadata(dict):
                                 headers=headers, params=params)
         return data.json()
 
+    def __has_metadata(self):
+        '''
+        Deacessioned items are notable for their lack of any indication
+        that they are deacessioned. However, they lack the "latestVersion" key.
+        '''
+        #try:
+        #    t = self.study_meta['data']
+        #    del t #OMG This is so dumb
+        #except KeyError as e:
+        #    raise e
+
+        if not self.study_meta.get('data'):
+            raise KeyError('data')
+
+        testfields = ['id', 'identifier', 'authority', 'latestVersion']
+        if all(self.study_meta['data'].get(_) for _ in testfields):
+            return True
+        return False
 
     def extract_metadata(self):
         '''
@@ -240,6 +290,9 @@ class StudyMetadata(dict):
 
         results are written to DvCollection.ez as a dict.
         '''
+        if not self.__has_metadata():
+            return
+
 
         for v in self.study_meta['data']['latestVersion']['metadataBlocks'].values():
             for field in v['fields']:
@@ -377,7 +430,6 @@ class ReadmeCreator:
     '''
     Make a formatted README document out of study metadata
     '''
-    #TODO: Should this even be in this file? Separate? Completely separate?
     #TODO: Add: DOI, current date, reorder geospatial metadata to be sane. Plus files
     #Use pyreadstat, damage, pandas or all of the above to get file level metadata
     def __init__(self, study_metadata_obj: StudyMetadata, **kwargs):
@@ -437,7 +489,7 @@ class ReadmeCreator:
                 del fileout[rem]
             fmeta.append(fileout)
 
-    
+
         outtmp = []
         for li in fmeta:
             outtmp.append('  \n'.join(f'{k}: {v}' for k, v in li.items()))
@@ -460,16 +512,47 @@ class ReadmeCreator:
         for rem in self.concat:
             out = {k:v for k,v in out.items()
                        if not (k.startswith(rem) and len(k) > len(rem))}
-
         fout = {self.rename_field(k): self.__fix_relation_type(self.__html_to_md(v))
                 for k, v in out.items()}
 
+        #cludgy geometry hack is best hack
+        if self.bbox():
+            fout.update(self.bbox())
+            delme = [_ for _ in fout if _.endswith('tude')]
+            for _ in delme:
+                del fout[_]
+        else:
+            del fout['Bounding Box(es)']
 
         outstr =  '\n\n'.join(f'{self.make_md_heads(k)}{v}' for k, v in fout.items())
         outstr += '\n\n## File information\n\n'
         outstr += self.file_metadata_md
 
         return outstr
+
+    def bbox(self)->dict:
+        '''
+        Produce sane bounding boxes
+        '''
+        #Yes, northLongitude, etc. Blame Harvard.
+        bbox_order =['westLongitude',
+                     'southLongitude',
+                     'southLatitude',
+                     'eastLongitude',
+                     'northLongitude',
+                     'northLatitude']
+
+        geog_me = {_: self.meta[_].split(';')
+                   for _ in bbox_order if self.meta.get(_)}# Checking for existence causes problems
+        if not geog_me: #Sometimes there is no bounding box
+            return {}
+        bbox = {k: [f'{v} {k[0].capitalize()}'.strip()
+                  for v in geog_me[k]] for k in bbox_order if geog_me.get(k)}
+        #breakpoint()
+        boxes =  self.max_zip(*bbox.values())
+        boxes = [', '.join(_) for _ in boxes]
+        boxes = [f'({_})' for _ in boxes]
+        return {'Bounding box(es)': '; '.join(boxes)}
 
     def __fix_relation_type(self, badstr:str)->str:
         '''
@@ -491,6 +574,11 @@ class ReadmeCreator:
             if pts:
                 ins_point = min(pts)
                 fieldlist.insert(ins_point, val)
+        #Geography fields are a special case yay.
+        #westLongitude is the fist one
+        if 'westLongitude' in fieldlist:
+            ins_here = fieldlist.index('westLongitude')
+            fieldlist.insert(ins_here, 'Bounding box(es)')
         return fieldlist
 
     def rename_field(self, instr:str)->str:
@@ -510,7 +598,16 @@ class ReadmeCreator:
         wordsp[0] = wordsp[0].capitalize()
         wordsp = ' '.join(wordsp)
         #because they can't even use camelCaseConsistently
-        fixthese ={'U R L': 'URL', 'U R I': 'URI', 'I D': 'ID', 'Ds': ''}
+        #Also pluralization of concatenated fields
+        fixthese ={'U R L': 'URL',
+                   'U R I': 'URI',
+                   'I D':
+                   'ID',
+                   'Ds': '',
+                   'Country':'Country(ies)',
+                   'State':'State(s)',
+                   'City':'City(ies)',
+                   'Geographic Unit':'Geographic unit(s)'}
         for k, v in fixthese.items():
             wordsp = wordsp.replace(k, v)
         return wordsp.strip()
