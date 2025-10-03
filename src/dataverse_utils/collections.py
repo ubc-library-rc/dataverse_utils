@@ -6,11 +6,12 @@ import pathlib
 import string
 import tempfile
 import textwrap
-#import typing
+import typing
 import traceback
 import warnings
 
 import markdown_pdf
+import pyreadstat
 import requests
 import tqdm #Progress meter
 from urllib3.util import Retry
@@ -521,15 +522,12 @@ class ReadmeCreator:
                        if not (k.startswith(rem) and len(k) > len(rem))}
         fout = {self.rename_field(k): self.__fix_relation_type(self.__html_to_md(v))
                 for k, v in out.items()}
-
         #cludgy geometry hack is best hack
         if self.bbox():
             fout.update(self.bbox())
             delme = [_ for _ in fout if _.endswith('tude')]
             for _ in delme:
                 del fout[_]
-        else:
-            del fout['Bounding Box(es)']
 
         outstr =  '\n\n'.join(f'{self.make_md_heads(k)}{v}' for k, v in fout.items())
         outstr += '\n\n## File information\n\n'
@@ -555,7 +553,6 @@ class ReadmeCreator:
             return {}
         bbox = {k: [f'{v} {k[0].capitalize()}'.strip()
                   for v in geog_me[k]] for k in bbox_order if geog_me.get(k)}
-        #breakpoint()
         boxes =  self.max_zip(*bbox.values())
         boxes = [', '.join(_) for _ in boxes]
         boxes = [f'({_})' for _ in boxes]
@@ -643,7 +640,6 @@ class ReadmeCreator:
                 #interim = '  \n'.join(interim) # Should it be newline?
                 interim= '<br/>'.join(interim)# Markdownify strips internal spaces
                 #if ke.startswith('keyw'):
-                #    breakpoint()
                 outdict[ke] = interim
         return outdict
 
@@ -687,20 +683,25 @@ class FileAnalysis(dict):
     produce useful metadata
     '''
 
-    def __init__(self, url:str, key:str, **kwargs):
+    def __init__(self, **kwargs):
         '''
         Intialize the object. Minimum required:
 
+        Mandatory keyword arguments:
+
+        Either
+
+        local : str
+            Path to local file
+
+        OR
+
         url : str
-            Base url of dataverse installation
-
+            URL of Dataverse instance
         key : str
-            API key
+            API key for downloading
 
-        --------
-        Mandatory keyword arguments
-
-        At least one of fid or pid:
+        AND at least one of fid or pid:
         fid : int
             Integer file id
         pid : str
@@ -712,21 +713,44 @@ class FileAnalysis(dict):
             File name (original)
         filesize_bytes : int
             File size in bytes
-
+        local : str
+            Path to local file in case you don't need to download it.
         '''
-        self.url = self.__clean_url(url)
-        self.headers = {'X-Dataverse-key': key}
+
+        #self.url = self.__clean_url(url)
+        #self.headers = {'X-Dataverse-key': key}
         self.kwargs = kwargs
+        self.local = None
+        if not self.__sufficient:
+            err = ('Insufficient required arguments. '
+                   'Include (url, key, '
+                   '(pid or id)) or (local) keyword parameters.')
+            raise TypeError(err)
         self.tempfile = None
         self.session = requests.Session()
         self.session.mount('https://',
                            requests.adapters.HTTPAdapter(max_retries=RETRY))
+        self.checkable = {'.sav': self.stat_file_metadata,
+                          '.sas7bdat': self.stat_file_metadata,
+                          '.dta': self.stat_file_metadata}
+        self.filename = None #get it later
+        self.enhance()
+
     def __del__(self):
         '''
         Cleanup
         '''
         self.session.close()
         del self.tempfile
+
+    def __sufficient(self):
+        if self.kwargs.get('local'):
+            return True
+        if (self.kwargs['url'] and self.kwargs['key']
+           and (self.kwargs.get('pid') or self.kwargs.get('id'))):
+            return True
+        return False
+
 
     def __clean_url(self, badurl:str):
         '''
@@ -742,31 +766,110 @@ class FileAnalysis(dict):
             clean = f'https://{clean}'
         return clean
 
-    def download(self, block_size:int=1024)-> None:
+    def __get_filename(self, head:dict)->typing.Union[str, None]:
         '''
-        Download the file to a temporary location for analysis
+        Determines whether or not this is a file that should be downloaded for further checking
+        '''
+        fname = head.get('content-type')
+        if fname:
+            if 'name=' in fname:
+                start = head['content-type'].find('name=')+5
+                end = head['content-type'].find(';', start)
+                if end != -1:
+                    fname = head['content-type'][start:end].strip('"')
+                else:
+                    fname = head['content-type'][start:].strip('"')
+        fname = self.kwargs.get('filename', fname)
+        return fname
+
+    def __check(self):
+        '''
+        Determines if this is one of the filetypes which supports extra metadata
+        '''
+        if pathlib.Path(self.filename).suffix.lower() in self.checkable:
+            return True
+        return False
+
+    def download(self, block_size:int=1024, force=False, local=None)-> None:
+        '''
+        Download the file to a temporary location for analysis.
+        block_size : int
+            Streaming block size
+        force : bool
+            Download even if not a file that is checkable
+        local : str
+            Path to local file
         '''
         # pylint: disable=consider-using-with
         self.tempfile = tempfile.NamedTemporaryFile(delete=True,
                                                     delete_on_close=False)
+        if local:
+            self.local = local
+            self.filename = local
+            self.tempfile.close()
+            del self.tempfile #to erase it
+            self.tempfile = None
+            return
 
+        params = {'format':'original'}
+        url = self.__clean_url(self.kwargs['url'])
+        headers = {'X-Dataverse-key' : self.kwargs['key']}
         if self.kwargs.get('pid'):
-            params={'persistentId':self.kwargs['pid']}
-            data = self.session.get(f'{self.url}/api/access/datafile/:persistentId',
-                                    headers=self.headers,
+            params.update({'persistentId':self.kwargs['pid']})
+            data = self.session.get(f'{url}/api/access/datafile/:persistentId',
+                                    headers=headers,
                                     params=params,
                                     stream=True)
         else:
-            data = self.session.get(f'{self.url}/api/access/datafile/{self.kwargs["id"]}',
-                                    headers=self.headers,
+            data = self.session.get(f'{url}/api/access/datafile/{self.kwargs["id"]}',
+                                    headers=headers,
+                                    params=params,
                                     stream=True)
         data.raise_for_status()
-        filesize = self.kwargs.get('filesize_bytes',
-                                   data.headers.get('content-length', 9e9))
-        with tqdm.tqdm(total=filesize, unit='B', unit_scale=True) as t:
-            for _ in data.iter_content(block_size):
-                self.tempfile.file.write(_)
-                t.update(len(_))
+        self.filename = self.__get_filename(data.headers)
+
+        if self.__check() or force:
+
+            filesize = self.kwargs.get('filesize_bytes',
+                                       data.headers.get('content-length', 9e9))
+            filesize = int(filesize) # comes out as string from header
+            with tqdm.tqdm(total=filesize, unit='B', unit_scale=True) as t:
+                for _ in data.iter_content(block_size):
+                    self.tempfile.file.write(_)
+                    t.update(len(_))
+            self.tempfile.close()
+
+    def enhance(self):
+        '''
+        Convenience function for downloading and creating extra metadata
+        '''
+        self.download(local=self.kwargs.get('local'))
+        self.checkable[pathlib.Path(self.filename).suffix.lower()]()
+
+
+    def stat_file_metadata(self)->dict:
+        '''
+        Use as a framework for everything else, ideally
+        '''
+        matcher = {'.sav': pyreadstat.read_sav,
+                   '.dta': pyreadstat.read_dta,
+                   '.sas7bdat': pyreadstat.read_sas7bdat}
+        ext = pathlib.Path(self.filename).suffix.lower()
+        if not self.filename or ext not in matcher:
+            return
+        whichfile = self.tempfile.name if self.tempfile else self.local
+        statdata, meta = matcher[ext](whichfile)
+        outmeta = {}
+        outmeta['variables'] = {_:{} for _ in meta.column_names_to_labels}
+
+        for k, v in meta.column_names_to_labels.items():
+            outmeta['variables'][k]['Variable label'] = v
+        for k, v in meta.original_variable_types.items():
+            outmeta['variables'][k]['Variable type'] = v
+        for k, v in meta.variable_to_label.items():
+            outmeta['variables'][k]['Value labels'] = meta.value_labels[v]
+        outmeta['encoding'] = meta.file_encoding
+        self.update(outmeta)
 
 if __name__ == '__main__':
     pass
