@@ -1,4 +1,3 @@
-#!python
 '''
 Auto download/upload LDC metadata and files.
 
@@ -9,9 +8,6 @@ import argparse
 import sys
 import dataverse_utils as du
 from dataverse_utils import ldc
-
-VERSION = (0, 3, 0)
-__version__ = '.'.join([str(x) for x in VERSION])
 
 def parse() -> argparse.ArgumentParser():
     '''
@@ -48,7 +44,7 @@ def parse() -> argparse.ArgumentParser():
                               'requires only one positional *studies* argument'),
                         default=None)
     parser.add_argument('-r', '--no-restrict', action='store_false', dest='rest',
-                        help=("Don't restrict files after upload."))
+                        help="Don't restrict files after upload.")
     parser.add_argument('-n', '--cname',
                         help=('Study contact name. '
                               'Default: "Abacus support"'),
@@ -67,11 +63,12 @@ def parse() -> argparse.ArgumentParser():
                         help='Verbose output',
                         action='store_true')
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 
-def upload_meta(ldccat: str, url: str, key: str, dvs: str, verbose: bool = False, certchain: str = None) -> str:
+def upload_meta(ldccat: str, url: str, key: str,
+                dvs: str, verbose: bool = False, certchain: str = None) -> str:
     '''
     Uploads metadata to target dataverse collection. Returns persistentId.
 
@@ -110,7 +107,7 @@ def main() -> None:
                           args.dvs, args.verbose, args.certchain)
         if args.verbose:
             print(f'Uploading files to {pid}')
-        with open(args.tsv, newline='') as fil:
+        with open(args.tsv, encoding='utf-8', newline='') as fil:
             du.upload_from_tsv(fil, hdl=pid,
                                dv=args.url, apikey=args.key,
                                trunc='',

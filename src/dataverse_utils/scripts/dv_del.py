@@ -7,8 +7,7 @@ import argparse
 import sys
 import time
 import requests
-VERSION = (0, 2, 4)
-__version__ = '.'.join([str(x) for x in VERSION])
+import dataverse_utils
 
 def delstudy(dvurl, key, pid):
     '''
@@ -23,7 +22,7 @@ def delstudy(dvurl, key, pid):
     '''
     try:
         deler = requests.delete(f'{dvurl}/api/datasets/:persistentId/versions/:draft',
-                                headers={'X-Dataverse-key':key},
+                                headers=make_header(key),
                                 params={'persistentId':pid},
                                 timeout=60)
         if deler.status_code == 200:
@@ -55,7 +54,7 @@ def getsize(dvurl, pid, key):
     '''
     try:
         sizer = requests.get(f'{dvurl}/api/datasets/:persistentId/storagesize',
-                             headers={'X-Dataverse-key':key},
+                             headers=make_header(key),
                              params={'persistentId':pid},
                              timeout=10)
         text = sizer.json()['data']['message']
@@ -86,10 +85,18 @@ def parsley()->argparse.ArgumentParser:
                         action='store_true', dest='conf')
     parser.add_argument('-u', '--url', help='URL to base Dataverse installation',
                         default='https://abacus.library.ubc.ca', dest='dvurl')
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__,
+    parser.add_argument('-v','--version', action='version',
+                        version=dataverse_utils.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
+
+def make_header(key:str)->dict:
+    '''
+    Make a proper header with user agent
+    '''
+    out = {'X-Dataverse-key' : key}
+    out.update(dataverse_utils.UAHEADER)
+    return out
 
 def main():
     '''
@@ -97,14 +104,13 @@ def main():
     '''
     args = parsley().parse_args()
     args.dvurl = args.dvurl.strip('/')
-    import sys
-    print(args)
 
     if args.dataverse:
         info = requests.get(f'{args.dvurl}/api/dataverses/{args.dataverse}/contents',
-                            headers={'X-Dataverse-key': args.key}, timeout=10).json()
+                            headers=make_header(args.key), timeout=10).json()
         #Protocol key only present in a dataset, not in a sub-collection listing
-        pids = [f'{x["protocol"]}:{x["authority"]}/{x["identifier"]}' for x in info['data'] if x.get('protocol')]
+        pids = [f'{x["protocol"]}:{x["authority"]}/{x["identifier"]}'
+                for x in info['data'] if x.get('protocol')]
         if not pids:
             print(f'Dataverse collection {args.dataverse} empty')
         for count, pid in enumerate(pids):

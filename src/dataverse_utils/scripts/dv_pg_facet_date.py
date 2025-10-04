@@ -1,4 +1,3 @@
-#!python
 '''
 Reads the date from a Dataverse study and forces the facet sidebar to use that
 date by manually updating the Dataverse Postgres database.
@@ -19,8 +18,9 @@ import csv
 import datetime
 import os
 import sys
-
 import requests
+import dataverse_utils as du
+
 try:
     import psycopg2
 except ModuleNotFoundError:
@@ -32,9 +32,6 @@ except ModuleNotFoundError:
            'platform, use \'pip install pysycopg2\'.'
            ))
     sys.exit()
-
-VERSION = (0, 1, 1)
-__version__ = '.'.join([str(x) for x in VERSION])
 
 def parsely() -> argparse.ArgumentParser: #HAHA it's parsley but misspelled.
     '''
@@ -83,7 +80,7 @@ def parsely() -> argparse.ArgumentParser: #HAHA it's parsley but misspelled.
                               'https://abacus.library.ubc.ca'),
                         default='https://abacus.library.ubc.ca')
     parser.add_argument('--version', action='version',
-                        version='%(prog)s '+__version__,
+                        version=du.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 
@@ -174,8 +171,10 @@ def fetch_date_api(url, key, pid, dtype) -> str:
     dtype : str
         Date type required
     '''
+    headers = {'X-Dataverse-key' : key}
+    headers.update(du.UAHEADER)
     study = requests.get(f'{url}/api/datasets/:persistentId',
-                          headers={'X-Dataverse-key':key},
+                          headers=headers,
                           params={'persistentId':pid},
                           timeout=90)
     out = study.json()

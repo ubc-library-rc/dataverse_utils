@@ -6,8 +6,8 @@ import argparse
 import io
 import csv
 import textwrap
+import dataverse_utils
 import dataverse_utils.collections as dvc
-from dataverse_utils import VERSION
 
 def parse() -> argparse.ArgumentParser():
     '''
@@ -49,8 +49,7 @@ def parse() -> argparse.ArgumentParser():
     #parser.add_argument('--verbose', help='Verbose output. See what\'s happening.',
     #                    action='store_true',)
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s ' +
-                                '.'.join([str(x) for x in VERSION]),
+                        version=dataverse_utils.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
 

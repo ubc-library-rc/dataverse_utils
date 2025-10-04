@@ -14,6 +14,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup as bs
 import dryad2dataverse.serializer as ds
+from dataverse_utils import UAHEADER
 
 #pylint: disable=invalid-name
 with open(os.path.dirname(os.path.abspath(__file__))+os.sep
@@ -465,9 +466,11 @@ class Ldc(ds.Serializer):
         key = kwargs['key']
         dv = kwargs['dv']
         json = kwargs.get('json', self.dvJson)
+        headers = {'X-Dataverse-key':key}
+        headers.update(UAHEADER)
         try:
             upload = self.session.post(f'{url}/api/dataverses/{dv}/datasets',
-                                       headers={'X-Dataverse-key':key},
+                                       headers=headers,
                                        json=json)
             upload.raise_for_status()
             return upload.json()

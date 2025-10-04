@@ -10,11 +10,12 @@ import pathlib
 import traceback
 
 import requests
+from dataverse_utils import UAHEADER
 
 TIMEOUT = 100
 LOGGER = logging.getLogger(__name__)
 
-class Study(dict): #pylint: disable=too-few-public-methods
+class Study(dict): #pylint:  disable=too-few-public-methods
     '''
     Dataverse record. Dataverse study records are pure metadata so this
     is represented with a dictionary.
@@ -32,7 +33,7 @@ class Study(dict): #pylint: disable=too-few-public-methods
         '''
         self['pid'] = pid
         self['url'] = url
-        self['key'] = key
+        self.__key = key
         self['orig_json'] = None
         self['timeout'] = kwargs.get('timeout',TIMEOUT)
         if not self['orig_json']:
@@ -59,6 +60,7 @@ class Study(dict): #pylint: disable=too-few-public-methods
             Request timeout in seconds
         '''
         ver = requests.get(f'{url}/api/info/version',
+                           headers=UAHEADER,
                            #headers = {'X-Dataverse-key' : key},
                            timeout = timeout)
         try:
@@ -101,8 +103,10 @@ class Study(dict): #pylint: disable=too-few-public-methods
         '''
         #curl -H "X-Dataverse-key:$API_TOKEN" /
         #$SERVER_URL/api/datasets/:persistentId/?persistentId=$PERSISTENT_IDENTIFIER
+        headers = {'X-Dataverse-key' : self.__key}
+        headers.update(UAHEADER)
         getjson = requests.get(self['url']+'/api/datasets/:persistentId',
-                               headers={'X-Dataverse-key':self['key']},
+                               headers=headers,
                                params = {'persistentId': self['pid']},
                                timeout = self['timeout'])
         getjson.raise_for_status()
@@ -228,7 +232,7 @@ class File(dict):
 
         '''
         self['url'] = url
-        self['key'] = key
+        self.__key = key
         self['downloaded'] = False
         self['downloaded_file_name'] = None
         self['downloaded_checksum'] = None
@@ -246,11 +250,14 @@ class File(dict):
         not Dataverse-processed TSVs
         '''
         if not self['downloaded'] or not os.path.exists(self.get('downloaded_file_name', '')):
+
+            headers = headers={'X-Dataverse-key':self.__key}
+            headers.update(UAHEADER)
             try:
                 #curl "$SERVER_URL/api/access/datafile/:persistentId/?persistentId=$PERSISTENT_ID"
                 dwnld = requests.get(self['url']+'/api/access/datafile/'+
                                                 str(self['dataFile']['id']),
-                                     headers={'X-Dataverse-key': self['key']},
+                                     headers=headers,
                                      params = {'format':'original'},
                                      timeout=self['timeout'])
                 with tempfile.NamedTemporaryFile(delete=False) as fil:
@@ -379,6 +386,7 @@ class FileInfo(dict):
         '''
         try:
             headers={'X-Dataverse-key' : self.kwargs.get('apikey')}
+            headers.update(UAHEADER)
             params = {'persistentId': self.kwargs['pid']}
             self.dv = requests.get(f'{self.kwargs["url"]}/api/datasets/:persistentId/versions',
                                    params=params,

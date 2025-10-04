@@ -10,16 +10,17 @@ import typing
 import traceback
 import warnings
 
+import bs4
 import markdown_pdf
+import markdownify
 import pyreadstat
 import requests
 import tqdm #Progress meter
 from urllib3.util import Retry
+from dataverse_utils import UAHEADER
 
 #README
-import bs4
 
-import markdownify
 
 LOGGER = logging.getLogger(__name__)
 RETRY = Retry(total=10,
@@ -59,9 +60,12 @@ class DvCollection:
         self.coll = coll
         self.url = self.__clean_url(url)
         self.headers = None
-        self.key = key
-        if self.key:
-            self.headers = {'X-Dataverse-key': self.key}
+        self.__key = key
+        if self.__key:
+            self.headers = {'X-Dataverse-key': self.__key}
+            self.headers.update(UAHEADER)
+        else:
+            self.headers = UAHEADER.copy()
         if not kwargs.get('retry'):
             self.retry_strategy = RETRY
         else:
@@ -110,8 +114,7 @@ class DvCollection:
         if not coll:
             coll = self.coll
         x = self.session.get(f'{self.url}/api/dataverses/{coll}/contents',
-                                 headers=self.headers) if self.headers\
-            else self.session.get(f'{self.url}/api/dataverses/{coll}/contents')
+                                 headers=self.headers)
         data = x.json().get('data')
         #---
         #Because it's possible that permissions errors can cause API read errors,
@@ -184,8 +187,7 @@ class DvCollection:
         --------------------
         '''
         cl = self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents',
-                                  headers={'X-Dataverse-key':self.key}) if self.headers\
-             else self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents')
+                                  headers=self.headers)
         cl.raise_for_status()
         pids = [f"{z['protocol']}:{z['authority']}/{z['identifier']}"
                 for z in cl.json()['data'] if z['type'] == 'dataset']
@@ -203,16 +205,12 @@ class DvCollection:
             Persistent ID of a Dataverse study
         --------------------
         '''
-        if not self.key:
-            meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                                params={'persistentId': pid})
-        else:
-            meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                                params={'persistentId': pid},
-                                headers={'X-Dataverse-key':self.key})
+        meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
+                            params={'persistentId': pid},
+                            headers=self.headers)
         meta.raise_for_status()
         LOGGER.debug(pid)
-        return StudyMetadata(study_meta=meta.json(), key=self.key)
+        return StudyMetadata(study_meta=meta.json(), key=self.__key)
 
 class StudyMetadata(dict):
     '''
@@ -241,8 +239,9 @@ class StudyMetadata(dict):
         self.study_meta  = kwargs.get('study_meta')
         self.url = kwargs.get('url')
         self.pid = kwargs.get('pid')
+        self.headers = UAHEADER.copy()
         if not (('study_meta' in kwargs) or ('url' in kwargs and 'pid' in kwargs)):
-            raise TypeError('At least one of a URL/pid combo (url, pid) or '
+            raise TypeError('At least one of a URL/pid combo (url, pid) (and possibly key) or '
             'study metadata json (study_meta) is required.')
         if not self.study_meta:
             self.study_meta = self.__obtain_metadata()
@@ -258,7 +257,7 @@ class StudyMetadata(dict):
         '''
         Obtain study metadata as required
         '''
-        headers = {'X-Dataverse-key':self.kwargs.get('key')}
+        self.headers.update(self.kwargs.get('key',{}))
         params = {'persistentId': self.pid}
         self.session = requests.Session()
         self.session.mount('https://',
@@ -267,7 +266,7 @@ class StudyMetadata(dict):
         if not self.url.startswith('https://'):
             self.url = f'https://{self.url}'
         data = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                                headers=headers, params=params)
+                                headers=self.headers, params=params)
         return data.json()
 
     def __has_metadata(self):
@@ -718,7 +717,8 @@ class FileAnalysis(dict):
         '''
 
         #self.url = self.__clean_url(url)
-        #self.headers = {'X-Dataverse-key': key}
+        self.headers = UAHEADER.copy()
+        self.headers.update(kwargs.get('key', {}))
         self.kwargs = kwargs
         self.local = None
         if not self.__sufficient:
@@ -750,7 +750,6 @@ class FileAnalysis(dict):
            and (self.kwargs.get('pid') or self.kwargs.get('id'))):
             return True
         return False
-
 
     def __clean_url(self, badurl:str):
         '''
@@ -813,23 +812,21 @@ class FileAnalysis(dict):
 
         params = {'format':'original'}
         url = self.__clean_url(self.kwargs['url'])
-        headers = {'X-Dataverse-key' : self.kwargs['key']}
         if self.kwargs.get('pid'):
             params.update({'persistentId':self.kwargs['pid']})
             data = self.session.get(f'{url}/api/access/datafile/:persistentId',
-                                    headers=headers,
+                                    headers=self.headers,
                                     params=params,
                                     stream=True)
         else:
             data = self.session.get(f'{url}/api/access/datafile/{self.kwargs["id"]}',
-                                    headers=headers,
+                                    headers=self.headers,
                                     params=params,
                                     stream=True)
         data.raise_for_status()
         self.filename = self.__get_filename(data.headers)
 
         if self.__check() or force:
-
             filesize = self.kwargs.get('filesize_bytes',
                                        data.headers.get('content-length', 9e9))
             filesize = int(filesize) # comes out as string from header
@@ -841,7 +838,8 @@ class FileAnalysis(dict):
 
     def enhance(self):
         '''
-        Convenience function for downloading and creating extra metadata
+        Convenience function for downloading and creating extra metadata,
+        ie, "enhancing" the metadata.
         '''
         self.download(local=self.kwargs.get('local'))
         self.checkable[pathlib.Path(self.filename).suffix.lower()]()
