@@ -718,8 +718,9 @@ class FileAnalysis(dict):
 
         #self.url = self.__clean_url(url)
         self.headers = UAHEADER.copy()
-        self.headers.update(kwargs.get('key', {}))
         self.kwargs = kwargs
+        if self.kwargs.get('key'):
+            self.headers.update({'X-Dataverse-key':self.kwargs['key']})
         self.local = None
         if not self.__sufficient:
             err = ('Insufficient required arguments. '

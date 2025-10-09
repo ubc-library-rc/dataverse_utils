@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.20.1"
+version = "0.20.2a0"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
