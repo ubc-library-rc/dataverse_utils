@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.20.2a0"
+version = "0.20.4"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -24,7 +24,8 @@ dependencies = [
     "urllib3 (>=1.26.15)",
     "markdown-pdf (>=1.9,<2.0)",
     "tqdm (>=4.67.1,<5.0.0)",
-    "pyreadstat (>=1.3.1,<2.0.0)"
+    "pyreadstat (>=1.3.1,<2.0.0)",
+    "pyreadr (>=0.5.3,<0.6.0)"
 ]
 
 keywords =['Harvard Dataverse', 'Dataverse', 'research data management', 'data repository'] 

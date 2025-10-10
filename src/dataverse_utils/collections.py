@@ -1,6 +1,7 @@
 '''
 Utilities for recursively analysing a Dataverse collection
 '''
+import io
 import logging
 import pathlib
 import string
@@ -14,6 +15,8 @@ import bs4
 import markdown_pdf
 import markdownify
 import pyreadstat
+import pandas as pd
+import pyreadr
 import requests
 import tqdm #Progress meter
 from urllib3.util import Retry
@@ -210,7 +213,7 @@ class DvCollection:
                             headers=self.headers)
         meta.raise_for_status()
         LOGGER.debug(pid)
-        return StudyMetadata(study_meta=meta.json(), key=self.__key)
+        return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url)
 
 class StudyMetadata(dict):
     '''
@@ -257,7 +260,8 @@ class StudyMetadata(dict):
         '''
         Obtain study metadata as required
         '''
-        self.headers.update(self.kwargs.get('key',{}))
+        if self.kwargs.get('key'):
+            self.headers.update({'X-Dataverse-key':self.kwargs['key']})
         params = {'persistentId': self.pid}
         self.session = requests.Session()
         self.session.mount('https://',
@@ -439,9 +443,20 @@ class ReadmeCreator:
     def __init__(self, study_metadata_obj: StudyMetadata, **kwargs):
         '''
         Send in StudyMetadata dict to create a nicely formatted README document
+
+        self_study_metadata_obj: StudyMetadata
+            A study metadata object
+
+        optional kwargs:
+
+        local: str
+            Path to the top level directory which holds study files.
+            If present, the Readme creator will try to create extended data from
+            local files instead of downloading.
         '''
         self.meta = study_metadata_obj
         self.kwargs = kwargs
+
         warnings.filterwarnings('ignore', category=bs4.MarkupResemblesLocatorWarning)
         #These values are the first part of the keys that need
         #concatenation to make them more legible.
@@ -494,14 +509,41 @@ class ReadmeCreator:
             #not everyone has a pid for the file
             if not fileout.get('Persistent Identifier'):
                 del fileout['Persistent Identifier']
+            #TODO add file detailed metadata
+            # Should I only have remote material here? What about
+            # local files?
+            if self.kwargs.get('local'):
+                #TODO, if local
+                fpath = pathlib.Path(self.kwargs['local'])
+                #And from here you have to walk the tree to get the file in fil['filename']
+            elif self.meta.kwargs.get('url'): # Should this be optional? ie,
+                                              # and self.kwargs.get('download') or summat
+                d_dict = FileAnalysis(url=self.meta.kwargs['url'],
+                                      key=self.meta.kwargs.get('key'),
+                                      **fil).md
+                #I test here
+                #d_dict = FileAnalysis(local='tmp/eics_2023_pumf_v1.sav').md
+                if d_dict:
+                    fileout['Data Dictionary'] = d_dict
+
             fmeta.append(fileout)
-
-
+        #----- original
+        #outtmp = []
+        #for li in fmeta:
+        #    outtmp.append('  \n'.join(f'{k}: {v}' for k, v in li.items()))
+        #return '\n\n'.join(outtmp)
+        #-------
         outtmp = []
         for li in fmeta:
-            outtmp.append('  \n'.join(f'{k}: {v}' for k, v in li.items()))
-        return '\n\n'.join(outtmp)
-        #return fmeta
+            o2 = []
+            for k, v in li.items():
+                if k == 'Data Dictionary':
+                    o2.append(f'### {k} for {li["File"]}  \n{v}')
+                else:
+                    o2.append(f'{k}: {v}')
+            outtmp.append('  \n'.join(o2))
+        outtmp = '\n\n'.join(outtmp)
+        return outtmp
 
     @property
     def readme_md(self)->str:
@@ -733,7 +775,11 @@ class FileAnalysis(dict):
                            requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.checkable = {'.sav': self.stat_file_metadata,
                           '.sas7bdat': self.stat_file_metadata,
-                          '.dta': self.stat_file_metadata}
+                          '.dta': self.stat_file_metadata,
+                          '.csv': self.generic_metadata,
+                          '.tsv': self.generic_metadata,
+                          '.rdata': self.generic_metadata,
+                          '.rda': self.generic_metadata}
         self.filename = None #get it later
         self.enhance()
 
@@ -781,6 +827,10 @@ class FileAnalysis(dict):
                     fname = head['content-type'][start:].strip('"')
         fname = self.kwargs.get('filename', fname)
         return fname
+
+    @property
+    def __whichfile(self):
+        return self.tempfile.name if self.tempfile else self.local
 
     def __check(self):
         '''
@@ -843,21 +893,21 @@ class FileAnalysis(dict):
         ie, "enhancing" the metadata.
         '''
         self.download(local=self.kwargs.get('local'))
-        self.checkable[pathlib.Path(self.filename).suffix.lower()]()
+        do_it = pathlib.Path(self.filename).suffix.lower()
+        if do_it in self.checkable:
+            self.checkable[do_it](ext=do_it)
 
-
-    def stat_file_metadata(self)->dict:
+    def stat_file_metadata(self, ext:str)->dict:
         '''
         Use as a framework for everything else, ideally
         '''
         matcher = {'.sav': pyreadstat.read_sav,
                    '.dta': pyreadstat.read_dta,
                    '.sas7bdat': pyreadstat.read_sas7bdat}
-        ext = pathlib.Path(self.filename).suffix.lower()
         if not self.filename or ext not in matcher:
             return
-        whichfile = self.tempfile.name if self.tempfile else self.local
-        statdata, meta = matcher[ext](whichfile)
+        #whichfile = self.tempfile.name if self.tempfile else self.local
+        statdata, meta = matcher[ext](self.__whichfile)
         outmeta = {}
         outmeta['variables'] = {_:{} for _ in meta.column_names_to_labels}
 
@@ -866,9 +916,84 @@ class FileAnalysis(dict):
         for k, v in meta.original_variable_types.items():
             outmeta['variables'][k]['Variable type'] = v
         for k, v in meta.variable_to_label.items():
-            outmeta['variables'][k]['Value labels'] = meta.value_labels[v]
+            outmeta['variables'][k]['Value labels'] = meta.value_labels.get(v, '')
         outmeta['encoding'] = meta.file_encoding
+        for dt in statdata.columns:
+            desc = {k:str(v) for k, v in dict(statdata[dt].describe()).items()}
+            outmeta['variables'][dt].update(desc)
         self.update(outmeta)
+        return
+
+    #def csv_metadata(self):
+    #    '''
+    #    Convenience function for nsv_metadata
+    #    '''
+    #    self.generic_metadata('.csv')
+
+    #def tsv_metadata(self):
+    #    '''
+    #    Convenience function for nsv_metadata
+    #    '''
+    #    self.generic_metadata('.tsv')
+
+    def generic_metadata(self, ext):
+        '''
+        Make metadata for a [ct]sv file and RData
+
+        ext : str
+            extension ('.csv' or '.tsv')
+        '''
+        #if ext == '.tsv':
+        #    data = pd.read_csv(self.__whichfile, sep='\t')
+        #else:
+        #    data = pd.read_csv(self.__whichfile)
+
+        lookuptable ={'.tsv': {'func': pd.read_csv,
+                                'kwargs' : {'sep':'\t'}},
+                        '.csv': {'func' : pd.read_csv},
+                        '.rda': {'func' : pyreadr.read_r},
+                       '.rdata':{'func' : pyreadr.read_r}}
+        data = lookuptable[ext]['func'](self.__whichfile,
+                                              **lookuptable[ext].get('kwargs', {}))
+        if ext  in ['.rda', '.rdata']:
+            data = data[None] #why pyreadr why
+        outmeta = {}
+        outmeta['variables'] = {_:{} for _ in data.columns}
+        for dt in data.columns:
+            outmeta['variables'][dt]['Variable type'] = str(data[dt].dtype)
+            # Make something from nothing
+            desc = {k:str(v) for k, v in dict(data[dt].describe()).items()}
+            outmeta['variables'][dt].update(desc)
+        self.update(outmeta)
+
+    @property
+    def md(self):
+        '''
+        Create markdown out of a FileAnalysis object
+        '''
+        out = io.StringIO()
+        indent = '\u00A0' # &nbsp;
+        if not self.get('variables'):
+            return None
+        for k, v in self.items():
+            if k != 'variables':
+                out.write(f'**{k.capitalize()}** : {v}  \n')
+        for k, v in self.get('variables',{}).items():
+            out.write(f"**{k}**: {v.get('Variable label', 'Description N/A')}  \n")
+            for kk, vv, in v.items():
+                if kk == 'Variable label':
+                    continue
+                if not isinstance(vv, dict):
+                    out.write(f'**{kk.capitalize()}**: {vv}  \n')
+                else:
+                    out.write(f'**{kk.capitalize()}**:  \n')
+                    for kkk, vvv in vv.items():
+                        #this one only originally
+                        out.write(f'{4*indent}{kkk}: {vvv}  \n')
+            out.write('\n')
+
+        out.seek(0)
+        return out.read()
 
 if __name__ == '__main__':
     pass
