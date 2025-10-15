@@ -1,6 +1,8 @@
 '''
 Utilities for recursively analysing a Dataverse collection
 '''
+#pylint: disable=too-many-lines
+
 import io
 import logging
 import pathlib
@@ -377,7 +379,12 @@ class StudyMetadata(dict):
             outie = []
             for v in self.study_meta['data']['latestVersion']['files']:
                 innie = {}
+                fpath = v.get('directoryLabel', '').strip('/')
                 innie['filename'] = v['dataFile'].get('originalFileName', v['dataFile']['filename'])
+                #innie['full_path'] = '/'.join([fpath, innie['filename']])
+                #In case it's pathless, drop any leading slash, because
+                #'' is not the same as None, and None can't be joined.
+                innie['filename'] = '/'.join([fpath, innie['filename']]).strip('/')
                 innie['file_label'] = v.get('label')
                 innie['description'] = v.get('description')
                 innie['filesize_bytes'] = v['dataFile'].get('originalFileSize',
@@ -390,6 +397,10 @@ class StudyMetadata(dict):
                 innie['study_pid'] = (f"{self.study_meta['data']['protocol']}:"
                                      f"{self.study_meta['data']['authority']}/"
                                      f"{self.study_meta['data']['identifier']}")
+                innie['tags'] = ', '.join(v.get('categories', []))
+                if not innie['tags']:
+                    del innie['tags']#tagless
+                #innie['path'] = v.get('directoryLabel', '')
                 outie.append(innie)
             self.__files = outie
 

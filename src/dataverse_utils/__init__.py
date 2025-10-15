@@ -7,7 +7,7 @@ import pathlib
 import sys
 from dataverse_utils.dataverse_utils import *
 
-VERSION = (0,21,0)
+VERSION = (0,21,1)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 USERAGENT = (f'dataverse_utils/v{__version__} ({sys.platform.capitalize()}); '
