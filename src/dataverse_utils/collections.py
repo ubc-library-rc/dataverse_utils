@@ -881,7 +881,7 @@ class FileAnalysis(dict):
             filesize = self.kwargs.get('filesize_bytes',
                                        data.headers.get('content-length', 9e9))
             filesize = int(filesize) # comes out as string from header
-            with tqdm.tqdm(total=filesize, unit='B', unit_scale=True) as t:
+            with tqdm.tqdm(total=filesize, unit='B', unit_scale=True, desc=self.filename) as t:
                 for _ in data.iter_content(block_size):
                     self.tempfile.file.write(_)
                     t.update(len(_))
