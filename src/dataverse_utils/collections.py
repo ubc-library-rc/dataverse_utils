@@ -3,6 +3,7 @@ Utilities for recursively analysing a Dataverse collection
 '''
 #pylint: disable=too-many-lines
 
+import datetime
 import io
 import logging
 import pathlib
@@ -871,7 +872,7 @@ class FileAnalysis(dict):
             del self.tempfile #to erase it
             self.tempfile = None
             return
-
+        start = datetime.datetime.now()
         params = {'format':'original'}
         url = self.__clean_url(self.kwargs['url'])
         if self.kwargs.get('pid'):
@@ -886,8 +887,10 @@ class FileAnalysis(dict):
                                     params=params,
                                     stream=True)
         data.raise_for_status()
+        finish = datetime.datetime.now()
         self.filename = self.__get_filename(data.headers)
-
+        LOGGER.info('Downloaded header for %s. Elapsed time: %s',
+                    self.filename, finish-start)
         if self.__check() or force:
             filesize = self.kwargs.get('filesize_bytes',
                                        data.headers.get('content-length', 9e9))
