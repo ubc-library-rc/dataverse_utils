@@ -36,16 +36,16 @@ def _make_info(dv_url, study, apikey) -> tuple:
     '''
     Returns correctly formated headers and URLs for a request
 
-    ------------------------------------------
-    Parameters:
-
+    Parameters
+    ----------
     study : str
         Study handle or file ID
 
     dv_url : str
         URL to base dataverse instance
 
-    apikey : Dataverse API key
+    apikey : str
+        Dataverse API key
     '''
     if dv_url.endswith('/'):
         dv_url = dv_url[:-1]
@@ -54,11 +54,13 @@ def _make_info(dv_url, study, apikey) -> tuple:
     params = {'persistentId': study}
     return (dv_url, headers, params)
 
-def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many-arguments
+def make_tsv(start_dir, in_list=None, def_tag='Data',
              inc_header=True,
              mime=False,
              quotype=csv.QUOTE_MINIMAL,
              **kwargs) -> str:
+    # pylint: disable=too-many-positional-arguments
+    # pylint: disable=too-many-arguments
     '''
     Recurses the tree for files and produces tsv output with
     with headers 'file', 'description', 'tags'.
@@ -67,9 +69,8 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many
 
     Returns tsv as string.
 
-    ------------------------------------------
-    Parameters:
-
+    Parameters
+    ----------
     start_dir : str
         Path to start directory
 
@@ -96,7 +97,12 @@ def make_tsv(start_dir, in_list=None, def_tag='Data', # pylint: disable=too-many
         csv.QUOTE_NONNUMERIC / 2
         csv.QUOTE_NONE / 3
 
-    path: bool
+    **kwargs : dict
+        Other parameters
+
+    Other parameters
+    ----------------
+    path : bool
         If true include a 'path' field so that you can type
         in a custom path instead of actually structuring
         your data
@@ -146,9 +152,8 @@ def dump_tsv(start_dir, filename, in_list=None,
     '''
     Dumps output of make_tsv manifest to a file.
 
-    ------------------------------------------
-    Parameters:
-
+    Parameters
+    ----------
     start_dir : str
         Path to start directory
 
@@ -156,27 +161,26 @@ def dump_tsv(start_dir, filename, in_list=None,
         List of files for which to create manifest entries. Will
         default to recursive directory crawl
 
-    OPTIONAL KEYWORD ARGUMENTS
+    **kwargs : dict
+        Other parameters
 
-    def_tag : str
-        Default Dataverse tag (eg, Data, Documentation, etc)
+    Other parameters
+    ----------------
+    def_tag : str, optional, default='Data'
+        Default Dataverse tag (eg, Data, Documentation, etc).
         Separate tags with an easily splitable character:
         eg. ('Data, 2016')
-        Default: 'Data'
 
-    inc_header : bool
+    inc_header : bool, optional, default=True
         Include header for tsv.
-        Default : True
 
-    quotype: int
+    quotype : int, optional, default=csv.QUOTE_MINIMAL
         integer value or csv quote type.
-        Default : csv.QUOTE_MINIMAL
         Acceptable values:
-        csv.QUOTE_MINIMAL / 0
-        csv.QUOTE_ALL / 1
-        csv.QUOTE_NONNUMERIC / 2
-        csv.QUOTE_NONE / 3
-
+        * csv.QUOTE_MINIMAL / 0
+        * csv.QUOTE_ALL / 1
+        * csv.QUOTE_NONNUMERIC / 2
+        * csv.QUOTE_NONE / 3
     '''
 
     def_tag= kwargs.get('def_tag', 'Data')
@@ -193,19 +197,22 @@ def file_path(fpath, trunc='') -> str:
     '''
     Create relative file path from full path string
 
-    >>> file_path('/tmp/Data/2011/excelfile.xlsx', '/tmp/')
-    'Data/2011'
-    >>> file_path('/tmp/Data/2011/excelfile.xlsx', '/tmp')
-    'Data/2011'
-
-    ----------------------------------------
-    Parameters:
-
+    Parameters
+    ----------
     fpath : str
         File location (ie, complete path)
 
     trunc : str
         Leftmost portion of path to remove
+
+    Notes
+    -----
+    ```
+    >>> file_path('/tmp/Data/2011/excelfile.xlsx', '/tmp/')
+    'Data/2011'
+    >>> file_path('/tmp/Data/2011/excelfile.xlsx', '/tmp')
+    'Data/2011'
+    ```
     '''
     if trunc and not trunc.endswith(os.sep):
         trunc += os.sep
@@ -227,10 +234,9 @@ def check_lock(dv_url, study, apikey) -> bool:
     '''
     Checks study lock status; returns True if locked.
 
-    ----------------------------------------
-    Parameters:
-
-    dvurl : str
+    Parameters
+    ----------
+    dv_url : str
         URL of Dataverse installation
 
     study: str
@@ -259,9 +265,8 @@ def force_notab_unlock(study, dv_url, fid, apikey, try_uningest=True) -> int:
 
     Returns 0 if unlocked, file id if locked (and then unlocked).
 
-    ----------------------------------------
-    Parameters:
-
+    Parameters
+    ----------
     study : str
         Persistent indentifer of study
 
@@ -294,9 +299,8 @@ def uningest_file(dv_url, fid, apikey, study='n/a'):
     Tries to uningest a file that has been ingested.
     Requires superuser API key.
 
-    ----------------------------------------
-    Parameters:
-
+    Parameters
+    ----------
     dv_url : str
         URL to base Dataverse installation
 
@@ -306,7 +310,7 @@ def uningest_file(dv_url, fid, apikey, study='n/a'):
     apikey : str
         API key for superuser
 
-    study : str
+    study : str, optional
         Optional handle parameter for log messages
     '''
     dv_url, headers, params = _make_info(dv_url, fid, apikey)
@@ -328,80 +332,62 @@ def upload_file(fpath, hdl, **kwargs):
     '''
     Uploads file to Dataverse study and sets file metadata and tags.
 
-    ----------------------------------------
-    Parameters:
-
+    Parameters
+    ----------
     fpath : str
         file location (ie, complete path)
 
     hdl : str
         Dataverse persistent ID for study (handle or DOI)
 
-    kwargs : dict
+    **kwargs : dict
+        Other parameters
 
-        other parameters. Acceptable keywords and contents are:
+    Other parameters
+    ----------------
+    dv : str, required
+        URL to base Dataverse installation
+        eg: 'https://abacus.library.ubc.ca'
 
-        dv : str
-            REQUIRED
-            url to base Dataverse installation
-            eg: 'https://abacus.library.ubc.ca'
+    apikey : str, required
+        API key for user
 
-        apikey : str
-            REQUIRED
-            API key for user
+    descr : str, optional
+        File description
 
-        descr : str
-            OPTIONAL
-            file description
+    md5 : str, optional
+        md5sum for file checking
 
-        md5 : str
-            OPTIONAL
-            md5sum for file checking
+    tags : list, optional
+        list of text file tags. Eg ['Data', 'June 2020']
 
-        tags : list
-            OPTIONAL
-            list of text file tags. Eg ['Data', 'June 2020']
+    dirlabel : str, optional
+        Unix style relative pathname for Dataverse
+        file path: eg: path/to/file/
 
-        dirlabel : str
-            OPTIONAL
-            Unix style relative pathname for Dataverse
-            file path: eg: path/to/file/
+    nowait : bool, optional
+        Force a file unlock and uningest instead of waiting for processing
+        to finish
 
-        nowait : bool
-            OPTIONAL
-            Force a file unlock and uningest instead of waiting for processing
-            to finish
+    trunc : str, optional
+        Leftmost portion of path to remove
 
-        trunc : str
-            OPTIONAL
-            Leftmost portion of path to remove
+    rest : bool, optional
+        Restrict file. Defaults to false unless True supplied
 
-        rest : bool
-            OPTIONAL
-            Restrict file. Defaults to false unless True supplied
+    mimetype : str, optional
+        Mimetype of file. Useful if using File Previewers. Mimetype for zip files
+        (application/zip) will be ignored to circumvent Dataverse's automatic
+        unzipping function.
 
-        mimetype : str
-            OPTIONAL
-            Mimetype of file. Useful if using File Previewers. Mimetype for zip files
-            (application/zip) will be ignored to circumvent Dataverse's automatic
-            unzipping function.
+    label : str, optional
+        If included in kwargs, this value will be used for the label
 
-        label : str
-            OPTIONAL
-            If included in kwargs, this value will be used for the label
+    timeout : int, optional
+        Timeout in seconds
 
-        timeout : int
-            OPTIONAL
-            Timeout in seconds
-
-        override : bool
-            OPTIONAL
-            Ignore NOTAB (ie, NOTAB = [])
-
-        timeout = int
-            OPTIONAL
-            Timeout in seconds
-
+    override : bool, optional
+        Ignore NOTAB (ie, NOTAB = [])
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -482,32 +468,31 @@ def restrict_file(**kwargs):
     '''
     Restrict file in Dataverse study.
 
-    ----------------------------------------
-    Parameters:
+    Parameters
+    ----------
+    **kwargs : dict
 
+    Other parameters
+    ----------------
+    pid : str, optional
+        file persistent ID
 
-    kwargs : dict
+    fid : str, optional
+        file database ID
 
-        other parameters. Acceptable keywords and contents are:
+    dv : str, required
+        url to base Dataverse installation
+        eg: 'https://abacus.library.ubc.ca'
 
-        **One of pid or fid is required**
-        pid : str
-            file persistent ID
+    apikey : str, required
+        API key for user
 
-        fid : str
-            file database ID
+    rest : bool
+        On True, restrict. Default True
 
-        dv : str
-            REQUIRED
-            url to base Dataverse installation
-            eg: 'https://abacus.library.ubc.ca'
-
-        apikey : str
-            REQUIRED
-            API key for user
-
-        rest : bool
-            On True, restrict. Default True
+    Notes
+    --------
+    One of `pid` or `fid` is **required**
     '''
     headers = {'X-Dataverse-key': kwargs['apikey']}
     headers.update(dataverse_utils.UAHEADER)
@@ -538,37 +523,36 @@ def upload_from_tsv(fil, hdl, **kwargs):
 
     'tags' field will be split on commas.
 
-    ----------------------------------------
-    Parameters:
-
-    fil : filelike object
+    Parameters
+    ----------
+    fil
         Open file object or io.IOStream()
 
     hdl : str
         Dataverse persistent ID for study (handle or DOI)
 
+    **kwargs : dict
+        Other parameters
+
+    Other parameters
+    ----------------
     trunc : str
-       Leftmost portion of Dataverse study file path to remove.
-       eg: trunc ='/home/user/' if the tsv field is
-       '/home/user/Data/ASCII'
-       would set the path for that line of the tsv to 'Data/ASCII'.
-       Defaults to None.
+        Leftmost portion of Dataverse study file path to remove.
+        eg: trunc ='/home/user/' if the tsv field is
+        '/home/user/Data/ASCII'
+        would set the path for that line of the tsv to 'Data/ASCII'.
+        Defaults to None.
 
-    kwargs : dict
+    dv : str, required
+        url to base Dataverse installation
+        eg: 'https://abacus.library.ubc.ca'
 
-        other parameters. Acceptable keywords and contents are:
+    apikey : str, required
+        API key for user
 
-        dv : str
-            REQUIRED
-            url to base Dataverse installation
-            eg: 'https://abacus.library.ubc.ca'
-
-        apikey : str
-            REQUIRED
-            API key for user
-
-        rest : bool
-            On True, restrict access. Default False '''
+    rest : bool, optional
+        On True, restrict access. Default False
+        '''
     #reader = csv.reader(fil, delimiter='\t', quotechar='"')
     #new, optional mimetype column allows using GeoJSONS.
     #Read the headers from the file first before using DictReader

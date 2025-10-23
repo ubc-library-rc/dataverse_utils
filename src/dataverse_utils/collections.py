@@ -1,5 +1,5 @@
 '''
-Utilities for recursively analysing a Dataverse collection
+Utilities for recursively analysing a Dataverse collection.
 '''
 #pylint: disable=too-many-lines
 
@@ -25,9 +25,6 @@ import tqdm #Progress meter
 from urllib3.util import Retry
 from dataverse_utils import UAHEADER
 
-#README
-
-
 LOGGER = logging.getLogger(__name__)
 RETRY = Retry(total=10,
                        status_forcelist=[429, 500, 502, 503, 504],
@@ -48,7 +45,9 @@ class DvCollection:
     def __init__(self, url:str, coll:str, key=None, **kwargs):
         '''
         All you need to start recursively crawling.
-        --------------------
+
+        Parameters
+        ----------
         coll : str
             short collection name or id number
         url : str
@@ -58,10 +57,13 @@ class DvCollection:
         key : str
             API key (optional, only use if you want to see hidden material)
 
-        Optional kwargs:
-            timeout : int
-                retry timeout in seconds
-        --------------------
+        **kwargs: dict
+            Other parameters
+
+        Other parameters
+        ----------------
+        timeout : int
+            retry timeout in seconds
         '''
         self.coll = coll
         self.url = self.__clean_url(url)
@@ -84,12 +86,13 @@ class DvCollection:
 
     def __clean_url(self, badurl:str):
         '''
-        Sanitize URL
-        --------
-        badurl: str
-            URL
+        Sanitize URL, return properly formatted HTTP string.
 
-        -------
+        Parameters
+        ----------
+        badurl: str
+            URL string
+
         '''
         clean = badurl.strip().strip('/')
         if not clean.startswith('https://'):
@@ -98,21 +101,24 @@ class DvCollection:
 
     def __get_shortname(self, dvid):
         '''
-        Get collection short name
+        Get collection short name.
         '''
         shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}', headers=self.headers)
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
-    def get_collections(self, coll:str=None, output=None, **kwargs):#pylint: disable=unused-argument
+    def get_collections(self, coll:str=None, output=None, **kwargs)->list:#pylint: disable=unused-argument
         '''
-        Get a listing of all dataverses in a collection
-        So difficult
-        --------------------
-        coll : str
-            Collection short name or id
+        Get a [recursive] listing of all dataverses in a collection.
 
-        --------------------
+        Parameters
+        ----------
+        coll : str, optional, default=None
+            Collection short name or id
+        output : list, optional, default=[]
+            output list to append to
+        **kwargs : dict
+            Other keyword arguments
 
         '''
         if not output:
@@ -167,11 +173,12 @@ class DvCollection:
 
     def get_studies(self, root:str=None):
         '''
-        return [(pid, title)..(pid_n, title_n)] of a collection
-        --------------------
+        return [(pid, title)..(pid_n, title_n)] of a collection.
+
+        Parameters
+        ----------
         root : str
             Short name or id of *top* level of tree. Default self.coll
-        --------------------
         '''
         all_studies = []
         if not root:
@@ -186,11 +193,12 @@ class DvCollection:
 
     def get_collection_listing(self, coll_id):
         '''
-        return a listing of studies in a collection, with pid
-        --------------------
+        Return a listing of studies in a collection, with pid.
+
+        Parameters
+        ----------
         coll_id : str
             Short name or id of a dataverse collection
-        --------------------
         '''
         cl = self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents',
                                   headers=self.headers)
@@ -204,12 +212,12 @@ class DvCollection:
 
     def get_study_info(self, pid):
         '''
-        Would it be to much to ask to be able to get info out of
-        dataverse without this much crap?
-        --------------------
+        Returns a StudyMetadata object with complete metadata for a study.
+
+        Parameters
+        ----------
         pid : str
             Persistent ID of a Dataverse study
-        --------------------
         '''
         meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
                             params={'persistentId': pid},
@@ -220,26 +228,37 @@ class DvCollection:
 
 class StudyMetadata(dict):
     '''
-    The metadata container for a single study
+    The metadata container for a single study.
     '''
     def __init__(self, **kwargs):
         '''
-        kwargs: At least one of:
+        Intializize a StudyMetadata object.
 
-            study_meta: dict
-                The dataverse study metadata JSON
+        Parameters
+        ----------
+        **kwargs: dict
+            At least some of the following
 
-            OR
 
-            url:  str
-                Base URL to dataverse instance
-            pid: str
-                Persistent ID of a study
+        Other parameters
+        ----------------
+        study_meta : dict, optional
+            The dataverse study metadata JSON
 
-            Optionally:
-                key: str
-                Dataverse instance API key (needed for unpublished studies)
+        url :  str, optional
+            Base URL to dataverse instance
 
+        pid : str, optional
+            Persistent ID of a study
+
+        key : str
+            Dataverse instance API key (needed for unpublished studies)
+
+        Notes
+        -----
+        Either `study_meta` is required OR `pid` and `url`. `key` _may_ be required
+        if either a draft study is being accessed or the Dataverse installation
+        requires API keys for all requests.
         '''
         self.kwargs = kwargs
         self.study_meta  = kwargs.get('study_meta')
@@ -261,7 +280,7 @@ class StudyMetadata(dict):
 
     def __obtain_metadata(self):
         '''
-        Obtain study metadata as required
+        Obtain study metadata as required.
         '''
         if self.kwargs.get('key'):
             self.headers.update({'X-Dataverse-key':self.kwargs['key']})
@@ -276,10 +295,12 @@ class StudyMetadata(dict):
                                 headers=self.headers, params=params)
         return data.json()
 
-    def __has_metadata(self):
+    def __has_metadata(self)->bool:
         '''
+        Returns a boolean to ensure if there *is* study metadata.
         Deacessioned items are notable for their lack of any indication
-        that they are deacessioned. However, they lack the "latestVersion" key.
+        that they are deacessioned. However, they lack the "latestVersion" key,
+        which serves as a proxy. Ideally.
         '''
         #try:
         #    t = self.study_meta['data']
@@ -299,7 +320,7 @@ class StudyMetadata(dict):
         '''
         Convenience function for parsing the study metadata of the latest version.
 
-        results are written to DvCollection.ez as a dict.
+        Results are written to self, accessible as a dictionary.
         '''
         if not self.__has_metadata():
             return
@@ -316,7 +337,7 @@ class StudyMetadata(dict):
     def extract_field_metadata(self, field):
         '''
         Extract the metadata from a single field and make it into a human-readable dict.
-        Output updates self.ez
+        Output updates self.
         '''
         #pylint: disable=too-many-branches, too-many-nested-blocks
         #typeClass: compound = dict, primitive = string
@@ -359,10 +380,11 @@ class StudyMetadata(dict):
             else:
                 self.update({field['typeName'] : field['value']})
         # And that should cover every option!
+
     @property
-    def files(self):
+    def files(self)->list:
         '''
-        Return a list of of dicts with file metadata
+        Return a list of of dicts with file metadata.
         '''
         if not self.__files:
             self.__extract_files()
@@ -370,7 +392,7 @@ class StudyMetadata(dict):
 
     def __extract_files(self):
         '''
-        Extract file level metadata
+        Extract file level metadata, and write to self.__files.
         '''
         #Note: ALL other dict values for this object are single values,
         #but files would (usually) be an arbitrary number of files.
@@ -407,7 +429,8 @@ class StudyMetadata(dict):
 
     def __extract_licence_info(self):
         '''
-        Extract all the licence information fields and add them *if present*
+        Extract all the licence information fields and add them
+        to self['licence'] *if present*.
         '''
         lic_fields = ('termsOfUse',
                       'confidentialityDeclaration',
@@ -437,7 +460,7 @@ class StudyMetadata(dict):
 
     def __version(self):
         '''
-        Obtain the current version and add it to self
+        Obtain the current version and add it to self['studyVersion'].
         '''
         if self.study_meta['data']['latestVersion']['versionState'] == 'RELEASED':
             self['studyVersion'] = (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
@@ -448,23 +471,39 @@ class StudyMetadata(dict):
 
 class ReadmeCreator:
     '''
-    Make a formatted README document out of study metadata
+    Make  formatted README documents out of a StudyMetadata object.
     '''
-    #TODO: Add: DOI, current date, reorder geospatial metadata to be sane. Plus files
-    #Use pyreadstat, damage, pandas or all of the above to get file level metadata
     def __init__(self, study_metadata_obj: StudyMetadata, **kwargs):
         '''
         Send in StudyMetadata dict to create a nicely formatted README document
 
-        self_study_metadata_obj: StudyMetadata
+        Parameters
+        ----------
+        study_metadata_obj : StudyMetadata
             A study metadata object
 
-        optional kwargs:
+        **kwargs : dict
+            Keyword arguments
 
-        local: str
+        Other parameters
+        ----------------
+        url : str
+            The base URL for a Dataverse instance
+
+        pid : typing.Union[str, int]
+            The persistent identifier of a file or a file id
+
+        key : str
+            A valid API key for performing operations on Dataverse studies
+
+        local : str
             Path to the top level directory which holds study files.
             If present, the Readme creator will try to create extended data from
             local files instead of downloading.
+
+        Notes
+        -----
+        Either `local` must be supplied, or `url`, `pid` and `key` must supplied
         '''
         self.meta = study_metadata_obj
         self.kwargs = kwargs
@@ -476,9 +515,14 @@ class ReadmeCreator:
                        'producer', 'production', 'distributor', 'series', 'software',
                        'dsDescription', 'grant', 'contributor']
 
-    def __html_to_md(self, inval)->str:
+    def __html_to_md(self, inval:str)->str:
         '''
-        Convert any HTML to markdown, or as much as possible
+        Convert any HTML to markdown, or as much as possible.
+
+        Parameters
+        ----------
+        inval : str
+            HTML string to convert
         '''
         if isinstance(inval, str):
             #markdownify kwargs are here:
@@ -488,7 +532,13 @@ class ReadmeCreator:
 
     def make_md_heads(self, inkey:str)->str:
         '''
-        Because we want the things to be nice
+        Make markdown H2 headings for selected sections, currently title, description,
+        licence and terms of use.
+
+        Parameters
+        ----------
+        inkey : str
+            Section heading
         '''
         section_heads = {'Title':'## ',
                         'Description':'**Description**\n\n',
@@ -504,9 +554,10 @@ class ReadmeCreator:
         return f'{inkey}: '
 
     @property
-    def file_metadata_md(self):
+    def file_metadata_md(self)->str:
         '''
-        Produce pretty markdown for file metadata
+        Produce pretty markdown for file metadata. Outputs
+        markdown text string.
         '''
         fmeta = []
         for fil in self.meta.files:
@@ -521,13 +572,13 @@ class ReadmeCreator:
             #not everyone has a pid for the file
             if not fileout.get('Persistent Identifier'):
                 del fileout['Persistent Identifier']
-            #TODO add file detailed metadata
             # Should I only have remote material here? What about
             # local files?
             if self.kwargs.get('local'):
                 #TODO, if local
                 fpath = pathlib.Path(self.kwargs['local'])
                 #And from here you have to walk the tree to get the file in fil['filename']
+                #One day I will do this
             elif self.meta.kwargs.get('url'): # Should this be optional? ie,
                                               # and self.kwargs.get('download') or summat
                 d_dict = FileAnalysis(url=self.meta.kwargs['url'],
@@ -560,7 +611,8 @@ class ReadmeCreator:
     @property
     def readme_md(self)->str:
         '''
-        Generate a markdown readme string
+        Generate a Markdown text string (ie, the entire README) for entire an
+        entire StudyMetadata object.
         '''
         metatmp = self.meta.copy()
         neworder = self.reorder_fields(metatmp)
@@ -590,7 +642,12 @@ class ReadmeCreator:
 
     def bbox(self)->dict:
         '''
-        Produce sane bounding boxes
+        Produce sane bounding boxes from Dataverse metadata.
+        Note that older versions of Dataverse used North and South *longitude*.
+
+        Outputs a dict with bounding boxes contcatenated into a single line
+        with each coordinate suffixed by its direction (eg: '42.97 E'), with coordinates
+        separated by commas and multiple boxes separated by semi-colons.
         '''
         #Yes, northLongitude, etc. Blame Harvard.
         bbox_order =['westLongitude',
@@ -615,15 +672,29 @@ class ReadmeCreator:
         '''
         For some reason, Dataverse puts camelCase values in the 'values' field
         for publication relation. This will make it more readable.
+
+        Parameters
+        ----------
+        badstr : str
+            Input string; problematic values will be fixed, all others returned as-is.
         '''
         fixthese = ['IsCitedBy', 'IsSupplementTo', 'IsSupplementedBy', 'IsReferencedBy']
         for val in fixthese:
             badstr=badstr.replace(val, self.rename_field(val))
         return badstr
 
-    def reorder_fields(self, indict)->list:
+    def reorder_fields(self, indict:dict)->list:
         '''
-        Create a new dictionary with the keys in the right order
+        Create a list which contains a list of keys in the right (corrected) order.
+        This ensures that concatenated fields are inserted into the right place
+        and not at the end of the dictionary, keeping the structure
+        of Dataverse metadata intact while concatenating values that need
+        combining.
+
+        Parameters
+        ----------
+        indict : dict
+            Metadata dictionary
         '''
         fieldlist = list(indict)
         for val in self.concat:
@@ -640,9 +711,14 @@ class ReadmeCreator:
 
     def rename_field(self, instr:str)->str:
         '''
-        Split and capitalize fields as required
+        Split and capitalize camelCase fields as required.
         eg: keywordValue -> Keyword Value
         eg: termsOfUse -> Terms of Use
+
+        Parameters
+        ----------
+        instr : str
+            Camel case tring to split into words and capitalize.
         '''
         noncap = ['A', 'Of', 'The']
 
@@ -669,8 +745,18 @@ class ReadmeCreator:
             wordsp = wordsp.replace(k, v)
         return wordsp.strip()
 
-    def concatenator(self, meta):
-        '''Produce a concatenated dictionary with the key being just the prefix'''
+    def concatenator(self, meta:dict)->dict:
+        '''
+        Produce a concatenated dictionary with the key being just the prefix.
+        For fields like author[whatever], etc, where there are multiple
+        *components* of similar metadata held in completely separated
+        fields.
+
+        Parameters
+        ----------
+        meta : dict
+            Input metadata
+        '''
         #The keys are the first part of the fields that need concatenation
         concat = {_:[] for _ in self.concat}
 
@@ -698,7 +784,13 @@ class ReadmeCreator:
 
     def max_zip(self, *args):
         '''
-        Like zip, only uses the *maximum* length and appends None if not found
+        Like built-in zip, only uses the *maximum* length and appends None if not found
+        instead of stopping at the shortest iterable.
+
+        Parameters
+        ----------
+        *args : iterable
+            Any iterable
         '''
         length = max(map(len, args))
         outlist=[]
@@ -714,7 +806,14 @@ class ReadmeCreator:
 
     def write_pdf(self, dest:str)->None:
         '''
-        Make the PDF and save it at "dest"
+        Make the PDF of a README and save it to a file.
+
+        Parameters
+        ----------
+        dest : str
+            Destination of file, optionally including path.
+            eg: /Users/foo/study/README.pdf or
+            ~/tmp/README_I_AM_METADATA.pdf
         '''
         dest = pathlib.Path(dest).expanduser().absolute()
         output = markdown_pdf.MarkdownPdf(toc_level=1)
@@ -724,7 +823,14 @@ class ReadmeCreator:
 
     def write_md(self, dest:str)->None:
         '''
-        Write markdown to file
+        Write Markdown text of the complete documentation to a file.
+
+        Parameters
+        ----------
+        dest : str
+            Destination of file, optionally including path.
+            eg: /Users/foo/study/README.md or
+            ~/tmp/README_I_AM_METADATA.md
         '''
         dest = pathlib.Path(dest).expanduser().absolute()
         with open(file=dest, mode='w', encoding='utf=8') as f:
@@ -733,41 +839,46 @@ class ReadmeCreator:
 class FileAnalysis(dict):
     '''
     Download and analyze a file from a dataverse installation and
-    produce useful metadata
+    produce useful metadata.
     '''
 
     def __init__(self, **kwargs):
         '''
-        Intialize the object. Minimum required:
+        Intialize the object.
 
-        Mandatory keyword arguments:
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments
 
-        Either
-
+        Other parameters
+        ----------------
         local : str
             Path to local file
 
-        OR
-
         url : str
             URL of Dataverse instance
+
         key : str
             API key for downloading
 
-        AND at least one of fid or pid:
         fid : int
             Integer file id
+
         pid : str
             Persistent ID of file
 
-        ----------
-        Optional keyword arguments
         filename : str
             File name (original)
+
         filesize_bytes : int
             File size in bytes
-        local : str
-            Path to local file in case you don't need to download it.
+
+        Notes
+        -----
+        Either `local` must be supplied, or `url`, `key` and at least one of
+        `fid` or `pid` must be supplied
+
         '''
 
         #self.url = self.__clean_url(url)
@@ -797,12 +908,16 @@ class FileAnalysis(dict):
 
     def __del__(self):
         '''
-        Cleanup
+        Cleanup old temporary files on object deletion.
         '''
         self.session.close()
         del self.tempfile
 
-    def __sufficient(self):
+    def __sufficient(self)->bool:
+        '''
+        Checks if sufficient information is supplied for intialization, with
+        local files taking preference over remote.
+        '''
         if self.kwargs.get('local'):
             return True
         if (self.kwargs['url'] and self.kwargs['key']
@@ -810,14 +925,14 @@ class FileAnalysis(dict):
             return True
         return False
 
-    def __clean_url(self, badurl:str):
+    def __clean_url(self, badurl:str)->str:
         '''
-        Sanitize URL
-        --------
+        Sanitize URL. Ensures ssl and no trailing slash.
+
+        Parameters
+        ----------
         badurl: str
             URL
-
-        -------
         '''
         clean = badurl.strip().strip('/')
         if not clean.startswith('https://'):
@@ -826,7 +941,17 @@ class FileAnalysis(dict):
 
     def __get_filename(self, head:dict)->typing.Union[str, None]:
         '''
-        Determines whether or not this is a file that should be downloaded for further checking
+        Determines whether or not this is a file that should be
+        downloaded for further checking.
+
+        Parameters
+        ----------
+        head : dict
+            Header from GET request
+
+        Returns
+        -------
+        True if extended metadata can be obtained
         '''
         fname = head.get('content-type')
         if fname:
@@ -842,11 +967,14 @@ class FileAnalysis(dict):
 
     @property
     def __whichfile(self):
+        '''
+        Returns the location of the path being analyzed.
+        '''
         return self.tempfile.name if self.tempfile else self.local
 
     def __check(self):
         '''
-        Determines if this is one of the filetypes which supports extra metadata
+        Determines if this is one of the filetypes which supports extra metadata.
         '''
         if pathlib.Path(self.filename).suffix.lower() in self.checkable:
             return True
@@ -855,6 +983,8 @@ class FileAnalysis(dict):
     def download(self, block_size:int=1024, force=False, local=None)-> None:
         '''
         Download the file to a temporary location for analysis.
+
+        --------------------
         block_size : int
             Streaming block size
         force : bool
@@ -904,7 +1034,8 @@ class FileAnalysis(dict):
     def enhance(self):
         '''
         Convenience function for downloading and creating extra metadata,
-        ie, "enhancing" the metadata.
+        ie, "enhancing" the metadata. Use this instead of going through the
+        steps manually.
         '''
         self.download(local=self.kwargs.get('local'))
         do_it = pathlib.Path(self.filename).suffix.lower()
@@ -913,7 +1044,12 @@ class FileAnalysis(dict):
 
     def stat_file_metadata(self, ext:str)->dict:
         '''
-        Use as a framework for everything else, ideally
+        Produces metadata from SAS, SPSS and Stata files.
+
+        Parameters
+        ----------
+        ext : str
+            File extension of statistical package file. Include the '.'. Eg. '.sav'
         '''
         matcher = {'.sav': pyreadstat.read_sav,
                    '.dta': pyreadstat.read_dta,
@@ -938,22 +1074,14 @@ class FileAnalysis(dict):
         self.update(outmeta)
         return
 
-    #def csv_metadata(self):
-    #    '''
-    #    Convenience function for nsv_metadata
-    #    '''
-    #    self.generic_metadata('.csv')
 
-    #def tsv_metadata(self):
-    #    '''
-    #    Convenience function for nsv_metadata
-    #    '''
-    #    self.generic_metadata('.tsv')
-
-    def generic_metadata(self, ext):
+    def generic_metadata(self, ext)->None:
         '''
-        Make metadata for a [ct]sv file and RData
+        Make metadata for a [ct]sv file and RData. Updates
+        self.
 
+        Parameters
+        ----------
         ext : str
             extension ('.csv' or '.tsv')
         '''
@@ -983,7 +1111,7 @@ class FileAnalysis(dict):
     @property
     def md(self):
         '''
-        Create markdown out of a FileAnalysis object
+        Create Markdown text out of a FileAnalysis object.
         '''
         out = io.StringIO()
         indent = '\u00A0' # &nbsp;

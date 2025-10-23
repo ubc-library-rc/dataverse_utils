@@ -31,6 +31,12 @@ SCRIPT_VERSIONS={
 def script_ver_stmt(name:str)->str:
     '''
     Returns a formatted version statement for any script
+
+    Parameters
+    ----------
+    name : str
+        Name of utility to join to create version statement. Normally %prog from argparse.
+
     '''
     key = pathlib.Path(name).stem
     if not SCRIPT_VERSIONS.get(key):

@@ -24,7 +24,7 @@ with open(os.path.dirname(os.path.abspath(__file__))+os.sep
     lic.seek(0)
     LICENCE = mark.convert(lic.read())
 
-class Ldc(ds.Serializer):
+class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
     '''
     An LDC item (eg, LDC2021T01)
     '''
@@ -34,13 +34,13 @@ class Ldc(ds.Serializer):
         Returns a dict with keys created from an LDC catalogue web
         page.
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         ldc : str
-           Linguistic Consortium Catalogue Number (eg. 'LDC2015T05'.
-           This is what forms the last part of the LDC catalogue URL.
-        cert : str
+            Linguistic Consortium Catalogue Number (eg. 'LDC2015T05'.
+            This is what forms the last part of the LDC catalogue URL.
+
+        cert : str, optional, default=None
             Path to certificate chain; LDC has had a problem
             with intermediate certificates, so you can
             download the chain with a browser and supply a
@@ -88,7 +88,7 @@ class Ldc(ds.Serializer):
         return self._dvJson
 
     @property
-    def embargo(self):
+    def embargo(self)->bool:
         '''
         Boolean indicating embargo status
         '''
@@ -112,6 +112,11 @@ class Ldc(ds.Serializer):
     def oversize(self, maxsize=None):
         '''
         Make sure file is not too big for the Dataverse instance
+
+        Parameters
+        ----------
+        maxsize : int, optional, default=None
+            Maximum size in bytes
         '''
         #pylint: disable=property-with-parameters
         if not maxsize:
@@ -119,11 +124,20 @@ class Ldc(ds.Serializer):
 
     @property
     def id(self):
+        '''
+        Returns LDC ID
+        '''
         return self.ldc
 
     def fetch_record(self, timeout=45):
         '''
         Downloads record from LDC website
+
+        Parameters
+        ----------
+        timeout : int, optional, default=45
+            Request timeout in seconds
+
         '''
         interim = self.session.get(f'https://catalog.ldc.upenn.edu/{self.ldc}',
                                    verify=self.cert, timeout=timeout)
@@ -220,13 +234,17 @@ class Ldc(ds.Serializer):
     @staticmethod
     def name_parser(name):
         '''
-        Returns lastName/firstName JSON snippet from name
+        Returns lastName/firstName JSON snippet from a name
 
-        -----------------/-----------------------
-        Parameters:
-
+        Parameters
+        ----------
         name : str
             A name
+
+        Notes
+        -----
+        Can't be 100% accurate, because names can be split in many ways. However, as they
+        say, 80% is good enough.
         '''
         names = name.split(' ')
         return {'lastName': names[-1], 'firstName': ' '.join(names[:-1]), 'affiliation':''}
@@ -235,10 +253,9 @@ class Ldc(ds.Serializer):
         '''
         Creates a Dryad-style dict from an LDC dictionary
 
-        ----------------------------------------
-        Parameters:
-
-        ldc : dict
+        Parameters
+        ----------
+        ldc : dict, optional, default=self.ldcJson
             Dictionary containing LDC data. Defaults to self.ldcJson
         '''
         if not ldc:
@@ -273,16 +290,15 @@ class Ldc(ds.Serializer):
         return dryad
 
 
-    def _make_note(self, ldc=None):
+    def _make_note(self, ldc=None)->str:
         '''
         Creates a generalizes HTML notes field from a bunch of
         LDC fields that don't fit into dataverse
 
-        ----------------------------------------
-        Parameters:
-
-        ldc : dict
-            Dictionary containing LDC data. Defaults to self.ldcJson
+        Parameters
+        ----------
+        ldc : dict, optional, default=self.ldcJson
+            Dictionary containing LDC data
         '''
         if not ldc:
             ldc = self.ldcJson
@@ -313,14 +329,13 @@ class Ldc(ds.Serializer):
         '''
         Finds the index number of an item in Dataverse's idiotic JSON list
 
-        ----------------------------------------
-        Parameters:
-
+        Parameters
+        ----------
         dvjson : dict
             Dataverse JSON
 
         key : str
-           key for which to find list index
+            key for which to find list index
         '''
         for num, item in enumerate(dvjson['datasetVersion']
                                    ['metadataBlocks']['citation']['fields']):
@@ -328,15 +343,14 @@ class Ldc(ds.Serializer):
                 return num
         return None
 
-    def make_dv_json(self, ldc=None):
+    def make_dv_json(self, ldc=None):#pylint: disable=too-many-locals, too-many-statements
         '''
         Returns complete Dataverse JSON
 
-        ----------------------------------------
-        Parameters:
-
-        ldc : dict
-            LDC dictionary. Defaults to self.ldcJson
+        Parameters
+        ----------
+        ldc : dict, optional, default=self.ldcJson
+            LDC dictionary.
         '''
         if not ldc:
             ldc = self.ldcJson
@@ -443,24 +457,24 @@ class Ldc(ds.Serializer):
 
     def upload_metadata(self, **kwargs) -> dict:
         '''
-        Uploads metadata to dataverse
+        Uploads metadata to dataverse. Returns json from
+        connection attempt.
 
-        Returns json from connection attempt.
+        Parameters
+        ----------
+        **kwargs : dict
+            Parameters
 
-        ----------------------------------------
-        Parameters:
-
-        kwargs:
-
+        Other parameters
+        ----------------
         url : str
-            base url to Dataverse
+            base url to Dataverse installation
 
         key : str
             api key
 
         dv : str
             Dataverse to which it is being uploaded
-
         '''
         url = kwargs['url'].strip('/')
         key = kwargs['key']

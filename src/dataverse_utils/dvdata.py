@@ -24,12 +24,26 @@ class Study(dict): #pylint:  disable=too-few-public-methods
                  url:str, key:str,
                  **kwargs):
         '''
+        Initialize a Study object
+
+        Parameters
+        ----------
         pid : str
             Record persistent identifier: hdl or doi
+
         url : str
             Base URL to host Dataverse instance
+
         key : str
             Dataverse API key with downloader privileges
+
+        **kwargs : dict
+            Keyword arguments
+
+        Other parameters
+        ----------------
+        timeout : int
+            Request timeout in seconds
         '''
         self['pid'] = pid
         self['url'] = url
@@ -54,9 +68,12 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         Floating point value composed of:
         float(f'{major_version}.{minor_verson:03d}{patch:03d}')
         ie, version 5.9.2 would be 5.009002
+
+        Parameters
+        ----------
         url : str
             URL of base Dataverse instance. eg: 'https://abacus.library.ubc.ca'
-        timeout : int
+        timeout : int, default=100
             Request timeout in seconds
         '''
         ver = requests.get(f'{url}/api/info/version',
@@ -83,9 +100,12 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         Sets self['target_version'] to appropriate integer value *AND*
         formats self['upload_json'] to correct JSON format
 
+        Parameters
+        ----------
         url : str
             URL of *target* Dataverse instance
-        timeout : int
+
+        timeout : int, optional, default=100
             request timeout in seconds
         '''
         self['target_version'] = Study.get_version(url, timeout)
@@ -115,6 +135,11 @@ class Study(dict): #pylint:  disable=too-few-public-methods
     def __add_email(self, upjson):
         '''
         Adds contact information if it's not there. Fills with dummy data
+
+        Parameters
+        ----------
+        upjson : dict
+            Metadata
         '''
         #pylint: disable=possibly-used-before-assignment
         for n, v in enumerate((upjson['datasetVersion']
@@ -154,6 +179,7 @@ class Study(dict): #pylint:  disable=too-few-public-methods
                                      'metadataBlocks': self['orig_json']['metadataBlocks']
                                      }
                   }
+
     def _get_file_pids(self)->list:
         '''
         Returns a list of file ids representing the file
@@ -169,6 +195,10 @@ class Study(dict): #pylint:  disable=too-few-public-methods
     ######
     def fix_licence(self)->None:
         '''
+        Replaces non-standard licence with None
+
+        Notes
+        -----
         With Dataverse v5.10+, a licence type of 'NONE' is now forbidden.
         Now, as per <https://guides.dataverse.org/en/5.14/api/sword.html\
         ?highlight=invalid%20license>,
@@ -188,7 +218,10 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         Changes "multiple" to True where typeName == 'productionPlace' in
         Study['upload_json'] Changes are done
         *in place*.
-        This change came into effect with Dataverse v5.13
+
+        Notes
+        -----
+        Multiple production places came into effect with Dataverse v5.13
         '''
         #{'typeName': 'productionPlace', 'multiple': True, 'typeClass': 'primitive',
         #'value': ['Vancouver, BC', 'Ottawa, ON']}
@@ -217,18 +250,26 @@ class File(dict):
     def __init__(self, url:str, key:str,
                  **kwargs):
         '''
+        Dataverse file object
+
+        Parameters
+        ----------
         url : str
             Base URL to host Dataverse instance
+
         key : str
             Dataverse API key with downloader privileges
-        id : int or str
-            File identifier; can be a file ID or PID
-        args : list
-        kwargs : dict
 
+        **kwargs : dict
+            Other parameters
+
+        Notes
+        -----
         To initialize correctly, pass a value from Study['file_info'].
 
-        Eg: File('https://test.invalid', 'ABC123', **Study_instance['file_info'][0])
+        Eg: `File('https://test.invalid', 'ABC123', **Study_instance['file_info'][0])`
+
+        Not to be confused with the FileAnalysis object in `dataverse_utils.collections`.
 
         '''
         self['url'] = url
@@ -287,16 +328,15 @@ class File(dict):
         '''
         Returns hex digest for object
 
-            fname : str
-               Path to a file object
+        Parameters
+        ----------
+        prot : str, optional, default='md5'
+            Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
+            'sha384', 'sha512', 'blake2b', 'blake2s', 'md5'.
+            Default: 'md5'
 
-            prot : str
-               Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
-                  'sha384', 'sha512', 'blake2b', 'blake2s', 'md5'.
-                  Default: 'md5'
-
-            blocksize : int
-               Read block size in bytes
+        blocksize : int, optional, default=2**16
+            Read block size in bytes
         '''
         if not self['downloaded_file_name']:
             return None
@@ -327,7 +367,7 @@ class File(dict):
 
     def verify(self)->None:
         '''
-        Compares checksum with stated checksum
+        Compares actual checksum with stated checksum
         '''
         if not self.get('downloaded_file_name') or not self.get('downloaded'):
             LOGGER.error('File has not been downloaded')
@@ -350,27 +390,30 @@ class FileInfo(dict):
     An object representing all of a dataverse study's files.
     Easily parseable as a dict.
 
-    data_chunk : dict
-        Metadata block;  the JSON output of a call to
-        [server]/api/datasets/:persistentId/versions
-    server: str
-        Base URL of dataverse server (like 'https://abacus.library.ubc.ca')
     '''
     #Should this be incorporated into the above class? Probably.
     def __init__(self, **kwargs)->None:
         '''
-        Required keyword parameters:
+        Intialize a File object
 
-        url : str
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments as below
+
+        Other parameters
+        ----------------
+        url : str, required
             Base URL of dataverse installation
-        pid : str
+
+        pid : str, required
             Handle or DOI of study
 
-        Optional keyword parameters:
+        apikey : str, optional
+            Dataverse API key; required for DRAFT or restricted material.
+            Or if the platform policy requires an API key.
 
-        apikey : str
-            Dataverse API key; required for DRAFT or restricted material
-        timeout : int
+        timeout : int, optional
             Optional timeout in seconds
         '''
         self.kwargs = kwargs
@@ -410,7 +453,7 @@ class FileInfo(dict):
 
     def _get_all_files(self):
         '''
-        Iterates over self.data_chunk. to produce a list of files
+        Iterates over self.dv_json()['data']. to produce a list of files
         in self['files']
         '''
         try:
@@ -431,13 +474,17 @@ class FileInfo(dict):
             LOGGER.exception('FileInfo KeyError: %s', msg)
             #LOGGER.exception(traceback.format_exc())
             raise err
+
     def _get_version_files(self, flist: list, current=1)->None:
         '''
         Set version number and assign file info a version key
 
+        Parameters
+        ----------
         flist : list
             list of file metadata for a particular version
-        current: int
+
+        current: int, optional, default=1
             Value of zero represents most current version
 
         '''
@@ -459,12 +506,17 @@ class FileInfo(dict):
         Returns a dict of required info from a chunk of dataverse study
         version metadata
 
+        Parameters
+        ----------
         file : dict
             The dict containing one file's metadata
-        ---
-        Keyword arguments
+
+        **kwargs : dict
+            Keyword arguments
+
         version_info: str
             Version info string
+
         state_info : str
             Publication state
         '''
