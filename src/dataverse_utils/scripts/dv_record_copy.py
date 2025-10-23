@@ -54,9 +54,18 @@ def parsley() -> argparse.ArgumentParser():
 
 def _download_original(url: str, pid : str, key: str) -> dict:
     '''
-    Downloads the original metadata record to be copied
-
+    Downloads the original metadata record to be copied.
     Returns the latest version of the metadata as dict.
+
+
+    Parameters
+    ----------
+    url : str
+        URL of base Dataverse instance
+    pid : str
+        Persistent ID of Datverse study
+    key : str
+        API key
     '''
     #curl -H "X-Dataverse-key:$API_TOKEN" /
     #$SERVER_URL/api/datasets/:persistentId/?persistentId=$PERSISTENT_IDENTIFIER
@@ -74,6 +83,11 @@ def _output_json(injson : dict)->dict:
     Takes a json representation of a downloaded dataset version
     and returns properly formatted dict for upload to a new
     Dataverse record.
+
+    Parameters
+    ----------
+    injson : dict
+        JSON dataset representation
     '''
     return {'datasetVersion': {'license': injson['license'],
                                  'termsOfUse': injson['termsOfUse'],

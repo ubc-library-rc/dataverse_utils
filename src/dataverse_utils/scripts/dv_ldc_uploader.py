@@ -67,11 +67,14 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
-def upload_meta(ldccat: str, url: str, key: str,
-                dvs: str, verbose: bool = False, certchain: str = None) -> str:
+def upload_meta(ldccat: str, url: str, key: str,#pylint: disable = too-many-arguments, too-many-positional-arguments
+                dvs: str, verbose: bool = False,
+                certchain: str = None) -> str:
     '''
     Uploads metadata to target dataverse collection. Returns persistentId.
 
+    Parameters
+    ----------
     ldccat : str
         Linguistic Data Consortium catalogue number
     url : str

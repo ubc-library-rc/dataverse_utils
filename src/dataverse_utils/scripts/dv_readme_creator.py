@@ -44,6 +44,11 @@ def parse() -> argparse.ArgumentParser():
 def valid_pid(inst:str)->bool:
     '''
     Check for proper formatting of a doi/hdl
+    
+    Parameters
+    ----------
+    inst : str
+        Input doi/hdl string
     '''
     if inst[:4] in ['doi:', 'hdl:'] and inst.count('/')==2:
         return True
@@ -52,6 +57,11 @@ def valid_pid(inst:str)->bool:
 def valid_outfile(infil:str)->bool:
     '''
     Ensures that it's possible to write the file
+    
+    Parameters
+    ----------
+    infil : str
+       Desired file path 
     '''
     whar = pathlib.Path(infil)
     if whar.suffix.lower() not in ['.pdf', '.md', '.txt']:

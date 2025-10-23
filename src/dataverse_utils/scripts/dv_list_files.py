@@ -50,7 +50,6 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
-
 def main()->None:
     '''
     The primary function

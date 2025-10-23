@@ -74,11 +74,27 @@ def parsley() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
-def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments
+def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments, too-many-positional-arguments
                           source_url, source_key,
                           target_url, target_key):
     '''
     Uploads a single file with metadata to a dataverse record
+
+
+    Parameters
+    ----------
+    indict : dict
+        Dataverse metadata
+    pid : str
+        Persistent ID
+    source_url : str
+        Originating Dataverse URL
+    source_key : str
+        API key for source Dataverse intance
+    target_url : str
+        Target Dataverse URL
+    target_key : str
+        API key for target dataverse instance
     '''
     file = dataverse_utils.dvdata.File(source_url, source_key, **indict)
     file.download_file()
@@ -102,10 +118,14 @@ def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments
 
 def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
     '''
-    Removes all files from a dataverse record.
-        record: dataverse_utils.dvdata.Study
-        timeout: int
-            Timeout in seconds
+    Removes all files from a dataverse record
+
+    Parameters
+    ----------
+    record: dataverse_utils.dvdata.Study
+        Dataverse record
+    timeout: int
+        Timeout in seconds
     '''
     for badfile in record['file_ids']:
         #I know, let's have two APIs for no reason!
@@ -119,8 +139,6 @@ def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
             print(f'File delete error for {record["pid"]}, fileid: {badfile}: Exiting',
                   file = sys.stderr)
             sys.exit()
-
-
 
 def main():
     '''

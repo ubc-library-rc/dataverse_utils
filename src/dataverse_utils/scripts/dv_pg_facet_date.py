@@ -88,7 +88,8 @@ def parse_dtype(dtype) -> str:
     '''
     Returns correctly formatted date type string for Dataverse API
 
-    ---
+    Parameters
+    ----------
     dtype : str
         One of the allowable values from the parser
     '''
@@ -107,9 +108,9 @@ def write_old(data) -> None:
 
     publicationdate is assumed to be a datetime.datetime instance.
 
-    ------
-    Parameters:
 
+    Parameters
+    ----------
     data : list
         Postqres query output list (ie, data = cursor.fetchall())
     '''
@@ -126,6 +127,11 @@ def write_old(data) -> None:
 def write_sql(data) -> None:
     '''
     Write SQL to file
+    
+    Parameters
+    ----------
+    data : str
+        SQL string data
     '''
     if not os.path.exists('pg_sql.sql'):
         flag = 0
@@ -147,7 +153,8 @@ def get_datetime(datestr) -> (datetime.datetime, str):
     '''
     Return datetime from poorly formatted Dataverse dates string
 
-    ----
+    Parameters
+    ----------
     datestr : str
         Dataverse date returned by API
     '''
@@ -161,7 +168,8 @@ def fetch_date_api(url, key, pid, dtype) -> str:
     '''
     Returns the requested date string from the Dataverse study record
 
-    ----
+    Parameters
+    ----------
     url : str
         Base URL of Dataverse installation
     key :str
@@ -189,7 +197,8 @@ def reindex(pid) -> dict:
     '''
     Reindexes study in place. Localhost access only.
 
-    ----
+    Parameters
+    ----------
     pid : str
         PersistentId for Dataverse study
     '''

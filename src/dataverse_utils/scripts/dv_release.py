@@ -63,10 +63,15 @@ class Dverse():
         '''
         Intializes Dataverse installation object.
 
-        :param dvurl: str. URL to base Dataverse installation
+        Parameters
+        ----------
+         dvurl : str
+            URL to base Dataverse installation
             (eg. 'https://abacus.library.ubc.ca')
-        :param apikey: str. API key for Dataverse user
-        :param dv: str. Short name of target Dataverse collection (eg. 'statcan')
+         apikey : str 
+            API key for Dataverse user
+         dv : str
+            Short name of target Dataverse collection (eg. 'statcan')
         '''
         self.dvurl = dvurl.strip('/')
         self.headers = {'X-Dataverse-key' : apikey}
@@ -95,8 +100,11 @@ class Dverse():
         '''
         Finds only unreleased studies from a list of studies
 
-        :param all_stud: list. List of Dataverse studies. Defaults to output of
-                   Dverse.get_study_list()
+        Parameters
+        ----------
+        all_stud : list
+            List of Dataverse studies. Defaults to output of
+            Dverse.get_study_list()
         '''
         if not all_stud:
             all_stud = self.study_list
@@ -114,11 +122,20 @@ class Study():
     '''Instance representing a Dataverse study'''
     def __init__(self, **kwargs):
         '''
-        :kwarg dvurl: str. Base URL for Dataverse instance
-        :kwarg apikey: str. API key for Dataverse user
-        :kwarg pid: str. Persistent identifier for study
-        :kwarg stime: int. Time between file lock checks. Default 10
-        :kwarg verbose: Verbose output. Default False
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments as below
+        dvurl : str
+            Base URL for Dataverse instance
+        apikey : str 
+            API key for Dataverse user
+        pid : str 
+            Persistent identifier for study
+        stime : int
+            Time between file lock checks. Default 10
+        verbose : bool, default=False
+            Verbose output flag
         '''
         #super().__init__(kwargs['dvurl'], kwargs['apikey'], kwargs['dv'])
 
@@ -157,7 +174,10 @@ class Study():
         '''
         Releases study and waits until it's unlocked before returning to the function
 
-        :params interactive: bool. Manually confirm each release
+        Parameters
+        ----------
+        interactive : bool
+            Manually confirm each release
         '''
         if interactive:
             relme = input(f'Release {self.pid} (y/n)? ')

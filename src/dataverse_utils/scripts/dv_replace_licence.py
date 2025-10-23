@@ -16,7 +16,7 @@ TIMEOUT = 100
 
 def parsley() -> argparse.ArgumentParser() :
     '''
-    parse the command line
+    Parse the command line
     '''
     description = ('Replaces the licence text in a '
                   'Dataverse study and [optionally] republishes it '
@@ -49,14 +49,15 @@ def replace_licence(hdl, lic, key,
     Replace the licence for a dataverse study with
     persistent ID hdl.
 
-    ---
+    Parameters
+    ----------
     hdl : str
         Dataverse persistent ID
     lic : str
         Licence text in Markdown format
     key : str
         Dataverse API key
-    url : str
+    url : str, default='https://abacus.library.ubc.ca'
         Dataverse installation base URL
     '''
 
@@ -80,12 +81,13 @@ def republish(hdl, key, url='https://abacus.library.ubc.ca'):
     '''
     Republish study without updating version
 
-    ---
+    Parameters
+    ----------
     hdl : str
         Persistent Id
     key : str
         Dataverse API key
-    url : str
+    url : str, default='https://abacus.library.ubc.ca'
         Dataverse installation base URL
     '''
     headers = {'X-Dataverse-key' : key}

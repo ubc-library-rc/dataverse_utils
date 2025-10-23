@@ -12,7 +12,9 @@ import dataverse_utils
 def delstudy(dvurl, key, pid):
     '''
     Deletes Dataverse study
-
+    
+    Parameters
+    ----------
     dvurl : str
         Dataverse installation base URL
     key : str
@@ -45,6 +47,9 @@ def conf(tex):
 def getsize(dvurl, pid, key):
     '''
     Returns size of Dataverse study. Mostly here for debugging.
+
+    Parameters
+    ----------
     dvurl : str
         Dataverse installation base URL
     pid : str
@@ -93,6 +98,11 @@ def parsley()->argparse.ArgumentParser:
 def make_header(key:str)->dict:
     '''
     Make a proper header with user agent
+
+    Parameters
+    ----------
+    key : str
+        API key
     '''
     out = {'X-Dataverse-key' : key}
     out.update(dataverse_utils.UAHEADER)

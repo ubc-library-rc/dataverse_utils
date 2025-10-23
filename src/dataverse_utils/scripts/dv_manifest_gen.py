@@ -14,7 +14,6 @@ import sys
 
 import dataverse_utils as du
 
-
 def parse() -> argparse.ArgumentParser():
     '''
     Parses the arguments from the command line.
@@ -79,7 +78,14 @@ def quotype(quote: str)-> int:
     '''
     Parse quotation type for csv parser.
 
-    returns csv quote constant.
+    Parameters
+    ----------
+    quote : str
+        Input string
+
+    Returns
+    -------
+    csv quote constant.
     '''
     vals = {'min'  : 0,
             'all' : 1,
