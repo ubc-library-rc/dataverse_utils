@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Common workflows - dataverse_utils</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../css/extra.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Common workflows";
+        var mkdocs_page_input_path = "common_workflows.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> dataverse_utils
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../scripts/">Console utilities</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Common workflows</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#studies-with-many-files">Studies with many files</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#using-linguistic-data-consortium-metadata">Using Linguistic Data Consortium metadata</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creating-readme-templates-for-institutional-users">Creating README templates for institutional users</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#collection-analysis">Collection analysis</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#recurring-series">Recurring series</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#helper-utilities">Helper utilities</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api_ref/">API reference</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../faq/">FAQ</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../windows/">Windows notes</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../credits/">Credits</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">dataverse_utils</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Common workflows</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="common-workflows">Common workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h1>
+<p>Given the pile of various utilities, what are they <em>for?</em> Here are some very common use cases.</p>
+<h2 id="studies-with-many-files">Studies with many files<a class="headerlink" href="#studies-with-many-files" title="Permanent link">&para;</a></h2>
+<p>While it&rsquo;s possible to add multiple files at once to a Dataverse record by uploading a zip file, there is no metadata included in a zip file, which means laboriously adding file descriptions after the fact using the Dataverse GUI.</p>
+<p>Imagine that you have a study with a complex file tree and a large number of files. For example:</p>
+<pre><code class="language-nohighlight">.
+├── Command Files
+│   ├── bootstrap
+│   │   ├── sas
+│   │   │   └── bsw_i.sas
+│   │   └── spss
+│   │       └── bsw_i.sps
+│   ├── sas
+│   │   └── CCHS_2022_SAS_sas.zip
+│   ├── spss
+│   │   └── CCHS_2022_SPSS_sps.zip
+│   └── stata
+│       └── CCHS_2022_Stata_do.zip
+├── Data
+│   ├── ascii
+│   │   ├── CCHS_2022_ASCII_csv.zip
+│   │   ├── CCHS_2022_ASCII_txt.zip
+│   │   ├── pumf_cchs.csv
+│   │   └── PUMF_MASTER_CCHS.txt
+│   ├── bootstrap
+│   │   ├── ascii
+│   │   │   ├── bsw.txt
+│   │   │   ├── CCHS_2022_BSW_ASCII_csv.zip
+│   │   │   └── CCHS_2022_BSW_ASCII_txt.zip
+│   │   ├── sas
+│   │   │   ├── bsw.sas7bdat
+│   │   │   └── CCHS_2022_BSW_SAS_sas7bdat.zip
+│   │   ├── spss
+│   │   │   ├── bsw.sav
+│   │   │   └── CCHS_2022_BSW_SPSS_sav.zip
+│   │   └── stata
+│   │       ├── bsw.dta
+│   │       └── CCHS_2022_BSW_Stata_dta.zip
+│   ├── sas
+│   │   └── CCHS_2022_SAS_sas7bdat.zip
+│   ├── spss
+│   │   ├── cchs_2022_pumf_v1.sav
+│   │   └── CCHS_2022_SPSS_sav.zip
+│   └── stata
+│       └── CCHS_2022_Stata_dta.zip
+└── Documentation
+    ├── CCHS 2022 PUMF Complement User Guide.pdf
+    ├── CCHS_2022_CV_Tables_PUMF.pdf
+    ├── CCHS_2022_DataDictionary_Freqs.pdf
+    ├── CCHS_2022_Income_Master File.pdf
+    ├── CCHS_2022_PUMF_Grouped_Variables.pdf
+    └── CCHS_2022_User_Guide.pdf
+</code></pre>
+<p>The procedure for this would be as follows:</p>
+<ul>
+<li>Create a study record manually</li>
+<li>Using <code>dv_manifest_gen</code>, create a file manifest. If the tree exists (ie, the files are arranged as shown above), use <code>dv_manifest_gen -r * [plus any other options]</code> to create a tsv manifest. If the tree does not yet exist, use the <code>-p</code> switch to add the field which allows virtual paths</li>
+<li>Edit the resultant tsv with file metadata. For example, the first three lines could be something like:</li>
+</ul>
+<pre><code>file    description tags
+Command Files/bootstrap/sas/bsw_i.sas   SAS program for bootstrap weights file  Command Files, SAS, Bootstrap weights
+Command Files/bootstrap/spss/bsw_i.sps  SPSS syntax for bootstrap weights file  Command Files, SPSS, Bootstrap weights
+</code></pre>
+<ul>
+<li>Once the file metadata is complete, upload the whole works in one shot:
+<code>dv_upload_tsv -u [url] -k [your API key] -p [your study id] [your manifest tsv file]</code></li>
+</ul>
+<p>Once it&rsquo;s uploaded, verify it&rsquo;s correct and you&rsquo;ve saved a great deal of time.</p>
+<p>Your definition of &ldquo;many&rdquo; may vary, but generally &ldquo;many&rdquo; is &gt;=1.</p>
+<h2 id="using-linguistic-data-consortium-metadata">Using Linguistic Data Consortium metadata<a class="headerlink" href="#using-linguistic-data-consortium-metadata" title="Permanent link">&para;</a></h2>
+<p>If your instituion uses a Dataverse installation to host Linguistic Data Consortium materials, you can automate record creation.</p>
+<ul>
+<li>Create a file manifest as outlined above for your LDC data.</li>
+<li>Use <code>dv_ldc_uploader -u [dataverse_url] -k [API key] -t [your file manifest] -d [collection name] [LDC Study number]</code> and your record will be created and the files uploaded and restricted. The only thing left to do is to review the record and hit the <strong>publish</strong> button.</li>
+</ul>
+<h2 id="creating-readme-templates-for-institutional-users">Creating README templates for institutional users<a class="headerlink" href="#creating-readme-templates-for-institutional-users" title="Permanent link">&para;</a></h2>
+<p>Researcher documentation is notoriously incomplete, often neglecting important information such as rights information or basic data dictionaries. Even if the fields are required to <em>create</em> a record, they can still be missing from researcher-supplied documentation. Data dictionaries, message digests, etc are also often missing.</p>
+<p>The README creator will harvest this information, much of which is required to create a record in the first place, and concatenate it into a nicely structured text (or PDF) document. </p>
+<p>This can be forwarded to the researcher for editing and uploading along with a data set.</p>
+<p>This is commonly done by the administrator of a collection, as they have access to the study contents and metadata.</p>
+<p>To do this:</p>
+<p><code>dv_readme_creator -u [Dataverse url] -p [persistent ID] --k [API key] README.md</code></p>
+<p>Attach the resultant <code>README.md</code> file to an email along with suggestions for improvement.</p>
+<h2 id="collection-analysis">Collection analysis<a class="headerlink" href="#collection-analysis" title="Permanent link">&para;</a></h2>
+<p>While Dataverse installations have a reasonably robust set of metrics available, detailed collection analysis may be required for any number of reasons. Collection recursion is not supported in the API, but is required for institutions analyzing their collections.</p>
+<p>A spreadsheet of a collection with selected metadata fields can be made easily with <code>dv_collection_info</code></p>
+<p>For example, you wish to recursively analyze your collection called <code>foo</code>, and you need the authors, titles, keywords and distribution date.</p>
+<p><code>dv_collection_info -u [Dataverse instance] -k [key, may or may not be required] -c foo -f authorName title keywordValue distributionDate -o [wherever your file is .tsv]</code></p>
+<p>Field names are those defined in the Dataverse JSON specification. Fields can be added by custom metadata blocks, but a sample can be found on the IQSS github page <a href="https://github.com/IQSS/dataverse/blob/19e67ef9e7e6a373d2551629fe19bb63a9ac7d18/scripts/api/data/dataset-create-new-all-default-fields.json#L633">here</a> [2025-10-23], where the field names are found using the &lsquo;typeName&rsquo; key.</p>
+<h2 id="recurring-series">Recurring series<a class="headerlink" href="#recurring-series" title="Permanent link">&para;</a></h2>
+<p>Some records are broadly similar, requiring only minor changes, such as a year change, etc. Instead of copy/paste:</p>
+<p><code>dv_record_copy -u [Dataverse installation] -k [key] -c [collection where it should live] doi:xxx/xxx</code></p>
+<p>Your record is instantly copied and requires minor edits instead of a full manual entry.</p>
+<h3 id="helper-utilities">Helper utilities<a class="headerlink" href="#helper-utilities" title="Permanent link">&para;</a></h3>
+<p>All of these things take place in a command line environment. To avoid having to leave it to use a spreadsheet application, consider using <a href="https://www.visidata.org/">Visidata</a> instead of a spreadsheet so that you can rapidly edit any tabular data. <em>Dataverse_utils</em> has no affiliation with <em>Visidata</em> beyond recommending it as a useful tool. </p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../scripts/" class="btn btn-neutral float-left" title="Console utilities"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../api_ref/" class="btn btn-neutral float-right" title="API reference">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../scripts/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../api_ref/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

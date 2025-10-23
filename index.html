@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="assets/_mkdocstrings.css" rel="stylesheet" />
         <link href="css/extra.css" rel="stylesheet" />
     
       <script>
@@ -70,6 +71,10 @@
               </ul>
               <ul>
                 <li class="toctree-l1"><a class="reference internal" href="scripts/">Console utilities</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="common_workflows/">Common workflows</a>
                 </li>
               </ul>
               <ul>
@@ -148,13 +153,16 @@
 <p>If you have <a href="https://www.mkdocs.org">mkdocs</a> installed, you can view the documentation in a web browser by running mkdocs from the top level directory of the <em>downloaded source files</em> by running <code>mkdocs serve</code>.</p>
 <h2 id="the-components">The components<a class="headerlink" href="#the-components" title="Permanent link">&para;</a></h2>
 <h3 id="console-utilities">Console utilities<a class="headerlink" href="#console-utilities" title="Permanent link">&para;</a></h3>
-<p>There are nine (9) console utilities currently available.</p>
-<ul>
+<p>There are twelve (12) console utilities currently available. In alphabetical order:</p>
+<ol>
+<li>
+<p><strong>dv_collection_info</strong>: A utility to produce the <em>recursive</em> contents of a dataverse collection, including any or all aspects of study metadata</p>
+</li>
 <li>
 <p><strong>dv_del</strong>: Bulk (unpublished) file deletion utility</p>
 </li>
 <li>
-<p><strong>dv_ldc_uploader</strong>: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. <strong>As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain</strong>. Don&rsquo;t worry, that&rsquo;s not as hard as it sounds.</p>
+<p><strong>dv_ldc_uploader</strong>: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. </p>
 </li>
 <li>
 <p><strong>dv_list_files</strong>: Lists all the files in a dataverse record, potentially including all versions and draft versions.</p>
@@ -166,6 +174,9 @@
 <p><strong>dv_pg_facet_date</strong>: A server-based tool which updates the publication date facet and performs a study reindex.</p>
 </li>
 <li>
+<p><strong>dv_readme_creator</strong>: Creates Markdown or PDF descriptive documents from published or unpublished (ideally) studies.</p>
+</li>
+<li>
 <p><strong>dv_record_copy</strong>: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.</p>
 </li>
 <li>
@@ -175,9 +186,12 @@
 <p><strong>dv_replace_licence</strong>: Replaces the licence associated with a PID with text from a Markdown file. Also available as <strong>dv_replace_license</strong> for those using American English.</p>
 </li>
 <li>
+<p><strong>dv_study_migrator</strong>: Moves the most current version of a study to completely different dataverse installation. Or the same one, if you need to copy it.</p>
+</li>
+<li>
 <p><strong>dv_upload_tsv</strong>: Takes a tsv file in the format from <em>dv_manifest_gen.py</em> and does all the uploading and metadata entry.</p>
 </li>
-</ul>
+</ol>
 <p>More information about these can be found on the <a href="scripts/">console utilities page</a>.</p>
 <h3 id="python-package-dataverse_utils">Python package: dataverse_utils<a class="headerlink" href="#python-package-dataverse_utils" title="Permanent link">&para;</a></h3>
 <p>If you want to use the Python package directly, you should install with <code>pip</code> instead of <code>pipx</code> although, to be fair, you don&rsquo;t <strong>have</strong> to. It will just make your life much easier. If you have no interest in using <code>dataverse_utils</code> code in your own code, you can safely ignore this section.</p>
@@ -265,5 +279,5 @@ with open('/Users/you/tmp/testme.tsv') as fil:
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-04-14 20:39:56.322486+00:00
+Build Date UTC : 2025-10-23 19:28:50.739437+00:00
 -->
