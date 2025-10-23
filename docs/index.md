@@ -64,25 +64,31 @@ If you have [mkdocs](https://www.mkdocs.org) installed, you can view the documen
 
 ### Console utilities 
 
-There are nine (9) console utilities currently available.
+There are twelve (12) console utilities currently available. In alphabetical order:
 
-* **dv_del**: Bulk (unpublished) file deletion utility
+1. **dv_collection_info**: A utility to produce the _recursive_ contents of a dataverse collection, including any or all aspects of study metadata
 
-* **dv_ldc_uploader**: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. **As of early 2023, there is an issue which requires attaching a manually downloaded certificate chain**. Don't worry, that's not as hard as it sounds.
+1. **dv_del**: Bulk (unpublished) file deletion utility
 
-* **dv_list_files**: Lists all the files in a dataverse record, potentially including all versions and draft versions.
+1. **dv_ldc_uploader**: A utility which scrapes Linguistic Data Consortium metadata from their website, converts it to Dataverse JSON and uploads it, with the possibility of including local files. 
 
-* **dv_manifest_gen**: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.
+1. **dv_list_files**: Lists all the files in a dataverse record, potentially including all versions and draft versions.
 
-* **dv_pg_facet_date**: A server-based tool which updates the publication date facet and performs a study reindex.
+1. **dv_manifest_gen**: Creates a simple tab-separated value format file which can be edited and then used to upload files as well as file-level metadata. Normally files will be edited after creation, usually in a spreadsheet like Excel.
 
-* **dv_record_copy**: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.
+1. **dv_pg_facet_date**: A server-based tool which updates the publication date facet and performs a study reindex.
 
-* **dv_release**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
+1. **dv_readme_creator**: Creates Markdown or PDF descriptive documents from published or unpublished (ideally) studies.
 
-* **dv_replace_licence**: Replaces the licence associated with a PID with text from a Markdown file. Also available as **dv_replace_license** for those using American English.
+1. **dv_record_copy**: Copies an existing Dataverse study metadata record to a target collection, or replace a currently existing record.
 
-* **dv_upload_tsv**: Takes a tsv file in the format from *dv_manifest_gen.py* and does all the uploading and metadata entry.
+1. **dv_release**: A bulk release utility. Either releases all the unreleased studies in a Dataverse or individually if persistent identifiers are available.
+
+1. **dv_replace_licence**: Replaces the licence associated with a PID with text from a Markdown file. Also available as **dv_replace_license** for those using American English.
+
+1. **dv_study_migrator**: Moves the most current version of a study to completely different dataverse installation. Or the same one, if you need to copy it.
+
+1. **dv_upload_tsv**: Takes a tsv file in the format from *dv_manifest_gen.py* and does all the uploading and metadata entry.
 
 More information about these can be found on the [console utilities page](scripts.md).
 

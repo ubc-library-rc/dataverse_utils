@@ -10,11 +10,11 @@ These utilities are available at the command line/command prompt and don't requi
 
 Once installed via pip, the scripts [will](#footnote) be available via the command line and will not require calling Python explicitly. That is, they can be called from the command line directly. For example:
 
-`dv_tsv_manifest`
+`dv_manifest_gen [parameters]`
 
 is all you will need to type.
 
-Note that these programs have been primarily tested on Linux and MacOS, with [Windows a tertiary priority](#footnote). Windows is notable for its unusual file  handling, so, as the MIT licence stipulates, there is no warranty as to the suitability for a particular purpose.
+Note that these programs have been primarily tested on Linux and MacOS, with [Windows a tertiary priority](#footnote). Windows is notable for its unusual file handling, so, as the MIT licence stipulates, there is no warranty as to the suitability for a particular purpose.
 
 
 In alphabetical order:
@@ -85,9 +85,8 @@ There are two main methods of use for this utility:
 
 2. If a TSV file with file information is upplied via the `-t` or `--tsv` switch, the utility will upload a single LDC study and upload the contents of the tsv file to the created record.
 
-### Important note
-
-**2024-09 Update**
+#### Certificate chain issues
+**Update of the certificate chain issue: 2024-09**
 
 The problem listed below seems to have resolved itself by September 2024. It's not clear whether this was a `certifi` issue or an issue with LDC's certificates. In any case, if you are having problems with LDC website, use the `-c` switch and follow the procedure below.
 
@@ -264,6 +263,32 @@ optional arguments:
 THIS WILL EDIT YOUR POSTGRESQL DATABASE DIRECTLY. USE AT YOUR OWN RISK.
 ```
 
+## dv_readme_creator
+
+Creates a basic data documentation from the metadata already existing in a Dataverse study. This includes a rudimentary data dictionary for plain text .csv/.tsv, SAS .sas7bdat, SPSS .sav, Stata .dta and R .Rdata/.rda files). The readme will include all fields from a record, and will concatenate repeating fields and fields with multiple components such as author fields. Output is in either Markdown/plain text format (for subsequent editing) or PDF. Note that .md and .txt output are identical, just have different extensions.
+
+The README creator is intended to be a framework for enhancing the documentation, not an end in itself. But incomplete documentation is still better than _no_ documentation.
+
+**Usage**
+
+```nohighlight
+usage: dv_readme_creator [-h] [-u URL] -p PID -k KEY [-v] outfile
+
+Creates a README file from a Dataverse study,
+in Markdown or PDF format. An API is *required* to use
+this utility, as it must work with draft studies.
+
+positional arguments:
+  outfile        Output file. File extension must be one of .pdf, .md or .txt (case insensitive).
+
+options:
+  -h, --help     show this help message and exit
+  -u, --url URL  Dataverse installation base url. defaults to "borealisdata.ca"
+  -p, --pid PID  Persistent ID of study (ie, doi or hdl)
+  -k, --key KEY  API key
+  -v, --version  Show version number and exit
+```
+
 ## dv_record_copy
 
 Copies an existing Dataverse study metadata record to a target collection, or replaces a currently existing record. Files are not copied, only the study record. This utility is useful for mateial which is in a series, requiring only minor changes for each iteration.
@@ -343,6 +368,7 @@ options:
   -r, --republish       Republish study without incrementing version
   --version             Show version number and exit
 ``` 
+
 ## dv_study_migrator
 
 If for some reason you need to copy everything from a Dataverse record to a different Dataverse installation or a different collection, this utility will do it for you. Metadata, file names, paths, restrictions etc will all be copied. There are some limitations, though, as only the most recent version will be copied and date handling is done on the target server. The utility will either copy records specifice with a persistent identifer (PID) to a target collection on the same or another server, or replace records with an existing PID.
@@ -393,7 +419,6 @@ options:
                         ie, something like dv_study_migrator -r blah blah -s http//test.invalid etc.
   -v, --version         Show version number and exit
 ```
-
 
 ## dv_upload_tsv
 
