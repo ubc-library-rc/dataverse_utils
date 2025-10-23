@@ -1,8 +1,9 @@
-site_name: 'dataverse_utils' 
+site_name: 'dataverse_utils'
 docs_dir: 'docs'
 nav:
   - Overview: index.md
   - Console utilities: scripts.md
+  - Common workflows: common_workflows.md
   - API reference: api_ref.md
   - FAQ: faq.md
   - Windows notes: windows.md
@@ -21,3 +22,14 @@ markdown_extensions:
   - attr_list
 
 theme: readthedocs
+plugins:
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_root_heading: true
+            docstring_style: numpy
+            show_source: true
+            filters: public
+  - search
