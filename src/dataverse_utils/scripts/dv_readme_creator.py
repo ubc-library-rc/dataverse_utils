@@ -17,19 +17,26 @@ def parse() -> argparse.ArgumentParser():
 
     Returns argparse.ArgumentParser
     '''
+    #pylint: disable=line-too-long
     description = textwrap.dedent(
                    '''
                    Creates a README file from a Dataverse study,
                    in Markdown or PDF format. An API is *required* to use
                    this utility, as it must work with draft studies.
+
+                   Example command:
+                   dv_readme_creator -p doi:12.2345/PRE/ZYX9876 -u test.invalid -k 00000000-0000-0000-0000-000000000000 test.md
+
+                   If using Borealis, -u switch is not required.
                    ''')
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-u', '--url', default='borealisdata.ca',
                         help=('Dataverse installation base url. '
-                              'defaults to "borealisdata.ca"'))
+                              'Defaults to "borealisdata.ca"'))
     parser.add_argument('-p', '--pid',
-                        help='Persistent ID of study (ie, doi or hdl)',
+                        help=('Persistent ID of study (ie, doi or hdl). '
+                              'format: doi: doi:12.2345/PRE/ZYX9876'),
                         type=str,
                         required=True)
     parser.add_argument('-k', '--key', required=True,
@@ -44,7 +51,7 @@ def parse() -> argparse.ArgumentParser():
 def valid_pid(inst:str)->bool:
     '''
     Check for proper formatting of a doi/hdl
-    
+
     Parameters
     ----------
     inst : str
@@ -57,11 +64,11 @@ def valid_pid(inst:str)->bool:
 def valid_outfile(infil:str)->bool:
     '''
     Ensures that it's possible to write the file
-    
+
     Parameters
     ----------
     infil : str
-       Desired file path 
+       Desired file path
     '''
     whar = pathlib.Path(infil)
     if whar.suffix.lower() not in ['.pdf', '.md', '.txt']:
