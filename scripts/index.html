@@ -352,13 +352,18 @@ Creates a README file from a Dataverse study,
 in Markdown or PDF format. An API is *required* to use
 this utility, as it must work with draft studies.
 
+Example command:
+dv_readme_creator -p doi:12.2345/PRE/ZYX9876 -u test.invalid -k 00000000-0000-0000-0000-000000000000 test.md
+
+If using Borealis, -u switch is not required.
+
 positional arguments:
   outfile        Output file. File extension must be one of .pdf, .md or .txt (case insensitive).
 
 options:
   -h, --help     show this help message and exit
-  -u, --url URL  Dataverse installation base url. defaults to &quot;borealisdata.ca&quot;
-  -p, --pid PID  Persistent ID of study (ie, doi or hdl)
+  -u, --url URL  Dataverse installation base url. Defaults to &quot;borealisdata.ca&quot;
+  -p, --pid PID  Persistent ID of study (ie, doi or hdl). format: doi: doi:12.2345/PRE/ZYX9876
   -k, --key KEY  API key
   -v, --version  Show version number and exit
 </code></pre>
