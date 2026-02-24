@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.21.6a0"
+version = "0.21.6"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -12,7 +12,7 @@ dependencies = [
     "beautifulsoup4 (>=4.12.2)",
     "certifi (>=2022.12.7)",
     "chardet (>=5.1.0)",
-    "charset-normalizer (>=3.1.0)",
+    "charset-normalizer (>=3.1.0, <4.0)",
     "dryad2dataverse (>=0.6.1)",
     "idna (>=3.4)",
     "markdown (>=3.2.1)",
