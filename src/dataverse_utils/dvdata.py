@@ -2,11 +2,11 @@
 Dataverse studies and files
 '''
 
-import tempfile
 import hashlib
-import os
 import logging
+import os
 import pathlib
+import tempfile
 import traceback
 
 import requests

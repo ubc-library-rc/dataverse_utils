@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.21.6"
+version = "0.22.1"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -8,26 +8,22 @@ authors = [
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.10, <4.0"
+#When requests 2.33 is released, update poetry and release
 dependencies = [
-    "beautifulsoup4 (>=4.12.2)",
-    "certifi (>=2022.12.7)",
-    "chardet (>=5.1.0)",
-    "charset-normalizer (>=3.1.0, <4.0)",
-    "dryad2dataverse (>=0.6.1)",
-    "idna (>=3.4)",
-    "markdown (>=3.2.1)",
-    "markdownify (>=0.11.6)",
-    "requests (>=2.29.0)",
-    "requests-toolbelt (>=1.0.0)",
-    "six (>=1.16.0)",
-    "soupsieve (>=2.4.1)",
-    "urllib3 (>=2.6.1)",
-    "markdown-pdf (>=1.9,<2.0)",
-    "tqdm (>=4.67.1,<5.0.0)",
-    "pyreadstat (>=1.3.1,<2.0.0)",
-    "pyreadr (>=0.5.3,<0.6.0)"
+    "requests (>=2.30.0,<3.0.0)",
+    "bs4 (>=0.0.2,<0.0.3)",
+    "markdown (>=3.10.2,<4.0.0)",
+    "markdown-pdf (>=1.13.1,<2.0.0)",
+    "markdownify (>=1.2.2,<2.0.0)",
+    "pyreadr (>=0.5.4,<0.6.0)",
+    "pyreadstat (>=1.3.3,<2.0.0)",
+    "requests-toolbelt (>=1.0.0,<2.0.0)",
+    "tqdm (>=4.67.3,<5.0.0)",
+    "dryad2dataverse (>=0.8.4,<0.9.0)",
+    "chardet (>=5.2,<5.3)"
 ]
-
+#Chardet and requests will need to be changed when requests goes to 2.32; at that
+#point just remove chardet 
 keywords =['Harvard Dataverse', 'Dataverse', 'research data management', 'data repository'] 
 
 [tool.poetry]
@@ -38,11 +34,6 @@ optional = true
 
 [tool.poetry.group.server.dependencies]
 psycopg2-binary = ">=2.9.10"
-
-[tool.poetry.group.dev.dependencies]
-pylint = ">=3.3.6"
-pydoc-markdown = ">=4.8.2"
-mkdocs = ">=1.6.1"
 
 [project.scripts]
 

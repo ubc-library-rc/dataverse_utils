@@ -3,6 +3,7 @@ Utilities for recursively analysing a Dataverse collection.
 '''
 #pylint: disable=too-many-lines
 
+import copy
 import datetime
 import io
 import logging
@@ -230,6 +231,7 @@ class StudyMetadata(dict):
     '''
     The metadata container for a single study.
     '''
+    #pylint: disable=too-many-instance-attributes
     def __init__(self, **kwargs):
         '''
         Intializize a StudyMetadata object.
@@ -262,21 +264,34 @@ class StudyMetadata(dict):
         '''
         self.kwargs = kwargs
         self.study_meta  = kwargs.get('study_meta')
+        self.all_versions = None
         self.url = kwargs.get('url')
         self.pid = kwargs.get('pid')
+        if self.study_meta:
+            #self.pid = kwargs.get('pid', (f"{self.study_meta['data']['protocol']}:"
+            #                         f"{self.study_meta['data']['authority']}"
+            #                         f"/{self.study_meta['data']['identifier']}") if not
+            #                         self.pid else self.pid)
+            self.pid = (f"{self.study_meta['data']['protocol']}:"
+                        f"{self.study_meta['data']['authority']}"
+                        f"/{self.study_meta['data']['identifier']}")
+
         self.headers = UAHEADER.copy()
         if not (('study_meta' in kwargs) or ('url' in kwargs and 'pid' in kwargs)):
             raise TypeError('At least one of a URL/pid combo (url, pid) (and possibly key) or '
             'study metadata json (study_meta) is required.')
-        if not self.study_meta:
-            self.study_meta = self.__obtain_metadata()
+        if not self.study_meta or not self.all_versions:
+            self.study_meta, self.all_versions = self.__obtain_metadata()
         try:
-            self.extract_metadata()
+            self.update(self.extract_metadata(self.study_meta['data']['latestVersion']))
         except KeyError as e:
             raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
                            f'{e} key not found.\n'
                            f'Offending JSON: {self.study_meta}') from e
         self.__files = None
+        self.__all_files = None
+        self.index = {f"{_['versionNumber']}.{_['versionMinorNumber']}": n
+                 for n, _ in enumerate(self.all_versions['data'])}
 
     def __obtain_metadata(self):
         '''
@@ -293,7 +308,9 @@ class StudyMetadata(dict):
             self.url = f'https://{self.url}'
         data = self.session.get(f'{self.url}/api/datasets/:persistentId',
                                 headers=self.headers, params=params)
-        return data.json()
+        all_versions = self.session.get(f'{self.url}/api/datasets/:persistentId/versions',
+                                headers=self.headers, params=params)
+        return data.json(), all_versions.json()
 
     def __has_metadata(self)->bool:
         '''
@@ -316,28 +333,31 @@ class StudyMetadata(dict):
             return True
         return False
 
-    def extract_metadata(self):
+    def extract_metadata(self, chunk:dict )->dict:
         '''
-        Convenience function for parsing the study metadata of the latest version.
+        Convenience function for parsing the study metadata
 
-        Results are written to self, accessible as a dictionary.
+        Takes a version chunk or the latest version metadata
+
         '''
+        tmp = {}
         if not self.__has_metadata():
-            return
-
-
-        for v in self.study_meta['data']['latestVersion']['metadataBlocks'].values():
+            return tmp
+        for v in chunk['metadataBlocks'].values():
             for field in v['fields']:
-                self.extract_field_metadata(field)
-        self.__extract_licence_info()
-        self.__version()
-        #['data']['latestVersion']['versionNumber']
-        #['data']['latestVersion']['versionMinorNumber']
+                tmp.update(self.extract_field_metadata(field))
+        tmp.update(self.__extract_licence_info(chunk))
+        tmp['versionStatement'] = f"{chunk['versionNumber']}.{chunk['versionMinorNumber']}"
+        return tmp
 
     def extract_field_metadata(self, field):
         '''
         Extract the metadata from a single field and make it into a human-readable dict.
-        Output updates self.
+
+        Parameters
+        ----------
+        field : dict
+            Dataverse metadata field
         '''
         #pylint: disable=too-many-branches, too-many-nested-blocks
         #typeClass: compound = dict, primitive = string
@@ -348,9 +368,10 @@ class StudyMetadata(dict):
         #[[x['typeName'], x['typeClass'], x['multiple']] for x in citation['fields']]
         # {('primitive', False), ('compound', True), ('compound', False),
         # ('primitive', True), ('controlledVocabulary', True)}
+        out = {}
         if not field['multiple']:
             if field['typeClass']=='primitive':
-                self.update({field['typeName']: field['value']})
+                out.update({field['typeName']: field['value']})
             if field['typeClass'] == 'compound':
                 for v2 in field['value']:
                     self.extract_field_metadata(field['value'][v2])
@@ -369,17 +390,58 @@ class StudyMetadata(dict):
                                 interim[v3['typeName']] = [v3.get('value', [] )]
                             LOGGER.debug(interim)
                 for k9, v9 in interim.items():
-                    self.update({k9: '; '.join(v9)})
+                    out.update({k9: '; '.join(v9)})
 
             if field['typeClass'] == 'primitive':
-                self.update({field['typeName'] :  '; '.join(field['value'])})
+                out.update({field['typeName'] :  '; '.join(field['value'])})
 
         if field['typeClass'] == 'controlledVocabulary':
             if isinstance(field['value'], list):
-                self.update({field['typeName'] : '; '.join(field['value'])})
+                out.update({field['typeName'] : '; '.join(field['value'])})
             else:
-                self.update({field['typeName'] : field['value']})
+                out.update({field['typeName'] : field['value']})
         # And that should cover every option!
+        return out
+
+    def version_metadata(self, version_stmt:str)->dict:
+        '''
+        Returns the study metadata for a particular version. Returns
+        None if version does not exist
+
+        Parameters
+        ----------
+        version_stmt : str
+            Version statement: eg "1.1"
+        '''
+        if version_stmt not in self.versions:
+            return {}
+        study_ver_meta = self.all_versions['data'][self.index[version_stmt]]
+        return self.extract_metadata(study_ver_meta)
+
+    def version_files(self, version_stmt:str)->list:
+        '''
+        Returns a list of files for a particular version
+        '''
+        if version_stmt not in self.versions:
+            return []
+
+        return [_ for _ in  self.all_files if _['versionStatement'] == version_stmt]
+
+    @property
+    def current_version(self)->str:
+        '''
+        Return a formatted version statement for the most recent version
+        '''
+        return (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
+                f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
+
+    @property
+    def versions(self)->list:
+        '''
+        Return a *list* of formatted version strings
+        '''
+        return [f"{_['versionNumber']}.{_['versionMinorNumber']}"
+                         for _ in self.all_versions['data']]
 
     @property
     def files(self)->list:
@@ -390,6 +452,91 @@ class StudyMetadata(dict):
             self.__extract_files()
         return self.__files
 
+    @property
+    def all_files(self)->list:
+        '''
+        Return a list of dict with file metadata for *all* versions
+        '''
+        add_fields = ['versionNumber', 'versionMinorNumber',
+                      'storageIdentifier',
+                      'internalVersionNumber', 'versionState',
+                      'latestVersionPublishingState', 'lastUpdateTime',
+                      'createTime', 'publicationDate', 'citationDate']
+        if not self.__all_files:
+            all_files = []
+            for _ in self.all_versions['data']:
+                filelist = self.extract_files(_.get('files', []))
+                for oldfile in filelist:
+                    oldfile.update({k:v for k,v in _.items() if k in add_fields})
+                    version_statement = {'versionStatement':
+                                             f'{_["versionNumber"]}.{_["versionMinorNumber"]}'}
+                    oldfile.update(version_statement)
+                #all_files.extend(self.extract_files_2(_.get('files', [])))
+                all_files.extend(filelist)
+            self.__all_files = all_files
+        return self.__all_files
+
+
+    def flatten(self, indict:dict, orig_order=None, sep_char='_')->dict:
+        '''
+        Flatten a dictionary of aritrary size. Flattened
+        keys will be separated by sepchar.
+
+        So {'a':2 , 'b':{'c':'3', 'd':4}} would return:
+        {'a':2, 'b_c':'3', 'b_d':4}
+
+        Parameters
+        ----------
+        indict : dict
+            The nested dict to be flattened
+        orig_order : list
+            order in which you want the dict keys;
+            dict keys starting with these values will be
+            placed in this sequence. Generally not required.
+        sep_char : str
+            Key separator
+        '''
+        if not orig_order:
+            orig_order = list(indict)
+        #base case
+        if all(not isinstance(v, dict) for v in indict.values()):
+            return indict
+
+        tmpdict = {k:v for k, v in indict.items() if not isinstance(v,dict)}
+        fixme = {k:v for k, v in indict.items() if isinstance(v, dict)}
+        for k, v in fixme.items():
+            for k2, v2 in v.items():
+                tmpdict.update({f'{k}{sep_char}{k2}': v2})
+        outdict = {}
+        #outdict.update(tmpdict)
+        #re-order to make it nice
+        for order in orig_order:
+            for k, v in tmpdict.items():
+                if k.startswith(order):
+                    outdict.update({k:v})
+        outdict.update(tmpdict)
+        return self.flatten(copy.deepcopy(outdict), list(outdict))
+
+    def extract_files(self, filelist:list)->dict:
+        '''
+        Generic file metadata extractor
+
+        Parameters
+        ----------
+        filelist : list
+            List containing file level metadata. Typically ['data']['latestVersion']['files']
+            or similar
+
+        Notes
+        -----
+        Will attach the study pid to the file list for easier joining
+        '''
+
+        files = [self.flatten(_) for _ in filelist]
+        for ff in files:
+            ff.update({'dataset_persistentId': self.pid})
+        return files
+
     def __extract_files(self):
         '''
         Extract file level metadata, and write to self.__files.
@@ -399,39 +546,19 @@ class StudyMetadata(dict):
         #That bothers me on an intellectual level. Therefore, it will be attribute.
         #Iterate over StudyMetadata.files if you want to know the contents
         if not self.__files:
-            outie = []
-            for v in self.study_meta['data']['latestVersion']['files']:
-                innie = {}
-                fpath = v.get('directoryLabel', '').strip('/')
-                innie['filename'] = v['dataFile'].get('originalFileName', v['dataFile']['filename'])
-                #innie['full_path'] = '/'.join([fpath, innie['filename']])
-                #In case it's pathless, drop any leading slash, because
-                #'' is not the same as None, and None can't be joined.
-                innie['filename'] = '/'.join([fpath, innie['filename']]).strip('/')
-                innie['file_label'] = v.get('label')
-                innie['description'] = v.get('description')
-                innie['filesize_bytes'] = v['dataFile'].get('originalFileSize',
-                                                             v['dataFile']['filesize'])
-                innie['chk_type'] = v['dataFile']['checksum']['type']
-                innie['chk_digest'] =v['dataFile']['checksum']['value']
-                innie['id'] = v['dataFile']['id']
-                innie['pid'] = v['dataFile'].get('persistentId')
-                innie['has_tab_file'] = v['dataFile'].get('tabularData', False)
-                innie['study_pid'] = (f"{self.study_meta['data']['protocol']}:"
-                                     f"{self.study_meta['data']['authority']}/"
-                                     f"{self.study_meta['data']['identifier']}")
-                innie['tags'] = ', '.join(v.get('categories', []))
-                if not innie['tags']:
-                    del innie['tags']#tagless
-                #innie['path'] = v.get('directoryLabel', '')
-                outie.append(innie)
-            self.__files = outie
+            self.__files = self.extract_files(self.study_meta['data']
+                                                   ['latestVersion']['files'])
 
-    def __extract_licence_info(self):
+    def __extract_licence_info(self, indict)->dict:
         '''
         Extract all the licence information fields and add them
         to self['licence'] *if present*.
+
+        Parameters
+        ----------
+        indict : dictionary holding study metadata
         '''
+        out = {}
         lic_fields = ('termsOfUse',
                       'confidentialityDeclaration',
                       'specialPermissions',
@@ -446,28 +573,28 @@ class StudyMetadata(dict):
                       'sizeOfCollection',
                       'studyCompletion',
                       'fileAccessRequest')
-        for field in self.study_meta['data']['latestVersion']:
+        for field in indict:
             if field in lic_fields:
-                self[field] = self.study_meta['data']['latestVersion'][field]
-        common_lic = self.study_meta['data']['latestVersion'].get('license')
+                out[field] = indict[field]
+        common_lic = indict.get('license')
         if isinstance(common_lic, str) and common_lic != 'NONE':
-            self['licence'] = common_lic
+            out['licence'] = common_lic
         elif isinstance(common_lic, dict):
-            self['licence'] = self.study_meta['data']['latestVersion']['license'].get('name')
-            link = self.study_meta['data']['latestVersion']['license'].get('uri')
+            out['licence'] = indict['license'].get('name')
+            link = indict['license'].get('uri')
             if link:
-                self['licenceLink'] = link
+                out['licenceLink'] = link
+        return out
 
-    def __version(self):
-        '''
-        Obtain the current version and add it to self['studyVersion'].
-        '''
-        if self.study_meta['data']['latestVersion']['versionState'] == 'RELEASED':
-            self['studyVersion'] = (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
-                           f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
-            return
-        self['studyVersion'] = self.study_meta['data']['latestVersion']['versionState']
-        return
+    #Unused?
+    #def __version(self):
+    #    '''
+    #    Obtain the current version and add it to self['studyVersion'].
+    #    '''
+    #    if self.study_meta['data']['latestVersion']['versionState'] == 'RELEASED':
+    #        return (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
+    #                       f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
+    #    return self.study_meta['data']['latestVersion']['versionState']
 
 class ReadmeCreator:
     '''
@@ -553,6 +680,41 @@ class ReadmeCreator:
             return f'{inkey}:  \n'
         return f'{inkey}: '
 
+
+    def __extract_files(self):
+        '''
+        Extract file level metadata, and write to self.__files.
+        '''
+        #Ported from StudyMetadata as it was used to make a nice README
+
+        outie = []
+        for v in self.meta.study_meta['data']['latestVersion']['files']:
+            innie = {}
+            fpath = v.get('directoryLabel', '').strip('/')
+            innie['filename'] = v['dataFile'].get('originalFileName', v['dataFile']['filename'])
+            #innie['full_path'] = '/'.join([fpath, innie['filename']])
+            #In case it's pathless, drop any leading slash, because
+            #'' is not the same as None, and None can't be joined.
+            innie['filename'] = '/'.join([fpath, innie['filename']]).strip('/')
+            innie['file_label'] = v.get('label')
+            innie['description'] = v.get('description')
+            innie['filesize_bytes'] = v['dataFile'].get('originalFileSize',
+                                                         v['dataFile']['filesize'])
+            innie['chk_type'] = v['dataFile']['checksum']['type']
+            innie['chk_digest'] =v['dataFile']['checksum']['value']
+            innie['id'] = v['dataFile']['id']
+            innie['pid'] = v['dataFile'].get('persistentId')
+            innie['has_tab_file'] = v['dataFile'].get('tabularData', False)
+            innie['study_pid'] = (f"{self.meta.study_meta['data']['protocol']}:"
+                                 f"{self.meta.study_meta['data']['authority']}/"
+                                 f"{self.meta.study_meta['data']['identifier']}")
+            innie['tags'] = ', '.join(v.get('categories', []))
+            if not innie['tags']:
+                del innie['tags']#tagless
+            #innie['path'] = v.get('directoryLabel', '')
+            outie.append(innie)
+        return outie
+
     @property
     def file_metadata_md(self)->str:
         '''
@@ -560,7 +722,8 @@ class ReadmeCreator:
         markdown text string.
         '''
         fmeta = []
-        for fil in self.meta.files:
+        #for fil in self.meta.files:
+        for fil in self.__extract_files():
             fileout = {}
             fileout['File'] = fil['filename']
             for k, v in fil.items():
@@ -570,16 +733,17 @@ class ReadmeCreator:
                         'File label', 'Filename']:
                 del fileout[rem]
             #not everyone has a pid for the file
+            #breakpoint()
             if not fileout.get('Persistent Identifier'):
                 del fileout['Persistent Identifier']
             # Should I only have remote material here? What about
             # local files?
-            if self.kwargs.get('local'):
-                #TODO, if local
-                fpath = pathlib.Path(self.kwargs['local'])
-                #And from here you have to walk the tree to get the file in fil['filename']
-                #One day I will do this
-            elif self.meta.kwargs.get('url'): # Should this be optional? ie,
+            #if self.kwargs.get('local'):
+            #    #TODO, if local
+            #    fpath = pathlib.Path(self.kwargs['local'])
+            #    #And from here you have to walk the tree to get the file in fil['filename']
+            #    #One day I will do this
+            if self.meta.kwargs.get('url'): # Should this be optional? ie,
                                               # and self.kwargs.get('download') or summat
                 d_dict = FileAnalysis(url=self.meta.kwargs['url'],
                                       key=self.meta.kwargs.get('key'),
@@ -804,6 +968,19 @@ class ReadmeCreator:
             outlist.append(vals)
         return outlist
 
+    @property
+    def readme_pdf(self)->io.BytesIO:
+        '''
+        Make the PDF of a README and save it to a file-like object
+        '''
+        output = markdown_pdf.MarkdownPdf(toc_level=1)
+        content = markdown_pdf.Section(self.readme_md, toc=False)
+        output.add_section(content)
+        out = io.BytesIO()
+        output.save_bytes(out)
+        out.seek(0)
+        return out
+
     def write_pdf(self, dest:str)->None:
         '''
         Make the PDF of a README and save it to a file.
@@ -816,10 +993,9 @@ class ReadmeCreator:
             ~/tmp/README_I_AM_METADATA.pdf
         '''
         dest = pathlib.Path(dest).expanduser().absolute()
-        output = markdown_pdf.MarkdownPdf(toc_level=1)
-        content = markdown_pdf.Section(self.readme_md, toc=False)
-        output.add_section(content)
-        output.save(dest)
+        with open(dest, 'wb') as f:
+            f.write(self.readme_pdf.read())
+        self.readme_pdf.seek(0)
 
     def write_md(self, dest:str)->None:
         '''
@@ -862,7 +1038,7 @@ class FileAnalysis(dict):
         key : str
             API key for downloading
 
-        fid : int
+        id : int
             Integer file id
 
         pid : str
@@ -877,7 +1053,7 @@ class FileAnalysis(dict):
         Notes
         -----
         Either `local` must be supplied, or `url`, `key` and at least one of
-        `fid` or `pid` must be supplied
+        `id` or `pid` must be supplied
 
         '''
 

@@ -93,7 +93,7 @@ def main():
 
     fpath = pathlib.Path(args.outfile).expanduser().absolute()
     study = c.StudyMetadata(url=args.url, pid=args.pid, key=args.key)
-    study_rm = c.ReadmeCreator(study)
+    study_rm = c.ReadmeCreator(study, url=args.url, pid=args.pid, key=args.key)
     if fpath.suffix.lower() == '.pdf':
         study_rm.write_pdf(str(fpath))
         sys.exit()
