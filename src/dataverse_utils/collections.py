@@ -16,6 +16,7 @@ import traceback
 import warnings
 
 import bs4
+import charset_normalizer as cn
 import markdown_pdf
 import markdownify
 import pyreadstat
@@ -290,8 +291,10 @@ class StudyMetadata(dict):
                            f'Offending JSON: {self.study_meta}') from e
         self.__files = None
         self.__all_files = None
-        self.index = {f"{_['versionNumber']}.{_['versionMinorNumber']}": n
-                 for n, _ in enumerate(self.all_versions['data'])}
+        #self.index = {f"{_['versionNumber']}.{_['versionMinorNumber']}": n
+        #         for n, _ in enumerate(self.all_versions['data'])}
+        #self.index = {_: n for _, n in enumerate(self.versions)}
+        self.index = dict(enumerate(self.versions))
 
     def __obtain_metadata(self):
         '''
@@ -347,7 +350,10 @@ class StudyMetadata(dict):
             for field in v['fields']:
                 tmp.update(self.extract_field_metadata(field))
         tmp.update(self.__extract_licence_info(chunk))
-        tmp['versionStatement'] = f"{chunk['versionNumber']}.{chunk['versionMinorNumber']}"
+        if chunk.get('versionNumber'):
+            tmp['versionStatement'] = f"{chunk['versionNumber']}.{chunk['versionMinorNumber']}"
+        else:
+            tmp['versionStatement'] = f"{chunk.get('versionState', '')}"
         return tmp
 
     def extract_field_metadata(self, field):
@@ -440,8 +446,15 @@ class StudyMetadata(dict):
         '''
         Return a *list* of formatted version strings
         '''
-        return [f"{_['versionNumber']}.{_['versionMinorNumber']}"
-                         for _ in self.all_versions['data']]
+        out = []
+        for _ in self.all_versions['data']:
+            if _.get('versionNumber'):
+                out.append(f"{_['versionNumber']}.{_['versionMinorNumber']}")
+            else:
+                out.append(_['versionState'])
+        #return [f"{_['versionNumber']}.{_['versionMinorNumber']}"
+        #                 for _ in self.all_versions['data']]
+        return out
 
     @property
     def files(self)->list:
@@ -904,7 +917,8 @@ class ReadmeCreator:
                    'Country':'Country(ies)',
                    'State':'State(s)',
                    'City':'City(ies)',
-                   'Geographic Unit':'Geographic unit(s)'}
+                   'Geographic Unit':'Geographic unit(s)',
+                   'State(s)ment' : 'Statement'}
         for k, v in fixthese.items():
             wordsp = wordsp.replace(k, v)
         return wordsp.strip()
@@ -1250,6 +1264,14 @@ class FileAnalysis(dict):
         self.update(outmeta)
         return
 
+    def get_encoding(self, fpath):
+        '''
+        Return the encoding of a file so that pandas
+        won't crash. Hopefully.
+
+        fpath : str
+            file path
+        '''
 
     def generic_metadata(self, ext)->None:
         '''
@@ -1265,14 +1287,20 @@ class FileAnalysis(dict):
         #    data = pd.read_csv(self.__whichfile, sep='\t')
         #else:
         #    data = pd.read_csv(self.__whichfile)
-
+        encme = {'.tsv': {'sep': '\t'},
+                 '.csv': {}}
+        if ext.lower() in encme:
+            with open(self.__whichfile, 'rb') as f:
+                encoding = {'encoding':'utf-8'}
+                encoding.update({'encoding':cn.detect(f.read()).get('encoding', 'utf-8')})
+                encme[ext.lower()].update(encoding)
         lookuptable ={'.tsv': {'func': pd.read_csv,
-                                'kwargs' : {'sep':'\t'}},
-                        '.csv': {'func' : pd.read_csv},
-                        '.rda': {'func' : pyreadr.read_r},
+                                'kwargs' : encme['.tsv']},
+                      '.csv': {'func' : pd.read_csv, 'kwargs' : encme['.csv']},
+                      '.rda': {'func' : pyreadr.read_r},
                        '.rdata':{'func' : pyreadr.read_r}}
         data = lookuptable[ext]['func'](self.__whichfile,
-                                              **lookuptable[ext].get('kwargs', {}))
+                                                  **lookuptable[ext].get('kwargs', {}))
         if ext  in ['.rda', '.rdata']:
             data = data[None] #why pyreadr why
         outmeta = {}

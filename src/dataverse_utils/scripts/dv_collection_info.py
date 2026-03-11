@@ -207,7 +207,7 @@ def main():
     else:
         try:
             all_studies = [dvc.StudyMetadata(url=args.url, pid=args.pid, key=args.key)]
-        except dataverse_utils.collections.MetadataError as e:
+        except (KeyError, dataverse_utils.collections.MetadataError) as e:
             print(e, file=sys.stderr)
             sys.exit()
     #if 'all' in [x.lower() for x in args.fields] and args.collection:

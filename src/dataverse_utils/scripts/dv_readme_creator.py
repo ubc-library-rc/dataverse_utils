@@ -36,7 +36,7 @@ def parse() -> argparse.ArgumentParser():
                               'Defaults to "borealisdata.ca"'))
     parser.add_argument('-p', '--pid',
                         help=('Persistent ID of study (ie, doi or hdl). '
-                              'format: doi: doi:12.2345/PRE/ZYX9876'),
+                              'eg: doi:12.2345/PRE/ZYX9876'),
                         type=str,
                         required=True)
     parser.add_argument('-k', '--key', required=True,
