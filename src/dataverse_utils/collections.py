@@ -481,10 +481,8 @@ class StudyMetadata(dict):
                 filelist = self.extract_files(_.get('files', []))
                 for oldfile in filelist:
                     oldfile.update({k:v for k,v in _.items() if k in add_fields})
-                    version_statement = {'versionStatement':
-                                             f'{_["versionNumber"]}.{_["versionMinorNumber"]}'}
-                    oldfile.update(version_statement)
-                #all_files.extend(self.extract_files_2(_.get('files', [])))
+                    vs = _.get('versionNumber', _.get('versionState', ''))
+                    oldfile.update({'versionStatement' : vs})
                 all_files.extend(filelist)
             self.__all_files = all_files
         return self.__all_files
