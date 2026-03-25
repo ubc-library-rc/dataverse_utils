@@ -481,7 +481,11 @@ class StudyMetadata(dict):
                 filelist = self.extract_files(_.get('files', []))
                 for oldfile in filelist:
                     oldfile.update({k:v for k,v in _.items() if k in add_fields})
-                    vs = _.get('versionNumber', _.get('versionState', ''))
+                    try:
+                        vs = f'{_["versionNumber"]}.{_["versionMinorNumber"]}'
+                    except KeyError:
+                        vs = _.get('versionState', '')
+                    #vs = _.get('versionNumber', _.get('versionState', ''))
                     oldfile.update({'versionStatement' : vs})
                 all_files.extend(filelist)
             self.__all_files = all_files
@@ -744,7 +748,6 @@ class ReadmeCreator:
                         'File label', 'Filename']:
                 del fileout[rem]
             #not everyone has a pid for the file
-            #breakpoint()
             if not fileout.get('Persistent Identifier'):
                 del fileout['Persistent Identifier']
             # Should I only have remote material here? What about

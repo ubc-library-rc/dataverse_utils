@@ -41,7 +41,7 @@ def parse() -> argparse.ArgumentParser():
                               'Default: title, author. for '
                               'study metadata and file label, id for file metadata' )),
                         nargs='*',
-                        default=['title', 'author', 'file_label', 'id'])
+                        default=['title', 'author', 'label', 'dataFile_id'])
     parser.add_argument('-o', '--output', help='Output file name.',
                        required=False)
     parser.add_argument('-i','--include-all-versions',
@@ -75,7 +75,6 @@ def fields(args:argparse.ArgumentParser, all_studies)->dict:
     '''
     Outputs appropriate header fields based on argparse values
     '''
-    #print(args)
     match (args.include_all_versions, args.files):
         case (0, 0):
             fieldnames = sorted(list(set(key for study in all_studies for key in study)))
@@ -220,7 +219,6 @@ def main():
 
     else:
         fieldnames =  args.fields[2:] if args.files else args.fields[:2]
-
     out = io.StringIO(newline='')
     writer = csv.DictWriter(out,
                             fieldnames=fieldnames,
