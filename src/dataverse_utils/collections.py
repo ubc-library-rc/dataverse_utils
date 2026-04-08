@@ -142,7 +142,6 @@ class DvCollection:
                     out=self.__get_shortname(_['id'])
                     dvs.append((_['title'], out))
                 except Exception as e:
-
                     obscure_error = f'''
                                         An error has occured where a collection can be
                                         identified by ID but its name cannot be determined.
@@ -188,7 +187,7 @@ class DvCollection:
         all_studies = self.get_collection_listing(root)
         #collections = self.get_collections(root, self.url)
         collections = self.get_collections(root)
-        for collection in collections:
+        for collection in tqdm.tqdm(collections):
             all_studies.extend(self.get_collection_listing(collection[1]))
         self.studies = all_studies
         return all_studies
@@ -286,15 +285,19 @@ class StudyMetadata(dict):
         try:
             self.update(self.extract_metadata(self.study_meta['data']['latestVersion']))
         except KeyError as e:
-            raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
-                           f'{e} key not found.\n'
-                           f'Offending JSON: {self.study_meta}') from e
+            if self.study_meta.get('status') == 'OK':
+                self.study_meta['data']['latestVersion'] = 'Not available'
+                #self.study_meta['data']['latestVersion']['files'] = []
+            else:
+                raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
+                               f'{e} key not found.\n'
+                               f'Offending JSON: {self.study_meta}') from e
         self.__files = None
         self.__all_files = None
         #self.index = {f"{_['versionNumber']}.{_['versionMinorNumber']}": n
         #         for n, _ in enumerate(self.all_versions['data'])}
-        #self.index = {_: n for _, n in enumerate(self.versions)}
-        self.index = dict(enumerate(self.versions))
+        self.index = {_: n for n, _ in enumerate(self.versions)}
+        #self.index = dict(enumerate(self.versions))
 
     def __obtain_metadata(self):
         '''

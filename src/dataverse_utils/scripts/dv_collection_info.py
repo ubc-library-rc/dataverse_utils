@@ -162,7 +162,7 @@ def output(study, include_all=False, file=False)->list:
             return [study]
         case (1,0):
             for v in study.versions:
-                out.append(study.study_version_metadata(v))
+                out.append(study.version_metadata(v))
             return out
         case (0,1):
             return study.files
@@ -191,7 +191,7 @@ def main():
     #pylint: disable=too-many-branches
     args = parse().parse_args()
     if args.collection:
-        coll_me  = dvc.DvCollection(args.url, args.collection, args.key)
+        coll_me = dvc.DvCollection(args.url, args.collection, args.key)
         try:
             coll_me.get_collections()
         except TypeError:
