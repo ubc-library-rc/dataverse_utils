@@ -39,7 +39,9 @@ def parse() -> argparse.ArgumentParser():
                         help=textwrap.fill(('Record metadata fields to output. '
                               'For all fields, use "all". '
                               'Default: title, author. for '
-                              'study metadata and file label, id for file metadata' )),
+                              'study metadata and file label, id for file metadata. '
+                              'The dataset persistent ID is *always* included '
+                              'for both studies and files.')),
                         nargs='*',
                         default=['title', 'author', 'label', 'dataFile_id'])
     parser.add_argument('-o', '--output', help='Output file name.',
@@ -64,8 +66,7 @@ def parse() -> argparse.ArgumentParser():
                         help=('Dataverse collection shortname or id at the '
                              'top of the tree'))
     mgroup.add_argument('-p', '--pid',
-                        help=('Dataverse study persistent identifier (DOI/handle)'
-                             'top of the tree'))
+                        help='Dataverse study persistent identifier (DOI/handle)')
     parser.add_argument('-v', '--version', action='version',
                         version=dataverse_utils.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
@@ -209,16 +210,15 @@ def main():
         except (KeyError, dataverse_utils.collections.MetadataError) as e:
             print(e, file=sys.stderr)
             sys.exit()
-    #if 'all' in [x.lower() for x in args.fields] and args.collection:
-    #    fieldnames = fields(args, all_studies)
-
-    #if 'all' in [x.lower() for x in args.fields] and args.pid:
-    #    fieldnames = fields(args, all_studies, 1)
+    #with open('data.pickle', 'wb') as f:
+    #    pickle.dump(all_studies, f)
     if 'all' in [x.lower() for x in args.fields]:
         fieldnames = fields(args, all_studies)
 
     else:
         fieldnames =  args.fields[2:] if args.files else args.fields[:2]
+    if not 'dataset_persistent_id' in fieldnames:
+        fieldnames.insert(0, 'dataset_persistent_id')
     out = io.StringIO(newline='')
     writer = csv.DictWriter(out,
                             fieldnames=fieldnames,
@@ -229,9 +229,13 @@ def main():
     #for stud in coll_me.studies:
     for stud in all_studies:
         for row in output(stud, args.include_all_versions, args.files):
-            writer.writerow({k:v.replace('\t',' ').replace('\r\n', ' ').replace('\n',' ')
+            data = {k:v.replace('\t',' ').replace('\r\n', ' ').replace('\n',' ')
                              if isinstance(v, str) else v
-                             for k, v in row.items()})
+                             for k, v in row.items()}
+
+            if not data.get('dataset_persistent_id'):
+                data.update({'dataset_persistent_id' : stud.pid})
+            writer.writerow(data)
     out.seek(0)
     if args.output:
         with open(args.output, mode='w', encoding='utf-8', newline='') as f:

@@ -9,6 +9,7 @@ import io
 import logging
 import pathlib
 import string
+import sys
 import tempfile
 import textwrap
 import typing
@@ -154,12 +155,13 @@ class DvCollection:
 
                                         Problematic collection id number: {_.get("id",
                                         "not available")}'''
-                    print(50*'-')
-                    print(textwrap.dedent(obscure_error))
+                    #to sys.stdout?
+                    print(50*'-', file=sys.stderr)
+                    print(textwrap.dedent(obscure_error), file=sys.stderr)
                     print(e)
                     LOGGER.error(textwrap.fill(textwrap.dedent(obscure_error).strip()))
                     traceback.print_exc()
-                    print(50*'-')
+                    print(50*'-', file=sys.stderr)
                     raise e
         #---
         if not dvs:
@@ -185,7 +187,6 @@ class DvCollection:
         if not root:
             root=self.coll
         all_studies = self.get_collection_listing(root)
-        #collections = self.get_collections(root, self.url)
         collections = self.get_collections(root)
         for collection in tqdm.tqdm(collections):
             all_studies.extend(self.get_collection_listing(collection[1]))
@@ -267,6 +268,10 @@ class StudyMetadata(dict):
         self.all_versions = None
         self.url = kwargs.get('url')
         self.pid = kwargs.get('pid')
+        #If only there would be an easy way to check if something was deaccessioned
+        #without yet another request. But right now, let's assume it's fine.
+        #See below (under Key Error) where it get set
+        self.deaccession_flag = 0
         if self.study_meta:
             #self.pid = kwargs.get('pid', (f"{self.study_meta['data']['protocol']}:"
             #                         f"{self.study_meta['data']['authority']}"
@@ -285,19 +290,23 @@ class StudyMetadata(dict):
         try:
             self.update(self.extract_metadata(self.study_meta['data']['latestVersion']))
         except KeyError as e:
-            if self.study_meta.get('status') == 'OK':
-                self.study_meta['data']['latestVersion'] = 'Not available'
-                #self.study_meta['data']['latestVersion']['files'] = []
+            if (self.study_meta.get('status') == 'OK' and not
+                self.study_meta['data'].get('latestVersion')):
+                # Latest version is not available because API strips out all
+                # citation metadata for deaccessioned studies but doesn't
+                # actually indicate this in any obvious manner
+                # This is further complicated because *all* the metadata
+                # we want is in the metadata blocks, which won't exist in the JSON
+                # because for some idiotic reason it's OK to expose it in the GUI
+                # but not via API.
+                self.deaccession_flag = 1
             else:
                 raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
                                f'{e} key not found.\n'
                                f'Offending JSON: {self.study_meta}') from e
         self.__files = None
         self.__all_files = None
-        #self.index = {f"{_['versionNumber']}.{_['versionMinorNumber']}": n
-        #         for n, _ in enumerate(self.all_versions['data'])}
         self.index = {_: n for n, _ in enumerate(self.versions)}
-        #self.index = dict(enumerate(self.versions))
 
     def __obtain_metadata(self):
         '''
@@ -563,9 +572,11 @@ class StudyMetadata(dict):
         #but files would (usually) be an arbitrary number of files.
         #That bothers me on an intellectual level. Therefore, it will be attribute.
         #Iterate over StudyMetadata.files if you want to know the contents
-        if not self.__files:
+        if not self.__files and not self.deaccession_flag:
             self.__files = self.extract_files(self.study_meta['data']
                                                    ['latestVersion']['files'])
+        if self.deaccession_flag:
+            self.__files = []
 
     def __extract_licence_info(self, indict)->dict:
         '''
