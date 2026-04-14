@@ -30,7 +30,7 @@ class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
     An LDC item (eg, LDC2021T01)
     '''
     #pylint: disable=super-init-not-called, arguments-differ
-    def __init__(self, ldc, cert=None):
+    def __init__(self, ldc, cert=None, **kwargs):
         '''
         Returns a dict with keys created from an LDC catalogue web
         page.
@@ -54,12 +54,12 @@ class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
         self._dvJson = None
         self.cert = cert
         self.session = requests.Session()
-        self.dc_config = dc.Config()
         self.session.mount('https://',
                            HTTPAdapter(max_retries=dc.RETRY_STRATEGY))
         if self.cert:
             self.cert = os.path.expanduser(self.cert)
         self.__fixdesc = None
+        self.kwargs = kwargs
 
     @property
     def ldcJson(self):
@@ -122,7 +122,7 @@ class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
         '''
         #pylint: disable=property-with-parameters
         if not maxsize:
-            maxsize = self.dc_config.get('max_upload', 68719476736)
+            maxsize = self.kwargs.get('max_upload', 68719476736)
 
     @property
     def id(self):

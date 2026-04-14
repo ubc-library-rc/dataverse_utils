@@ -6,6 +6,7 @@ python3 uploadme.py LDC20201S01 . . . LDC2021T21 apikey
 '''
 import argparse
 import sys
+import dryad2dataverse.config as dc
 import dataverse_utils as du
 from dataverse_utils import ldc
 
@@ -88,11 +89,7 @@ def upload_meta(ldccat: str, url: str, key: str,#pylint: disable = too-many-argu
     **kwargs
         Other parameters, notably dv_contact_email and dv_contact_name
     '''
-    stud = ldc.Ldc(ldccat, cert=certchain)
-    stud.dc_config['dv_contact_email']=kwargs.get('dv_contact_email',
-                                                  stud.dc_config['dv_contact_email'])
-    stud.dc_config['dv_contact_name']=kwargs.get('dv_contact_name',
-                                                 stud.dc_config['dv_contact_name'])
+    stud = ldc.Ldc(ldccat, cert=certchain, **kwargs)
     stud.fetch_ldc_record()
     if verbose:
         print(f'Uploading {stud.ldc} metadata')
@@ -105,14 +102,16 @@ def main() -> None:
     '''
     parser = parse()
     args = parser.parse_args()
+    dc_config = dc.Config()
     contact_info={'dv_contact_name' : args.cname,
                   'dv_contact_email' : args.email}
+    dc_config.update(contact_info)
     if args.tsv:
         if len(args.studies) > 1:
             print('Error: Only one LDC study may be processed with the -t/--tsv option')
             sys.exit()
         pid = upload_meta(args.studies[0], args.url, args.key,
-                          args.dvs, args.verbose, args.certchain, **contact_info)
+                          args.dvs, args.verbose, args.certchain, **dc_config)
         if args.verbose:
             print(f'Uploading files to {pid}')
         with open(args.tsv, encoding='utf-8', newline='') as fil:
