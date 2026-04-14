@@ -81,11 +81,25 @@ class DvCollection:
             self.retry_strategy = RETRY
         else:
             self.retry_strategy = kwargs['retry']
+        self.collections = None
         self.session = requests.Session()
         self.session.mount('https://',
                            requests.adapters.HTTPAdapter(max_retries=self.retry_strategy))
-        self.collections = None
         self.studies = None
+        self.__root = None
+        self.all_colls = [self.root]
+
+    @property
+    def root(self):
+        '''
+        Return the name and short name of the top level collection
+        '''
+        if not self.__root:
+            x = self.session.get(f'{self.url}/api/dataverses/{self.coll}',
+                                 headers=self.headers)
+            x.raise_for_status()
+            self.__root = (x.json()['data']['name'], x.json()['data']['alias'])
+        return self.__root
 
     def __clean_url(self, badurl:str):
         '''
@@ -172,6 +186,7 @@ class DvCollection:
             LOGGER.debug('recursive')
             self.get_collections(dv[1], output)
         self.collections = output
+        self.collections.append(self.root)
         return output
 
     def get_studies(self, root:str=None):
@@ -207,12 +222,16 @@ class DvCollection:
         cl.raise_for_status()
         pids = [f"{z['protocol']}:{z['authority']}/{z['identifier']}"
                 for z in cl.json()['data'] if z['type'] == 'dataset']
-        out = [(self.get_study_info(pid), pid) for pid in pids]
+        #Pass collection info into the study because that's not available from
+        #a metadata download
+        smkwargs = [{'collection_name':_[0] , 'collection_short_name':_[1]}
+                    for _ in self.collections if coll_id == _[1]][0]
+        out = [(self.get_study_info(pid, **smkwargs), pid) for pid in pids]
         for _ in out:
             _[0].update({'pid': _[1]})
         return [x[0] for x in out]
 
-    def get_study_info(self, pid):
+    def get_study_info(self, pid, **kwargs):
         '''
         Returns a StudyMetadata object with complete metadata for a study.
 
@@ -220,13 +239,16 @@ class DvCollection:
         ----------
         pid : str
             Persistent ID of a Dataverse study
+
+        **kwargs
+            Other useful information to pass onto StudyMetadata, such as collection info, etc.
         '''
         meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
                             params={'persistentId': pid},
                             headers=self.headers)
         meta.raise_for_status()
         LOGGER.debug(pid)
-        return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url)
+        return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url, **kwargs)
 
 class StudyMetadata(dict):
     '''
@@ -366,6 +388,10 @@ class StudyMetadata(dict):
             tmp['versionStatement'] = f"{chunk['versionNumber']}.{chunk['versionMinorNumber']}"
         else:
             tmp['versionStatement'] = f"{chunk.get('versionState', '')}"
+
+        for _ in ['collection_name', 'collection_short_name']:
+            if self.kwargs.get(_):
+                tmp[_] = self.kwargs[_]
         return tmp
 
     def extract_field_metadata(self, field):
@@ -561,7 +587,7 @@ class StudyMetadata(dict):
 
         files = [self.flatten(_) for _ in filelist]
         for ff in files:
-            ff.update({'dataset_persistentId': self.pid})
+            ff.update({'dataset_pid': self.pid})
         return files
 
     def __extract_files(self):
@@ -708,7 +734,6 @@ class ReadmeCreator:
                 return f'{inkey}(s):  \n'
             return f'{inkey}:  \n'
         return f'{inkey}: '
-
 
     def __extract_files(self):
         '''

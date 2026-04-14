@@ -5,8 +5,12 @@ outputs study metadata for the latest version
 import argparse
 import io
 import csv
+import pathlib
+import sqlite3
 import sys
 import textwrap
+
+import pandas as pd # I could use sqlite but why go the hassle
 import dataverse_utils
 import dataverse_utils.collections as dvc
 
@@ -19,11 +23,14 @@ def parse() -> argparse.ArgumentParser():
     description = textwrap.fill(textwrap.dedent(
                    '''
                    Recursively parses a dataverse collection and
-                   outputs study metadata for the latest version.
+                   outputs study and file metadata for the latest version.
 
                    If analyzing publicly available collections, a
                    dataverse API key for the target system is not
                    required.
+
+                   Study and file output can be joined on 'pid' (studies) and
+                   'dataset_pid' (files).
                    '''), 80)
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=argparse.RawTextHelpFormatter)
@@ -32,29 +39,24 @@ def parse() -> argparse.ArgumentParser():
                               'defaults to "https://abacus.library.ubc.ca"'))
     parser.add_argument('-k', '--key', required=False,
                         help='API key', default=None)
+    parser.add_argument('output',
+                        help=textwrap.fill(textwrap.dedent(
+                        '''
+                        Output file name prefix. If tsv output is chosen,
+                        files will be saved as [prefix]_studies.tsv
+                        and [prefix]_files.tsv.
+
+                        If SQLite output is chosen, it will be a single file file: [prefix].sqlite3.
+                        '''),80))
     parser.add_argument('-d', '--delimiter', required=False,
                         help='Delimiter for output spreadsheet. Default: tab (\\t)',
                         default='\t')
-    parser.add_argument('-f', '--fields',
-                        help=textwrap.fill(('Record metadata fields to output. '
-                              'For all fields, use "all". '
-                              'Default: title, author. for '
-                              'study metadata and file label, id for file metadata. '
-                              'The dataset persistent ID is *always* included '
-                              'for both studies and files.')),
-                        nargs='*',
-                        default=['title', 'author', 'label', 'dataFile_id'])
-    parser.add_argument('-o', '--output', help='Output file name.',
-                       required=False)
     parser.add_argument('-i','--include-all-versions',
                         help='Include *all** versions, not just the current version',
                         action='store_true')
-    parser.add_argument('--files',
-                        help=textwrap.fill(('Show only the *files* associated with a study.'
-                              'The output will contain the PID of the study '
-                              'and the version (if applicable) so that study metadata '
-                              'and file metadata can be linked')),
-                              action='store_true')
+    parser.add_argument('-s', '--sqlite',
+                        help='Save output as SQLite3 database',
+                        action='store_true')
     group = parser.add_argument_group(title='Harvest options',
                                       description=textwrap.fill(
                                       ' You can obtain info for *either* a recursive crawl '
@@ -72,11 +74,11 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
-def fields(args:argparse.ArgumentParser, all_studies)->dict:
+def fields(include_all:bool, is_file:bool, all_studies)->dict:
     '''
     Outputs appropriate header fields based on argparse values
     '''
-    match (args.include_all_versions, args.files):
+    match (include_all, is_file):
         case (0, 0):
             fieldnames = sorted(list(set(key for study in all_studies for key in study)))
         case (1, 0):
@@ -103,54 +105,6 @@ def fields(args:argparse.ArgumentParser, all_studies)->dict:
                           for file in study.version_files(ver)
                           for key in file)))
 
-    return fieldnames
-
-def fields_no(args:argparse.ArgumentParser, all_studies, fmeta=False)->dict:
-    '''
-    Outputs appropriate header fields based on argparse values
-    '''
-    #print(args)
-    match (args.include_all_versions, args.files, fmeta):
-        case (0, 0, 0):
-            fieldnames = sorted(list(set(key for study in all_studies for key in study)))
-        case (1, 0, 0):
-            fieldnames = sorted(list(set(key for study in all_studies
-                                         for ver in study.versions
-                                         for key in study.version_metadata(ver))))
-        case (0, 1, 0):
-            fieldnames = sorted(list(set(key for study in all_studies
-                                         for file in study.files
-                                         for key in file)))
-        #this is actually an outer join
-        #case (1, 1, 0):
-        #    fieldnames1 = sorted(list(set(key for study in coll_me.studies
-        #                  for ver in study.versions
-        #                  for file in study.version_files(ver)
-        #                  for key in file)))
-        #    fieldnames = sorted(list(set(key for study in coll_me.studies
-        #                                 for ver in study.versions
-        #                                 for key in study.version_metadata(ver))))
-        #    fieldnames.extend(fieldnames1)
-        case (1, 1, 0):
-            fieldnames = sorted(list(set(key for study in all_studies
-                          for ver in study.versions
-                          for file in study.version_files(ver)
-                          for key in file)))
-
-        case (1, 0, 1):
-            fieldnames = sorted(list(set(key for ver in all_studies[0].versions
-                                     for key in all_studies[0].version_metadata(ver))))
-        case (1, 1, 1):
-            fieldnames = sorted(list(set(key
-                      for ver in all_studies[0].versions
-                      for file in all_studies[0].version_files(ver)
-                      for key in file)))
-        case (0, 1, 1):
-            fieldnames = sorted(list(set(key for file in all_studies[0].files
-                                     for key in file)))
-
-        case (0, 0, 1):
-            fieldnames = sorted(list(set(all_studies[0])))
     return fieldnames
 
 def output(study, include_all=False, file=False)->list:
@@ -185,11 +139,21 @@ def output(study, include_all=False, file=False)->list:
         case _:
             return []
 
+def extension(args:argparse.ArgumentParser):
+    '''
+    Return extension for output
+    '''
+    extype ={'\t' : '.tsv',
+             ','  : '.csv'}
+    if args.sqlite:
+        return '.sqlite3'
+    return extype.get(args.delimiter, '.txt')
+
 def main():
     '''
     You know what this is
     '''
-    #pylint: disable=too-many-branches
+    #pylint: disable=too-many-branches, too-many-locals
     args = parse().parse_args()
     if args.collection:
         coll_me = dvc.DvCollection(args.url, args.collection, args.key)
@@ -210,39 +174,59 @@ def main():
         except (KeyError, dataverse_utils.collections.MetadataError) as e:
             print(e, file=sys.stderr)
             sys.exit()
-    #with open('data.pickle', 'wb') as f:
-    #    pickle.dump(all_studies, f)
-    if 'all' in [x.lower() for x in args.fields]:
-        fieldnames = fields(args, all_studies)
+    fname = {0: '_studies', 1:'_files'}
+    outdata = {}
+    for stud_file in range(2): # studies and files
+        fieldnames= fields(args.include_all_versions, stud_file, all_studies)
+        out = io.StringIO(newline='')
+        writer = csv.DictWriter(out,
+                                fieldnames=fieldnames,
+                                delimiter=args.delimiter,
+                                quoting=csv.QUOTE_MINIMAL,
+                                extrasaction='ignore')
+        writer.writeheader()
+        for stud in all_studies:
+            for row in output(stud, args.include_all_versions, stud_file):
+                data = {k:v.replace('\t',' ').replace('\r\n', ' ').replace('\n',' ')
+                                 if isinstance(v, str) else v
+                                 for k, v in row.items()}
+                writer.writerow(data)
+        out.seek(0)
+        outdata[fname[stud_file][1:]] = out
+        if not args.sqlite:
+            outf =  pathlib.Path(args.output+f'{fname[stud_file]}{extension(args)}').expanduser()
+            with open(outf,
+                       'w', encoding='utf-8') as f:
+                print(f'Writing {str(outf)}', file=sys.stdout)
+                f.write(out.read())
 
-    else:
-        fieldnames =  args.fields[2:] if args.files else args.fields[:2]
-    if not 'dataset_persistent_id' in fieldnames:
-        fieldnames.insert(0, 'dataset_persistent_id')
-    out = io.StringIO(newline='')
-    writer = csv.DictWriter(out,
-                            fieldnames=fieldnames,
-                            delimiter=args.delimiter,
-                            quoting=csv.QUOTE_MINIMAL,
-                            extrasaction='ignore')
-    writer.writeheader()
-    #for stud in coll_me.studies:
-    for stud in all_studies:
-        for row in output(stud, args.include_all_versions, args.files):
-            data = {k:v.replace('\t',' ').replace('\r\n', ' ').replace('\n',' ')
-                             if isinstance(v, str) else v
-                             for k, v in row.items()}
 
-            if not data.get('dataset_persistent_id'):
-                data.update({'dataset_persistent_id' : stud.pid})
-            writer.writerow(data)
-    out.seek(0)
-    if args.output:
-        with open(args.output, mode='w', encoding='utf-8', newline='') as f:
-            f.write(out.read())
-            return
-    else:
-        print(out.read())
+    if args.sqlite:
+        print(f'Writing {str(pathlib.Path(args.output+extension(args)).expanduser())}',
+              file=sys.stdout)
+        conn = sqlite3.connect(pathlib.Path(args.output+extension(args)).expanduser())
+        for k,v in outdata.items():
+            x=pd.read_csv(v, delimiter=args.delimiter)
+            x.to_sql(k, conn, if_exists='replace', index=0)
+        cursor = conn.cursor()
+        cursor.execute('DROP VIEW IF EXISTS short_combined_view;')
+        query = textwrap.fill(textwrap.dedent(
+                    '''CREATE VIEW short_combined_view AS
+                        SELECT studies.pid AS pid,
+                        studies.authorName AS author,
+                        studies.title AS title,
+                        studies.dateOfDeposit AS deposit_date,
+                        studies.versionStatement AS version_statement,
+                        files.dataFile_filename AS file_name,
+                        files.dataFile_id AS file_id,
+                        files.restricted AS restricted,
+                        files.version AS file_version
+                        FROM studies
+                        INNER JOIN files ON studies.pid = files.dataset_pid;
+                        '''
+                    ),80)
+        cursor.execute(query)
+        conn.close()
 
 if __name__ == '__main__':
     main()
