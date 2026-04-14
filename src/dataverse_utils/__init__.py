@@ -17,7 +17,7 @@ UAHEADER = {'User-agent' : USERAGENT}
 SCRIPT_VERSIONS={
 'dv_collection_info' : (0, 3, 0),
 'dv_del' : (0, 2, 4),
-'dv_ldc_uploader' : (0, 3, 0),
+'dv_ldc_uploader' : (0, 4, 0),
 'dv_list_files' : (0, 1, 1),
 'dv_manifest_gen' : (0, 5, 1),
 'dv_pg_facet_date' : (0, 1, 1),

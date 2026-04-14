@@ -69,7 +69,7 @@ def parse() -> argparse.ArgumentParser():
 
 def upload_meta(ldccat: str, url: str, key: str,#pylint: disable = too-many-arguments, too-many-positional-arguments
                 dvs: str, verbose: bool = False,
-                certchain: str = None) -> str:
+                certchain: str = None, **kwargs) -> str:
     '''
     Uploads metadata to target dataverse collection. Returns persistentId.
 
@@ -85,9 +85,15 @@ def upload_meta(ldccat: str, url: str, key: str,#pylint: disable = too-many-argu
         Target Dataverse collection short name
     certchain : str
         Path to LDC .PEM certificate chain
+    **kwargs
+        Other parameters, notably dv_contact_email and dv_contact_name
     '''
     stud = ldc.Ldc(ldccat, cert=certchain)
-    stud.fetch_record()
+    stud.dc_config['dv_contact_email']=kwargs.get('dv_contact_email',
+                                                  stud.dc_config['dv_contact_email'])
+    stud.dc_config['dv_contact_name']=kwargs.get('dv_contact_name',
+                                                 stud.dc_config['dv_contact_name'])
+    stud.fetch_ldc_record()
     if verbose:
         print(f'Uploading {stud.ldc} metadata')
     info = stud.upload_metadata(url=url, key=key, dv=dvs)
@@ -99,15 +105,14 @@ def main() -> None:
     '''
     parser = parse()
     args = parser.parse_args()
-    ldc.ds.constants.DV_CONTACT_EMAIL = args.email
-    ldc.ds.constants.DV_CONTACT_NAME = args.cname
-    #print(args)
+    contact_info={'dv_contact_name' : args.cname,
+                  'dv_contact_email' : args.email}
     if args.tsv:
         if len(args.studies) > 1:
             print('Error: Only one LDC study may be processed with the -t/--tsv option')
             sys.exit()
         pid = upload_meta(args.studies[0], args.url, args.key,
-                          args.dvs, args.verbose, args.certchain)
+                          args.dvs, args.verbose, args.certchain, **contact_info)
         if args.verbose:
             print(f'Uploading files to {pid}')
         with open(args.tsv, encoding='utf-8', newline='') as fil:

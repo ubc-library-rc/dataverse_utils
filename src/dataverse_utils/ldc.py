@@ -14,6 +14,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from bs4 import BeautifulSoup as bs
 import dryad2dataverse.serializer as ds
+import dryad2dataverse.config as dc
 from dataverse_utils import UAHEADER
 
 #pylint: disable=invalid-name
@@ -53,8 +54,9 @@ class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
         self._dvJson = None
         self.cert = cert
         self.session = requests.Session()
+        self.dc_config = dc.Config()
         self.session.mount('https://',
-                           HTTPAdapter(max_retries=ds.constants.RETRY_STRATEGY))
+                           HTTPAdapter(max_retries=dc.RETRY_STRATEGY))
         if self.cert:
             self.cert = os.path.expanduser(self.cert)
         self.__fixdesc = None
@@ -120,7 +122,7 @@ class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
         '''
         #pylint: disable=property-with-parameters
         if not maxsize:
-            maxsize = ds.constants.MAX_UPLOAD
+            maxsize = self.dc_config.get('max_upload', 68719476736)
 
     @property
     def id(self):
@@ -129,7 +131,7 @@ class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
         '''
         return self.ldc
 
-    def fetch_record(self, timeout=45):
+    def fetch_ldc_record(self, timeout=45):
         '''
         Downloads record from LDC website
 
@@ -150,7 +152,7 @@ class Ldc(ds.Serializer):#pylint: disable=too-many-instance-attributes
         page.
         '''
         if not self.ldcHtml:
-            self.fetch_record()
+            self.fetch_ldc_record()
         soup = bs(self.ldcHtml, 'html.parser')
         #Should data just look in the *first* table? Specifically tbody?
         #Is it always the first? I assume yes.
