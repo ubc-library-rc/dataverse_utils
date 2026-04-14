@@ -95,7 +95,6 @@ class Dverse():
         return [x['storageIdentifier'].replace('file://', f'{self.hdl}:') for x in data
                 if x['type'] == 'dataset']
 
-    @property
     def unreleased(self, all_stud: list = None) -> list:
         '''
         Finds only unreleased studies from a list of studies
@@ -208,7 +207,7 @@ def main():
     args = parser.parse_args()
     if args.dv:
         the_dv = Dverse(args.url, args.key, args.dv)
-        un_rel = the_dv.unreleased
+        un_rel = the_dv.unreleased()
     else:
         un_rel = args.pid
     if args.dryrun:
