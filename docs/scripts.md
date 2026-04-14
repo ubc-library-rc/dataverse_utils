@@ -21,32 +21,42 @@ In alphabetical order:
 
 ## dv_collection_info
 
-A recursive file metadata utility. You can specify the head of a tree and the harvester will harvest the \[latest\]  study metadata and output it as a spreadsheet. An API key is not required for publicly accessible data.
+A recursive file metadata utility. You can specify the head of a tree and the harvester will harvest either the \[latest\] or *all* study metadata, including files. Output consists of either two text files (TSV or custom separator) or a single SQLite3 database. It is also possible to harvest the metadata of a single item. An API key currently required.
 
 ```nohighlight
-usage: dv_collection_info [-h] [-u URL] -c COLLECTION [-k KEY] [-d DELIMITER] [-f [FIELDS ...]] [-o OUTPUT] [--verbose] [-v]
+usage: dv_collection_info [-h] [-u URL] [-k KEY] [-d DELIMITER] [-i] [-s] (-c COLLECTION | -p PID) [-v] output
 
-Recursively parses a dataverse collection and
-outputs study metadata for the latest version.
+ Recursively parses a dataverse collection and outputs study and file metadata
+for the latest version.  If analyzing publicly available collections, a
+dataverse API key for the target system is not required.  Study and file output
+can be joined on 'pid' (studies) and 'dataset_pid' (files).
 
-If analyzing publicly available collections, a
-dataverse API key for the target system is not
-required.
+positional arguments:
+  output                 Output file name prefix. If tsv output is chosen, files will be saved as
+                        [prefix]_studies.tsv and [prefix]_files.tsv.  If SQLite output is chosen, it
+                        will be a single file file: [prefix].sqlite3.
 
 options:
   -h, --help            show this help message and exit
   -u, --url URL         Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
-  -c, --collection COLLECTION
-                        Dataverse collection shortname or id at the top of the tree
   -k, --key KEY         API key
   -d, --delimiter DELIMITER
                         Delimiter for output spreadsheet. Default: tab (\t)
-  -f, --fields [FIELDS ...]
-                        Record metadata fields to output. For all fields, use "all". Default: title, author.
-  -o, --output OUTPUT   Output file name.
-  --verbose             Verbose output. See what's happening.
+  -i, --include-all-versions
+                        Include *all** versions, not just the current version
+  -s, --sqlite          Save output as SQLite3 database
   -v, --version         Show version number and exit
+
+Harvest options:
+   You can obtain info for *either* a recursive crawl of a collection
+  (-c, --collection) OR for a single Dataverse study (-p, --pid). These
+  arguments are mutually exclusive.
+
+  -c, --collection COLLECTION
+                        Dataverse collection shortname or id at the top of the tree
+  -p, --pid PID         Dataverse study persistent identifier (DOI/handle)
 ```
+
 ## dv_del
 
 This is bulk deletion utility for unpublished studies (or even single studies). It's useful when your automated procedures have gone wrong, or if you don't feel like navigating through many menus.
