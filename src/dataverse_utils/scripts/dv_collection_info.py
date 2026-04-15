@@ -5,6 +5,7 @@ outputs study metadata for the latest version
 import argparse
 import io
 import csv
+import logging
 import pathlib
 import sqlite3
 import sys
@@ -57,9 +58,24 @@ def parse() -> argparse.ArgumentParser():
     parser.add_argument('-s', '--sqlite',
                         help='Save output as SQLite3 database',
                         action='store_true')
+    parser.add_argument('-l', '--log',
+                        help=textwrap.fill(textwrap.dedent(
+                        '''
+                        If you would like a log, provide a log file name here.
+                        If no file name is provided, no log is created.
+                        '''),80),
+                        default=None)
+    parser.add_argument('--log-level',
+                         help=textwrap.fill(textwrap.dedent(
+                        '''
+                        Log level. Acceptable values for log level are: debug, info,
+                        warning, error, critical.
+                        Default value: warning.
+                        '''),80),
+                        default='warning')
     group = parser.add_argument_group(title='Harvest options',
                                       description=textwrap.fill(
-                                      ' You can obtain info for *either* a recursive crawl '
+                                      'You can obtain info for *either* a recursive crawl '
                                       'of a collection (-c, --collection) OR for a single '
                                       'Dataverse ' 'study (-p, --pid). '
                                       'These arguments are mutually exclusive.'))
@@ -149,35 +165,74 @@ def extension(args:argparse.ArgumentParser):
         return '.sqlite3'
     return extype.get(args.delimiter, '.txt')
 
+def logme(pargs:argparse.Namespace)->logging.Logger:
+    '''
+    Text logger
+    '''
+    logger=logging.getLogger()
+    l_format = logging.Formatter('%(name)s - %(asctime)s'
+                                 ' - %(levelname)s - %(funcName)s - '
+                                 '%(message)s')
+    lookup = {'debug' : logging.DEBUG,
+              'info' : logging.INFO,
+              'warning': logging.WARNING,
+              'error': logging.ERROR,
+              'critical': logging.CRITICAL}
+    level = lookup.get(pargs.log_level.lower(), logging.WARNING)
+    logger.setLevel(level)
+    if pargs.log:
+        text = logging.FileHandler(pargs.log, encoding='utf-8', delay=True)
+        text.setFormatter(l_format)
+        logger.addHandler(text)
+        return logger
+    logger.addHandler(logging.NullHandler())
+    return logger
+
+#def logit(pargs: argparse.Namespace, log:logging.logger, mesg)->None:
+#    '''
+#    Write all the things
+#    '''
+#    if pargs.log:
+#        log.
+
 def main():
     '''
     You know what this is
     '''
-    #pylint: disable=too-many-branches, too-many-locals
+    #pylint: disable=too-many-branches, too-many-locals, too-many-statements
     args = parse().parse_args()
+    logger = logme(args)
     if args.collection:
         coll_me = dvc.DvCollection(args.url, args.collection, args.key)
         try:
             coll_me.get_collections()
-        except TypeError:
+        except TypeError as e:
             print(f'Error with parsing collection: {args.collection}', file=sys.stderr)
+            logger.critical(e)
             sys.exit()
         try:
             coll_me.get_studies()
             all_studies = coll_me.studies
+            if not all_studies: #Stupid but this happens
+                print('No studies in collection', file=sys.stderr)
+                logger.warning('No studies to process in collection %s', args.collection)
+                sys.exit()
         except dataverse_utils.collections.MetadataError as e:
             print(e, file=sys.stderr)
+            logger.critical(e)
             sys.exit()
     else:
         try:
             all_studies = [dvc.StudyMetadata(url=args.url, pid=args.pid, key=args.key)]
         except (KeyError, dataverse_utils.collections.MetadataError) as e:
             print(e, file=sys.stderr)
+            logger.critical(e)
             sys.exit()
     fname = {0: '_studies', 1:'_files'}
     outdata = {}
     for stud_file in range(2): # studies and files
-        fieldnames= fields(args.include_all_versions, stud_file, all_studies)
+        fieldnames = fields(args.include_all_versions, stud_file, all_studies)
+        logger.info(fieldnames)
         out = io.StringIO(newline='')
         writer = csv.DictWriter(out,
                                 fieldnames=fieldnames,
@@ -186,10 +241,12 @@ def main():
                                 extrasaction='ignore')
         writer.writeheader()
         for stud in all_studies:
+            logger.info(stud)
             for row in output(stud, args.include_all_versions, stud_file):
                 data = {k:v.replace('\t',' ').replace('\r\n', ' ').replace('\n',' ')
                                  if isinstance(v, str) else v
                                  for k, v in row.items()}
+                logger.debug(data)
                 writer.writerow(data)
         out.seek(0)
         outdata[fname[stud_file][1:]] = out
@@ -206,7 +263,7 @@ def main():
               file=sys.stdout)
         conn = sqlite3.connect(pathlib.Path(args.output+extension(args)).expanduser())
         for k,v in outdata.items():
-            x=pd.read_csv(v, delimiter=args.delimiter)
+            x = pd.read_csv(v, delimiter=args.delimiter)
             x.to_sql(k, conn, if_exists='replace', index=0)
         cursor = conn.cursor()
         cursor.execute('DROP VIEW IF EXISTS short_combined_view;')
