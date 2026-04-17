@@ -43,7 +43,7 @@ class MetadataError(Exception):
     MetadataError
     '''
 
-class RateLimiter():
+class RateLimiter:
     '''
     Pauses for a random interval
     '''
@@ -58,10 +58,16 @@ class RateLimiter():
         ----------------
         rate_limit_on: bool
             Turn on rate limit for requests
+
         rate_limit_min : int
             Minimum time between requests in seconds
+
         rate_limit_max : int
             Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
 
         Notes
         -----
@@ -110,12 +116,19 @@ class DvCollection:
         ----------------
         timeout : int
             retry timeout in seconds
+
         rate_limit_on: bool
             Turn on rate limit for requests
+
         rate_limit_min : int
             Minimum time between requests in seconds
+
         rate_limit_max : int
             Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
 
         Notes
         -----
@@ -140,9 +153,9 @@ class DvCollection:
         else:
             self.retry_strategy = kwargs['retry']
         self.collections = None
-        self.session = requests.Session()
+        self.session = kwargs.get('session', requests.Session())
         self.session.mount('https://',
-                           requests.adapters.HTTPAdapter(max_retries=self.retry_strategy))
+                           requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.studies = None
         self.__root = None
         self.all_colls = [self.root]
@@ -155,7 +168,8 @@ class DvCollection:
         if not self.__root:
             self.limit.rate_limit()
             x = self.session.get(f'{self.url}/api/dataverses/{self.coll}',
-                                 headers=self.headers)
+                                 headers=self.headers,
+                                 timeout=self.kwargs.get('timeout', 15))
             x.raise_for_status()
             self.__root = (x.json()['data']['name'], x.json()['data']['alias'])
         return self.__root
@@ -180,7 +194,9 @@ class DvCollection:
         Get collection short name.
         '''
         self.limit.rate_limit()
-        shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}', headers=self.headers)
+        shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}',
+                                     headers=self.headers,
+                                     timeout=self.kwargs.get('timeout', 15))
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
@@ -201,7 +217,8 @@ class DvCollection:
             coll = self.coll
         self.limit.rate_limit()
         x = self.session.get(f'{self.url}/api/dataverses/{coll}/contents',
-                                 headers=self.headers)
+                                headers=self.headers,
+                                timeout=self.kwargs.get('timeout', 15))
         data = x.json().get('data')
         #---
         #Because it's possible that permissions errors can cause API read errors,
@@ -244,7 +261,8 @@ class DvCollection:
             LOGGER.debug('recursive')
             self.get_collections(dv[1], output)
         self.collections = output
-        self.collections.append(self.root)
+        if self.root not in self.collections:
+            self.collections.insert(0, self.root)
         return output
 
     def get_studies(self, root:str=None):
@@ -259,9 +277,15 @@ class DvCollection:
         all_studies = []
         if not root:
             root=self.coll
-        all_studies = self.get_collection_listing(root)
+        #Redundant, as root is now added to get_collections
+        #all_studies = self.get_collection_listing(root)
+        all_studies = []
         collections = self.get_collections(root)
-        for collection in tqdm.tqdm(collections):
+        for collection in tqdm.tqdm(collections,
+                             desc='collections',
+                             unit='collection',
+                             leave=False,
+                             bar_format=BAR_FORMAT):
             all_studies.extend(self.get_collection_listing(collection[1]))
         self.studies = all_studies
         return all_studies
@@ -277,7 +301,8 @@ class DvCollection:
         '''
         self.limit.rate_limit()
         cl = self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents',
-                                  headers=self.headers)
+                               headers=self.headers,
+                               timeout=self.kwargs.get('timeout', 15))
         cl.raise_for_status()
         pids = [f"{z['protocol']}:{z['authority']}/{z['identifier']}"
                 for z in cl.json()['data'] if z['type'] == 'dataset']
@@ -312,11 +337,13 @@ class DvCollection:
         '''
         self.limit.rate_limit()
         meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                            params={'persistentId': pid},
-                            headers=self.headers)
+                                params={'persistentId': pid},
+                                headers=self.headers,
+                                timeout=self.kwargs.get('timeout', 15))
         meta.raise_for_status()
         LOGGER.debug(pid)
-        return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url, **kwargs)
+        return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url,
+                             session=self.session, **kwargs)
 
 class StudyMetadata(dict):
     '''
@@ -349,25 +376,32 @@ class StudyMetadata(dict):
 
         rate_limit_on: bool
             Turn on rate limit for requests
-        
+
         rate_limit_min : int
             Minimum time between requests in seconds
-        
+
         rate_limit_max : int
             Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
 
         Notes
         -----
         Either `study_meta` is required OR `pid` and `url`. `key` _may_ be required
         if either a draft study is being accessed or the Dataverse installation
         requires API keys for all requests.
-       
+
         The rate limiter will wait for a random interval between
         rate_limit_min and rate_limit_max. Obviously, if you want
         a constant interval, set them to be equal.
 
         '''
         self.kwargs = kwargs
+        self.session = kwargs.get('session', requests.Session())
+        self.session.mount('https://',
+                           requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.limit = RateLimiter(**kwargs)
         self.study_meta  = kwargs.get('study_meta')
         self.all_versions = None
@@ -420,9 +454,6 @@ class StudyMetadata(dict):
         if self.kwargs.get('key'):
             self.headers.update({'X-Dataverse-key':self.kwargs['key']})
         params = {'persistentId': self.pid}
-        self.session = requests.Session()
-        self.session.mount('https://',
-                           requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.url = self.url.strip('/')
         if not self.url.startswith('https://'):
             self.url = f'https://{self.url}'
@@ -430,13 +461,15 @@ class StudyMetadata(dict):
         LOGGER.debug('Attempting %s/api/datasets/, params %s, headers %s',
                      self.url, params, self.headers)
         data = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                                headers=self.headers, params=params)
+                                headers=self.headers, params=params,
+                                timeout=self.kwargs.get('timeout', 15))
         data.raise_for_status()
         self.limit.rate_limit()
         LOGGER.debug('Attempting %s/api/datasets/:persistentId/versions, params %s, headers %s',
                      self.url, params, self.headers)
         all_versions = self.session.get(f'{self.url}/api/datasets/:persistentId/versions',
-                                headers=self.headers, params=params)
+                                        headers=self.headers, params=params,
+                                        timeout=self.kwargs.get('timeout', 15))
         all_versions.raise_for_status()
         return data.json(), all_versions.json()
 
@@ -479,10 +512,14 @@ class StudyMetadata(dict):
             tmp['versionStatement'] = f"{chunk['versionNumber']}.{chunk['versionMinorNumber']}"
         else:
             tmp['versionStatement'] = f"{chunk.get('versionState', '')}"
-
+        #ADD fields here if they are not in the metadata and you need them
+        tmp['pid'] = self.pid #Because you need generally need this
+        #Collection info
         for _ in ['collection_name', 'collection_short_name']:
             if self.kwargs.get(_):
                 tmp[_] = self.kwargs[_]
+        #Latest version number or state for easy filtering @@@
+        tmp['is_current_version'] = tmp['versionStatement'] == self.current_version
         return tmp
 
     def extract_field_metadata(self, field):
@@ -567,8 +604,14 @@ class StudyMetadata(dict):
         '''
         Return a formatted version statement for the most recent version
         '''
-        return (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
-                f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
+        try:
+            return (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
+                    f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
+        except (KeyError, ValueError):
+            try:
+                return f"{self.study_meta['data']['latestVersion']['versionState']}"
+            except (ValueError, KeyError):
+                return 'DEACCESSIONED'
 
     @property
     def versions(self)->list:
@@ -923,6 +966,12 @@ class ReadmeCreator:
         entire StudyMetadata object.
         '''
         metatmp = self.meta.copy()
+        #Delete redundant info fields added when harvesting Study Metadata
+        for _ in ['pid', 'is_current_version', 'version_statement']:
+            try:
+                del metatmp[_]
+            except KeyError:
+                continue
         neworder = self.reorder_fields(metatmp)
         addme = self.concatenator(metatmp)
         metatmp.update(addme)
@@ -1194,21 +1243,25 @@ class FileAnalysis(dict):
 
         filesize_bytes : int
             File size in bytes
-        
+
         rate_limit_on: bool
             Turn on rate limit for requests
-        
+
         rate_limit_min : int
             Minimum time between requests in seconds
-        
+
         rate_limit_max : int
             Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
 
         Notes
         -----
         Either `local` must be supplied, or `url`, `key` and at least one of
         `id` or `pid` must be supplied
-        
+
         The rate limiter will wait for a random interval between
         rate_limit_min and rate_limit_max. Obviously, if you want
         a constant interval, set them to be equal.
@@ -1228,7 +1281,7 @@ class FileAnalysis(dict):
                    '(pid or id)) or (local) keyword parameters.')
             raise TypeError(err)
         self.tempfile = None
-        self.session = requests.Session()
+        self.session = kwargs.get('session', requests.Session())
         self.session.mount('https://',
                            requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.checkable = {'.sav': self.stat_file_metadata,
@@ -1346,12 +1399,14 @@ class FileAnalysis(dict):
             data = self.session.get(f'{url}/api/access/datafile/:persistentId',
                                     headers=self.headers,
                                     params=params,
-                                    stream=True)
+                                    stream=True,
+                                    timeout=self.kwargs.get('timeout', 15))
         else:
             data = self.session.get(f'{url}/api/access/datafile/{self.kwargs["id"]}',
                                     headers=self.headers,
                                     params=params,
-                                    stream=True)
+                                    stream=True,
+                                    timeout=self.kwargs.get('timeout', 15))
         data.raise_for_status()
         finish = datetime.datetime.now()
         self.filename = self.__get_filename(data.headers)

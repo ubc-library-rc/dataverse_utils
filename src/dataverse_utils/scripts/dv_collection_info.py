@@ -73,6 +73,17 @@ def parse() -> argparse.ArgumentParser():
                         Default value: warning.
                         '''),80),
                         default='warning')
+    parser.add_argument('--rate-limit-off',
+                        action='store_true',
+                        help=('Turn off rate limiter. '
+                              'Requests are randomly between min and max. Default is ON.'))
+    parser.add_argument('--rate-limit-min',
+                        help='Minimum time before requests in seconds. Default 0.25',
+                        default=0.25)
+    parser.add_argument('--rate-limit-max',
+                        help='Maximum time between requests in seconds: Default 1',
+                        default=1)
+
     group = parser.add_argument_group(title='Harvest options',
                                       description=textwrap.fill(
                                       'You can obtain info for *either* a recursive crawl '
@@ -188,13 +199,6 @@ def logme(pargs:argparse.Namespace)->logging.Logger:
     logger.addHandler(logging.NullHandler())
     return logger
 
-#def logit(pargs: argparse.Namespace, log:logging.logger, mesg)->None:
-#    '''
-#    Write all the things
-#    '''
-#    if pargs.log:
-#        log.
-
 def main():
     '''
     You know what this is
@@ -203,13 +207,10 @@ def main():
     args = parse().parse_args()
     logger = logme(args)
     if args.collection:
-        coll_me = dvc.DvCollection(args.url, args.collection, args.key)
-        try:
-            coll_me.get_collections()
-        except TypeError as e:
-            print(f'Error with parsing collection: {args.collection}', file=sys.stderr)
-            logger.critical(e)
-            sys.exit()
+        coll_me = dvc.DvCollection(args.url, args.collection, args.key,
+                                   rate_limit_on=not args.rate_limit_off,
+                                   rate_limit_min=args.rate_limit_min,
+                                   rate_limit_max=args.rate_limit_max)
         try:
             coll_me.get_studies()
             all_studies = coll_me.studies
@@ -221,9 +222,16 @@ def main():
             print(e, file=sys.stderr)
             logger.critical(e)
             sys.exit()
+        except TypeError as e:
+            print(f'Error with parsing collection: {args.collection}', file=sys.stderr)
+            logger.critical(e)
+            sys.exit()
     else:
         try:
-            all_studies = [dvc.StudyMetadata(url=args.url, pid=args.pid, key=args.key)]
+            all_studies = [dvc.StudyMetadata(url=args.url, pid=args.pid, key=args.key,
+                                             rate_limit_on=True,
+                                             rate_limit_min=0.25,
+                                             rate_limit_max=1)]
         except (KeyError, dataverse_utils.collections.MetadataError) as e:
             print(e, file=sys.stderr)
             logger.critical(e)
