@@ -8,9 +8,11 @@ import datetime
 import io
 import logging
 import pathlib
+import random
 import string
 import sys
 import tempfile
+import time
 import textwrap
 import typing
 import traceback
@@ -34,11 +36,52 @@ RETRY = Retry(total=10,
                        allowed_methods=['HEAD', 'GET', 'OPTIONS',
                                          'POST', 'PUT'],
                        backoff_factor=1)
+BAR_FORMAT='{l_bar}{bar}{n_fmt}/{total_fmt} : time remaining - {remaining}'
 
 class MetadataError(Exception):
     '''
     MetadataError
     '''
+
+class RateLimiter():
+    '''
+    Pauses for a random interval
+    '''
+    #pylint: disable=too-few-public-methods
+    def __init__(self, **kwargs):
+        '''
+        Parameters
+        ----------
+        **kwargs
+
+        Other parameters
+        ----------------
+        rate_limit_on: bool
+            Turn on rate limit for requests
+        rate_limit_min : int
+            Minimum time between requests in seconds
+        rate_limit_max : int
+            Maximum time between requests in seconds
+
+        Notes
+        -----
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
+        '''
+        self.kwargs = kwargs
+
+        if not self.kwargs.get('rate_limit_on', False):
+            self.kwargs['rate_limit_on'] = False
+            self.kwargs['rate_limit_min'] = 0
+            self.kwargs['rate_limit_max'] = 0
+
+    def rate_limit(self):
+        '''
+        Sleep before requests for the time set by the rate limits
+        '''
+        time.sleep(random.uniform(self.kwargs['rate_limit_min'],
+                                  self.kwargs['rate_limit_max']))
 
 class DvCollection:
     '''
@@ -67,7 +110,22 @@ class DvCollection:
         ----------------
         timeout : int
             retry timeout in seconds
+        rate_limit_on: bool
+            Turn on rate limit for requests
+        rate_limit_min : int
+            Minimum time between requests in seconds
+        rate_limit_max : int
+            Maximum time between requests in seconds
+
+        Notes
+        -----
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
+
         '''
+        self.kwargs = kwargs
+        self.limit = RateLimiter(**kwargs)
         self.coll = coll
         self.url = self.__clean_url(url)
         self.headers = None
@@ -95,6 +153,7 @@ class DvCollection:
         Return the name and short name of the top level collection
         '''
         if not self.__root:
+            self.limit.rate_limit()
             x = self.session.get(f'{self.url}/api/dataverses/{self.coll}',
                                  headers=self.headers)
             x.raise_for_status()
@@ -120,11 +179,12 @@ class DvCollection:
         '''
         Get collection short name.
         '''
+        self.limit.rate_limit()
         shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}', headers=self.headers)
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
-    def get_collections(self, coll:str=None, output=None, **kwargs)->list:#pylint: disable=unused-argument
+    def get_collections(self, coll:str=None, output=None)->list:#pylint: disable=unused-argument
         '''
         Get a [recursive] listing of all dataverses in a collection.
 
@@ -134,14 +194,12 @@ class DvCollection:
             Collection short name or id
         output : list, optional, default=[]
             output list to append to
-        **kwargs : dict
-            Other keyword arguments
-
         '''
         if not output:
             output = []
         if not coll:
             coll = self.coll
+        self.limit.rate_limit()
         x = self.session.get(f'{self.url}/api/dataverses/{coll}/contents',
                                  headers=self.headers)
         data = x.json().get('data')
@@ -217,6 +275,7 @@ class DvCollection:
         coll_id : str
             Short name or id of a dataverse collection
         '''
+        self.limit.rate_limit()
         cl = self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents',
                                   headers=self.headers)
         cl.raise_for_status()
@@ -226,7 +285,15 @@ class DvCollection:
         #a metadata download
         smkwargs = [{'collection_name':_[0] , 'collection_short_name':_[1]}
                     for _ in self.collections if coll_id == _[1]][0]
-        out = [(self.get_study_info(pid, **smkwargs), pid) for pid in pids]
+        #out = [(self.get_study_info(pid, **smkwargs), pid) for pid in pids]
+        out = []
+        for pid in tqdm.tqdm(pids,
+                             desc=smkwargs.get('collection_short_name', 'collection'),
+                             unit='study',
+                             leave=False,
+                             colour='red',
+                             bar_format=BAR_FORMAT):
+            out.append((self.get_study_info(pid, **smkwargs), pid))
         for _ in out:
             _[0].update({'pid': _[1]})
         return [x[0] for x in out]
@@ -243,6 +310,7 @@ class DvCollection:
         **kwargs
             Other useful information to pass onto StudyMetadata, such as collection info, etc.
         '''
+        self.limit.rate_limit()
         meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
                             params={'persistentId': pid},
                             headers=self.headers)
@@ -279,13 +347,28 @@ class StudyMetadata(dict):
         key : str
             Dataverse instance API key (needed for unpublished studies)
 
+        rate_limit_on: bool
+            Turn on rate limit for requests
+        
+        rate_limit_min : int
+            Minimum time between requests in seconds
+        
+        rate_limit_max : int
+            Maximum time between requests in seconds
+
         Notes
         -----
         Either `study_meta` is required OR `pid` and `url`. `key` _may_ be required
         if either a draft study is being accessed or the Dataverse installation
         requires API keys for all requests.
+       
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
+
         '''
         self.kwargs = kwargs
+        self.limit = RateLimiter(**kwargs)
         self.study_meta  = kwargs.get('study_meta')
         self.all_versions = None
         self.url = kwargs.get('url')
@@ -343,10 +426,18 @@ class StudyMetadata(dict):
         self.url = self.url.strip('/')
         if not self.url.startswith('https://'):
             self.url = f'https://{self.url}'
+        self.limit.rate_limit()
+        LOGGER.debug('Attempting %s/api/datasets/, params %s, headers %s',
+                     self.url, params, self.headers)
         data = self.session.get(f'{self.url}/api/datasets/:persistentId',
                                 headers=self.headers, params=params)
+        data.raise_for_status()
+        self.limit.rate_limit()
+        LOGGER.debug('Attempting %s/api/datasets/:persistentId/versions, params %s, headers %s',
+                     self.url, params, self.headers)
         all_versions = self.session.get(f'{self.url}/api/datasets/:persistentId/versions',
                                 headers=self.headers, params=params)
+        all_versions.raise_for_status()
         return data.json(), all_versions.json()
 
     def __has_metadata(self)->bool:
@@ -432,7 +523,7 @@ class StudyMetadata(dict):
                             else:
                                 #sometimes value is None because reasons.
                                 interim[v3['typeName']] = [v3.get('value', [] )]
-                            LOGGER.debug(interim)
+                            #LOGGER.debug(interim)
                 for k9, v9 in interim.items():
                     out.update({k9: '; '.join(v9)})
 
@@ -1071,7 +1162,7 @@ class FileAnalysis(dict):
     Download and analyze a file from a dataverse installation and
     produce useful metadata.
     '''
-
+    #pylint: disable=too-many-instance-attributes
     def __init__(self, **kwargs):
         '''
         Intialize the object.
@@ -1103,17 +1194,31 @@ class FileAnalysis(dict):
 
         filesize_bytes : int
             File size in bytes
+        
+        rate_limit_on: bool
+            Turn on rate limit for requests
+        
+        rate_limit_min : int
+            Minimum time between requests in seconds
+        
+        rate_limit_max : int
+            Maximum time between requests in seconds
 
         Notes
         -----
         Either `local` must be supplied, or `url`, `key` and at least one of
         `id` or `pid` must be supplied
+        
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
 
         '''
-
+        #pylint disable=too-many-instance-attributes
         #self.url = self.__clean_url(url)
         self.headers = UAHEADER.copy()
         self.kwargs = kwargs
+        self.limit = RateLimiter(**kwargs)
         if self.kwargs.get('key'):
             self.headers.update({'X-Dataverse-key':self.kwargs['key']})
         self.local = None
@@ -1235,6 +1340,7 @@ class FileAnalysis(dict):
         start = datetime.datetime.now()
         params = {'format':'original'}
         url = self.__clean_url(self.kwargs['url'])
+        self.limit.rate_limit()
         if self.kwargs.get('pid'):
             params.update({'persistentId':self.kwargs['pid']})
             data = self.session.get(f'{url}/api/access/datafile/:persistentId',
@@ -1255,7 +1361,9 @@ class FileAnalysis(dict):
             filesize = self.kwargs.get('filesize_bytes',
                                        data.headers.get('content-length', 9e9))
             filesize = int(filesize) # comes out as string from header
-            with tqdm.tqdm(total=filesize, unit='B', unit_scale=True, desc=self.filename) as t:
+            with tqdm.tqdm(total=filesize, unit='B', unit_scale=True,
+                           desc=self.filename, leave=False,
+                           bar_format=BAR_FORMAT) as t:
                 for _ in data.iter_content(block_size):
                     self.tempfile.file.write(_)
                     t.update(len(_))
