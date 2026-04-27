@@ -20,3 +20,7 @@ lib/**
 include/
 include/**
 site/**
+tests/all_versions_lfs.json
+tests/backup.json
+tests/fields.json
+tests/tmp.json

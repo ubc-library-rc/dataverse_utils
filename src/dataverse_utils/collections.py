@@ -404,7 +404,7 @@ class StudyMetadata(dict):
                            requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.limit = RateLimiter(**kwargs)
         self.study_meta  = kwargs.get('study_meta')
-        self.all_versions = None
+        self.all_versions = kwargs.get('all_versions')
         self.url = kwargs.get('url')
         self.pid = kwargs.get('pid')
         #If only there would be an easy way to check if something was deaccessioned
@@ -416,9 +416,12 @@ class StudyMetadata(dict):
             #                         f"{self.study_meta['data']['authority']}"
             #                         f"/{self.study_meta['data']['identifier']}") if not
             #                         self.pid else self.pid)
-            self.pid = (f"{self.study_meta['data']['protocol']}:"
-                        f"{self.study_meta['data']['authority']}"
-                        f"/{self.study_meta['data']['identifier']}")
+            try:
+                self.pid = (f"{self.study_meta['data']['protocol']}:"
+                            f"{self.study_meta['data']['authority']}"
+                            f"/{self.study_meta['data']['identifier']}")
+            except (KeyError,) as e:
+                raise MetadataError(f'Key error: {e}') from e
 
         self.headers = UAHEADER.copy()
         if not (('study_meta' in kwargs) or ('url' in kwargs and 'pid' in kwargs)):
