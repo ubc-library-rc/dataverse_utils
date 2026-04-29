@@ -24,7 +24,9 @@ In alphabetical order:
 A recursive file metadata utility. You can specify the head of a tree and the harvester will harvest either the \[latest\] or *all* study metadata, including files. Output consists of either two text files (TSV or custom separator) or a single SQLite3 database. It is also possible to harvest the metadata of a single item. An API key currently required.
 
 ```nohighlight
-usage: dv_collection_info [-h] [-u URL] [-k KEY] [-d DELIMITER] [-i] [-s] (-c COLLECTION | -p PID) [-v] output
+usage: dv_collection_info [-h] [-u URL] [-k KEY] [-d DELIMITER] [-i] [-s] [-l LOG] [--log-level LOG_LEVEL] [--rate-limit-off] [--rate-limit-min RATE_LIMIT_MIN]
+                          [--rate-limit-max RATE_LIMIT_MAX] (-c COLLECTION | -p PID) [-v]
+                          output
 
  Recursively parses a dataverse collection and outputs study and file metadata
 for the latest version.  If analyzing publicly available collections, a
@@ -45,10 +47,20 @@ options:
   -i, --include-all-versions
                         Include *all** versions, not just the current version
   -s, --sqlite          Save output as SQLite3 database
+  -l, --log LOG          If you would like a log, provide a log file name here. If no file name is
+                        provided, no log is created.
+  --log-level LOG_LEVEL
+                         Log level. Acceptable values for log level are: debug, info, warning, error,
+                        critical. Default value: warning.
+  --rate-limit-off      Turn off rate limiter. Requests are randomly between min and max. Default is ON.
+  --rate-limit-min RATE_LIMIT_MIN
+                        Minimum time before requests in seconds. Default 0.25
+  --rate-limit-max RATE_LIMIT_MAX
+                        Maximum time between requests in seconds: Default 1
   -v, --version         Show version number and exit
 
 Harvest options:
-   You can obtain info for *either* a recursive crawl of a collection
+  You can obtain info for *either* a recursive crawl of a collection
   (-c, --collection) OR for a single Dataverse study (-p, --pid). These
   arguments are mutually exclusive.
 
