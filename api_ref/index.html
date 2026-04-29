@@ -108,8 +108,6 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.dvdata.Study">Study</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.__add_email">__add_email</a>
-    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.__init__">__init__</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.fix_licence">fix_licence</a>
@@ -146,9 +144,7 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.ldc.Ldc.__init__">__init__</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.ldc.Ldc.__no_intro">__no_intro</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.ldc.Ldc.fetch_record">fetch_record</a>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.ldc.Ldc.fetch_ldc_record">fetch_ldc_record</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.ldc.Ldc.find_block_index">find_block_index</a>
     </li>
@@ -170,9 +166,7 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.collections.DvCollection">DvCollection</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.DvCollection.__clean_url">__clean_url</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.DvCollection.__get_shortname">__get_shortname</a>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.DvCollection.root">root</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.DvCollection.__init__">__init__</a>
     </li>
@@ -188,21 +182,11 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis">FileAnalysis</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.__whichfile">__whichfile</a>
-    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.md">md</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.__check">__check</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.__clean_url">__clean_url</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.__del__">__del__</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.__get_filename">__get_filename</a>
-    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.__init__">__init__</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.__sufficient">__sufficient</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.download">download</a>
     </li>
@@ -210,11 +194,21 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.generic_metadata">generic_metadata</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.get_encoding">get_encoding</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.FileAnalysis.stat_file_metadata">stat_file_metadata</a>
     </li>
         </ul>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.collections.MetadataError">MetadataError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.collections.RateLimiter">RateLimiter</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.RateLimiter.__init__">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.RateLimiter.rate_limit">rate_limit</a>
+    </li>
+        </ul>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.collections.ReadmeCreator">ReadmeCreator</a>
         <ul>
@@ -222,9 +216,7 @@
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.ReadmeCreator.readme_md">readme_md</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.ReadmeCreator.__fix_relation_type">__fix_relation_type</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.ReadmeCreator.__html_to_md">__html_to_md</a>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.ReadmeCreator.readme_pdf">readme_pdf</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.ReadmeCreator.__init__">__init__</a>
     </li>
@@ -248,23 +240,27 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata">StudyMetadata</a>
         <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.all_files">all_files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.current_version">current_version</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.files">files</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.__extract_files">__extract_files</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.__extract_licence_info">__extract_licence_info</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.__has_metadata">__has_metadata</a>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.versions">versions</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.__init__">__init__</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.__obtain_metadata">__obtain_metadata</a>
-    </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.__version">__version</a>
-    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.extract_field_metadata">extract_field_metadata</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.extract_files">extract_files</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.extract_metadata">extract_metadata</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.flatten">flatten</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.version_files">version_files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.collections.StudyMetadata.version_metadata">version_metadata</a>
     </li>
         </ul>
     </li>
@@ -336,7 +332,7 @@
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -362,8 +358,8 @@
               Bases: <code><span title="Exception">Exception</span></code></p>
 
 
-        <p>Raised on non-200 URL response</p>
 
+        <p>Raised on non-200 URL response</p>
 
 
 
@@ -380,6 +376,7 @@
               </details>
 
     </div>
+
 
 </div>
 
@@ -399,8 +396,8 @@
               Bases: <code><span title="Exception">Exception</span></code></p>
 
 
-        <p>Raised on md5 mismatch</p>
 
+        <p>Raised on md5 mismatch</p>
 
 
 
@@ -417,6 +414,7 @@
               </details>
 
     </div>
+
 
 </div>
 
@@ -474,7 +472,7 @@
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def check_lock(dv_url, study, apikey) -&gt; bool:
     '''
@@ -613,7 +611,7 @@ Acceptable values:
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def dump_tsv(start_dir, filename, in_list=None,
              **kwargs):
@@ -722,7 +720,7 @@ Acceptable values:
 </code></pre>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def file_path(fpath, trunc='') -&gt; str:
     '''
@@ -841,7 +839,7 @@ Default: True</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def force_notab_unlock(study, dv_url, fid, apikey, try_uningest=True) -&gt; int:
     '''
@@ -1016,7 +1014,7 @@ your data</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def make_tsv(start_dir, in_list=None, def_tag='Data',
              inc_header=True,
@@ -1217,7 +1215,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
   <p>One of <code>pid</code> or <code>fid</code> is <strong>required</strong></p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def restrict_file(**kwargs):
     '''
@@ -1313,7 +1311,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/__init__.py</code></summary>
               <pre class="codehilite"><code class="language-python">def script_ver_stmt(name:str)-&gt;str:
     '''
@@ -1401,7 +1399,7 @@ Requires superuser API key.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def uningest_file(dv_url, fid, apikey, study='n/a'):
     '''
@@ -1622,7 +1620,7 @@ unzipping function.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def upload_file(fpath, hdl, **kwargs):
     '''
@@ -1874,7 +1872,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
               <pre class="codehilite"><code class="language-python">def upload_from_tsv(fil, hdl, **kwargs):
     '''
@@ -1983,7 +1981,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -2009,8 +2007,8 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
               Bases: <code><span title="dict">dict</span></code></p>
 
 
-        <p>Class representing a file on a Dataverse instance</p>
 
+        <p>Class representing a file on a Dataverse instance</p>
 
 
 
@@ -2164,7 +2162,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -2238,7 +2236,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
 <p>Not to be confused with the FileAnalysis object in <code>dataverse_utils.collections</code>.</p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __init__(self, url:str, key:str,
              **kwargs):
@@ -2296,7 +2294,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
         <p>Delete tempfile if it exists</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def del_tempfile(self):
     '''
@@ -2327,7 +2325,7 @@ eg: &lsquo;https://abacus.library.ubc.ca&rsquo;</p>
 not Dataverse-processed TSVs</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def download_file(self):
     '''
@@ -2414,7 +2412,7 @@ Default: &lsquo;md5&rsquo;</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def produce_digest(self, prot: str = 'md5', blocksize: int = 2**16) -&gt; str:
     '''
@@ -2475,7 +2473,7 @@ Default: &lsquo;md5&rsquo;</p>
         <p>Compares actual checksum with stated checksum</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def verify(self)-&gt;None:
     '''
@@ -2506,6 +2504,7 @@ Default: &lsquo;md5&rsquo;</p>
 
     </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
@@ -2524,9 +2523,9 @@ Default: &lsquo;md5&rsquo;</p>
               Bases: <code><span title="dict">dict</span></code></p>
 
 
+
         <p>An object representing all of a dataverse study&rsquo;s files.
 Easily parseable as a dict.</p>
-
 
 
 
@@ -2692,7 +2691,7 @@ Easily parseable as a dict.</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -2792,7 +2791,7 @@ Or if the platform policy requires an API key.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __init__(self, **kwargs)-&gt;None:
     '''
@@ -2835,6 +2834,7 @@ Or if the platform policy requires an API key.</p>
 
     </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
@@ -2853,9 +2853,9 @@ Or if the platform policy requires an API key.</p>
               Bases: <code><span title="dict">dict</span></code></p>
 
 
+
         <p>Dataverse record. Dataverse study records are pure metadata so this
 is represented with a dictionary.</p>
-
 
 
 
@@ -3096,7 +3096,7 @@ is represented with a dictionary.</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -3106,73 +3106,6 @@ is represented with a dictionary.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.dvdata.Study.__add_email" class="doc doc-heading">
-            <code class=" language-python">__add_email(upjson)</code>
-
-<a href="#dataverse_utils.dvdata.Study.__add_email" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Adds contact information if it&rsquo;s not there. Fills with dummy data</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>upjson</code></b>
-                  (<code><span title="dict">dict</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>Metadata</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __add_email(self, upjson):
-    '''
-    Adds contact information if it's not there. Fills with dummy data
-
-    Parameters
-    ----------
-    upjson : dict
-        Metadata
-    '''
-    #pylint: disable=possibly-used-before-assignment
-    for n, v in enumerate((upjson['datasetVersion']
-                          ['metadataBlocks']['citation']['fields'])):
-        if v['typeName'] == 'datasetContact':
-            contact_no = n
-    for _x in (upjson['datasetVersion']['metadataBlocks']
-              ['citation']['fields'][contact_no]['value']):
-        if not _x.get('datasetContactEmail'):
-            _x['datasetContactEmail'] = {'typeName':'datasetContactEmail',
-                                          'multiple': False,
-                                          'typeClass':'primitive',
-                                          'value': 'suppressed_value@test.invalid'}
-    return upjson</code></pre>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -3262,7 +3195,7 @@ is represented with a dictionary.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __init__(self, pid: str,
              url:str, key:str,
@@ -3331,7 +3264,7 @@ non-standard licences may be replaced with None.</p>
 <p>This function edits the same Study object <em>in place</em>, so returns nothing.</p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def fix_licence(self)-&gt;None:
     '''
@@ -3412,7 +3345,7 @@ ie, version 5.9.2 would be 5.009002</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">@classmethod
 def get_version(cls, url:str, timeout:int=100)-&gt;float:
@@ -3473,7 +3406,7 @@ Study[&lsquo;upload_json&rsquo;] Changes are done
   <p>Multiple production places came into effect with Dataverse v5.13</p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def production_location(self)-&gt;None:
     '''
@@ -3558,7 +3491,7 @@ formats self[&lsquo;upload_json&rsquo;] to correct JSON format</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
               <pre class="codehilite"><code class="language-python">def set_version(self, url:str, timeout:int=100)-&gt;None:
     '''
@@ -3589,6 +3522,7 @@ formats self[&lsquo;upload_json&rsquo;] to correct JSON format</p>
   </div>
 
     </div>
+
 
 </div>
 
@@ -3625,7 +3559,7 @@ website page.</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -3651,8 +3585,8 @@ website page.</p>
               Bases: <code><span title="dryad2dataverse.serializer.Serializer">Serializer</span></code></p>
 
 
-        <p>An LDC item (eg, LDC2021T01)</p>
 
+        <p>An LDC item (eg, LDC2021T01)</p>
 
 
 
@@ -3667,7 +3601,7 @@ website page.</p>
     An LDC item (eg, LDC2021T01)
     '''
     #pylint: disable=super-init-not-called, arguments-differ
-    def __init__(self, ldc, cert=None):
+    def __init__(self, ldc, cert=None, **kwargs):
         '''
         Returns a dict with keys created from an LDC catalogue web
         page.
@@ -3692,10 +3626,11 @@ website page.</p>
         self.cert = cert
         self.session = requests.Session()
         self.session.mount('https://',
-                           HTTPAdapter(max_retries=ds.constants.RETRY_STRATEGY))
+                           HTTPAdapter(max_retries=dc.RETRY_STRATEGY))
         if self.cert:
             self.cert = os.path.expanduser(self.cert)
         self.__fixdesc = None
+        self.kwargs = kwargs
 
     @property
     def ldcJson(self):
@@ -3758,7 +3693,7 @@ website page.</p>
         '''
         #pylint: disable=property-with-parameters
         if not maxsize:
-            maxsize = ds.constants.MAX_UPLOAD
+            maxsize = self.kwargs.get('max_upload', 68719476736)
 
     @property
     def id(self):
@@ -3767,7 +3702,7 @@ website page.</p>
         '''
         return self.ldc
 
-    def fetch_record(self, timeout=45):
+    def fetch_ldc_record(self, timeout=45):
         '''
         Downloads record from LDC website
 
@@ -3788,7 +3723,7 @@ website page.</p>
         page.
         '''
         if not self.ldcHtml:
-            self.fetch_record()
+            self.fetch_ldc_record()
         soup = bs(self.ldcHtml, 'html.parser')
         #Should data just look in the *first* table? Specifically tbody?
         #Is it always the first? I assume yes.
@@ -4134,7 +4069,7 @@ website page.</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -4351,7 +4286,7 @@ website page.</p>
 
 
 <h4 id="dataverse_utils.ldc.Ldc.__init__" class="doc doc-heading">
-            <code class=" language-python">__init__(ldc, cert=None)</code>
+            <code class=" language-python">__init__(ldc, cert=None, **kwargs)</code>
 
 <a href="#dataverse_utils.ldc.Ldc.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -4400,9 +4335,9 @@ path to the .pem with this parameter</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __init__(self, ldc, cert=None):
+              <pre class="codehilite"><code class="language-python">def __init__(self, ldc, cert=None, **kwargs):
     '''
     Returns a dict with keys created from an LDC catalogue web
     page.
@@ -4427,10 +4362,11 @@ path to the .pem with this parameter</p>
     self.cert = cert
     self.session = requests.Session()
     self.session.mount('https://',
-                       HTTPAdapter(max_retries=ds.constants.RETRY_STRATEGY))
+                       HTTPAdapter(max_retries=dc.RETRY_STRATEGY))
     if self.cert:
         self.cert = os.path.expanduser(self.cert)
-    self.__fixdesc = None</code></pre>
+    self.__fixdesc = None
+    self.kwargs = kwargs</code></pre>
             </details>
     </div>
 
@@ -4439,50 +4375,10 @@ path to the .pem with this parameter</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="dataverse_utils.ldc.Ldc.__no_intro" class="doc doc-heading">
-            <code class=" language-python">__no_intro()</code>
+<h4 id="dataverse_utils.ldc.Ldc.fetch_ldc_record" class="doc doc-heading">
+            <code class=" language-python">fetch_ldc_record(timeout=45)</code>
 
-<a href="#dataverse_utils.ldc.Ldc.__no_intro" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Makes an introduction even if they forgot to include the word &ldquo;Introduction&rdquo;</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __no_intro(self)-&gt;str:
-    '''
-    Makes an introduction even if they forgot to include the word "Introduction"
-    '''
-    #self.__fixdesc is set in make_ldc_json
-    intro = [x for x in self.__fixdesc if
-             self.__fixdesc[0]['itemprop']=='description'][0]
-    while intro.find('div'): #nested?, not cleaning properly
-        intro.find('div').unwrap() # remove the div tag
-    intro = str(intro)
-    #Normally, there's an &lt;h3&gt;Introduction&lt;/h3&gt; but sometimes there's not
-    #Assumes that the first section up to "&lt;h" is an intro.
-    #You know what they say about assuming
-    intro = intro[:intro.find('&lt;h')]
-    start = intro.find('&lt;div')
-    if start != -1:
-        end = intro.find('&gt;',start)+1
-        intro = intro.replace(intro[start:end], '').strip()
-    return intro</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.ldc.Ldc.fetch_record" class="doc doc-heading">
-            <code class=" language-python">fetch_record(timeout=45)</code>
-
-<a href="#dataverse_utils.ldc.Ldc.fetch_record" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#dataverse_utils.ldc.Ldc.fetch_ldc_record" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
@@ -4516,9 +4412,9 @@ path to the .pem with this parameter</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def fetch_record(self, timeout=45):
+              <pre class="codehilite"><code class="language-python">def fetch_ldc_record(self, timeout=45):
     '''
     Downloads record from LDC website
 
@@ -4587,7 +4483,7 @@ path to the .pem with this parameter</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
               <pre class="codehilite"><code class="language-python">@staticmethod
 def find_block_index(dvjson, key):
@@ -4652,7 +4548,7 @@ def find_block_index(dvjson, key):
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
               <pre class="codehilite"><code class="language-python">def make_dryad_json(self, ldc=None):
     '''
@@ -4738,7 +4634,7 @@ def find_block_index(dvjson, key):
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
               <pre class="codehilite"><code class="language-python">def make_dv_json(self, ldc=None):#pylint: disable=too-many-locals, too-many-statements
     '''
@@ -4871,7 +4767,7 @@ def find_block_index(dvjson, key):
 page.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
               <pre class="codehilite"><code class="language-python">def make_ldc_json(self):
     '''
@@ -4879,7 +4775,7 @@ page.</p>
     page.
     '''
     if not self.ldcHtml:
-        self.fetch_record()
+        self.fetch_ldc_record()
     soup = bs(self.ldcHtml, 'html.parser')
     #Should data just look in the *first* table? Specifically tbody?
     #Is it always the first? I assume yes.
@@ -4992,7 +4888,7 @@ page.</p>
 say, 80% is good enough.</p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
               <pre class="codehilite"><code class="language-python">@staticmethod
 def name_parser(name):
@@ -5097,7 +4993,7 @@ connection attempt.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/ldc.py</code></summary>
               <pre class="codehilite"><code class="language-python">def upload_metadata(self, **kwargs) -&gt; dict:
     '''
@@ -5147,6 +5043,7 @@ connection attempt.</p>
 
     </div>
 
+
 </div>
 
 
@@ -5181,7 +5078,7 @@ connection attempt.</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -5205,8 +5102,8 @@ connection attempt.</p>
     <div class="doc doc-contents ">
 
 
-        <p>Metadata for an <em>entire</em> dataverse collection, recursively.</p>
 
+        <p>Metadata for an <em>entire</em> dataverse collection, recursively.</p>
 
 
 
@@ -5243,7 +5140,29 @@ connection attempt.</p>
         ----------------
         timeout : int
             retry timeout in seconds
+
+        rate_limit_on: bool
+            Turn on rate limit for requests
+
+        rate_limit_min : int
+            Minimum time between requests in seconds
+
+        rate_limit_max : int
+            Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
+
+        Notes
+        -----
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
+
         '''
+        self.kwargs = kwargs
+        self.limit = RateLimiter(**kwargs)
         self.coll = coll
         self.url = self.__clean_url(url)
         self.headers = None
@@ -5257,11 +5176,27 @@ connection attempt.</p>
             self.retry_strategy = RETRY
         else:
             self.retry_strategy = kwargs['retry']
-        self.session = requests.Session()
-        self.session.mount('https://',
-                           requests.adapters.HTTPAdapter(max_retries=self.retry_strategy))
         self.collections = None
+        self.session = kwargs.get('session', requests.Session())
+        self.session.mount('https://',
+                           requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.studies = None
+        self.__root = None
+        self.all_colls = [self.root]
+
+    @property
+    def root(self):
+        '''
+        Return the name and short name of the top level collection
+        '''
+        if not self.__root:
+            self.limit.rate_limit()
+            x = self.session.get(f'{self.url}/api/dataverses/{self.coll}',
+                                 headers=self.headers,
+                                 timeout=self.kwargs.get('timeout', 15))
+            x.raise_for_status()
+            self.__root = (x.json()['data']['name'], x.json()['data']['alias'])
+        return self.__root
 
     def __clean_url(self, badurl:str):
         '''
@@ -5282,11 +5217,14 @@ connection attempt.</p>
         '''
         Get collection short name.
         '''
-        shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}', headers=self.headers)
+        self.limit.rate_limit()
+        shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}',
+                                     headers=self.headers,
+                                     timeout=self.kwargs.get('timeout', 15))
         shortname.raise_for_status()
         return shortname.json()['data']['alias']
 
-    def get_collections(self, coll:str=None, output=None, **kwargs)-&gt;list:#pylint: disable=unused-argument
+    def get_collections(self, coll:str=None, output=None)-&gt;list:#pylint: disable=unused-argument
         '''
         Get a [recursive] listing of all dataverses in a collection.
 
@@ -5296,16 +5234,15 @@ connection attempt.</p>
             Collection short name or id
         output : list, optional, default=[]
             output list to append to
-        **kwargs : dict
-            Other keyword arguments
-
         '''
         if not output:
             output = []
         if not coll:
             coll = self.coll
+        self.limit.rate_limit()
         x = self.session.get(f'{self.url}/api/dataverses/{coll}/contents',
-                                 headers=self.headers)
+                                headers=self.headers,
+                                timeout=self.kwargs.get('timeout', 15))
         data = x.json().get('data')
         #---
         #Because it's possible that permissions errors can cause API read errors,
@@ -5319,7 +5256,6 @@ connection attempt.</p>
                     out=self.__get_shortname(_['id'])
                     dvs.append((_['title'], out))
                 except Exception as e:
-
                     obscure_error = f'''
                                         An error has occured where a collection can be
                                         identified by ID but its name cannot be determined.
@@ -5332,12 +5268,13 @@ connection attempt.</p>
 
                                         Problematic collection id number: {_.get("id",
                                         "not available")}'''
-                    print(50*'-')
-                    print(textwrap.dedent(obscure_error))
+                    #to sys.stdout?
+                    print(50*'-', file=sys.stderr)
+                    print(textwrap.dedent(obscure_error), file=sys.stderr)
                     print(e)
                     LOGGER.error(textwrap.fill(textwrap.dedent(obscure_error).strip()))
                     traceback.print_exc()
-                    print(50*'-')
+                    print(50*'-', file=sys.stderr)
                     raise e
         #---
         if not dvs:
@@ -5348,6 +5285,8 @@ connection attempt.</p>
             LOGGER.debug('recursive')
             self.get_collections(dv[1], output)
         self.collections = output
+        if self.root not in self.collections:
+            self.collections.insert(0, self.root)
         return output
 
     def get_studies(self, root:str=None):
@@ -5362,10 +5301,15 @@ connection attempt.</p>
         all_studies = []
         if not root:
             root=self.coll
-        all_studies = self.get_collection_listing(root)
-        #collections = self.get_collections(root, self.url)
+        #Redundant, as root is now added to get_collections
+        #all_studies = self.get_collection_listing(root)
+        all_studies = []
         collections = self.get_collections(root)
-        for collection in collections:
+        for collection in tqdm.tqdm(collections,
+                             desc='collections',
+                             unit='collection',
+                             leave=False,
+                             bar_format=BAR_FORMAT):
             all_studies.extend(self.get_collection_listing(collection[1]))
         self.studies = all_studies
         return all_studies
@@ -5379,17 +5323,31 @@ connection attempt.</p>
         coll_id : str
             Short name or id of a dataverse collection
         '''
+        self.limit.rate_limit()
         cl = self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents',
-                                  headers=self.headers)
+                               headers=self.headers,
+                               timeout=self.kwargs.get('timeout', 15))
         cl.raise_for_status()
         pids = [f"{z['protocol']}:{z['authority']}/{z['identifier']}"
                 for z in cl.json()['data'] if z['type'] == 'dataset']
-        out = [(self.get_study_info(pid), pid) for pid in pids]
+        #Pass collection info into the study because that's not available from
+        #a metadata download
+        smkwargs = [{'collection_name':_[0] , 'collection_short_name':_[1]}
+                    for _ in self.collections if coll_id == _[1]][0]
+        #out = [(self.get_study_info(pid, **smkwargs), pid) for pid in pids]
+        out = []
+        for pid in tqdm.tqdm(pids,
+                             desc=smkwargs.get('collection_short_name', 'collection'),
+                             unit='study',
+                             leave=False,
+                             colour='red',
+                             bar_format=BAR_FORMAT):
+            out.append((self.get_study_info(pid, **smkwargs), pid))
         for _ in out:
             _[0].update({'pid': _[1]})
         return [x[0] for x in out]
 
-    def get_study_info(self, pid):
+    def get_study_info(self, pid, **kwargs):
         '''
         Returns a StudyMetadata object with complete metadata for a study.
 
@@ -5397,18 +5355,24 @@ connection attempt.</p>
         ----------
         pid : str
             Persistent ID of a Dataverse study
+
+        **kwargs
+            Other useful information to pass onto StudyMetadata, such as collection info, etc.
         '''
+        self.limit.rate_limit()
         meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                            params={'persistentId': pid},
-                            headers=self.headers)
+                                params={'persistentId': pid},
+                                headers=self.headers,
+                                timeout=self.kwargs.get('timeout', 15))
         meta.raise_for_status()
         LOGGER.debug(pid)
-        return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url)</code></pre>
+        return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url,
+                             session=self.session, **kwargs)</code></pre>
               </details>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -5416,95 +5380,30 @@ connection attempt.</p>
 
 
 
+<div class="doc doc-object doc-attribute">
 
 
 
-<div class="doc doc-object doc-function">
+<h4 id="dataverse_utils.collections.DvCollection.root" class="doc doc-heading">
+            <code class=" language-python">root</code>
 
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
-<h4 id="dataverse_utils.collections.DvCollection.__clean_url" class="doc doc-heading">
-            <code class=" language-python">__clean_url(badurl)</code>
-
-<a href="#dataverse_utils.collections.DvCollection.__clean_url" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Sanitize URL, return properly formatted HTTP string.</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>badurl</code></b>
-                  (<code><span title="str">str</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>URL string</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __clean_url(self, badurl:str):
-    '''
-    Sanitize URL, return properly formatted HTTP string.
-
-    Parameters
-    ----------
-    badurl: str
-        URL string
-
-    '''
-    clean = badurl.strip().strip('/')
-    if not clean.startswith('https://'):
-        clean = f'https://{clean}'
-    return clean</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.DvCollection.__get_shortname" class="doc doc-heading">
-            <code class=" language-python">__get_shortname(dvid)</code>
-
-<a href="#dataverse_utils.collections.DvCollection.__get_shortname" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#dataverse_utils.collections.DvCollection.root" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Get collection short name.</p>
+        <p>Return the name and short name of the top level collection</p>
 
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __get_shortname(self, dvid):
-    '''
-    Get collection short name.
-    '''
-    shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}', headers=self.headers)
-    shortname.raise_for_status()
-    return shortname.json()['data']['alias']</code></pre>
-            </details>
     </div>
 
 </div>
+
+
+
 
 <div class="doc doc-object doc-function">
 
@@ -5589,13 +5488,52 @@ eg: https://borealisdata.ca
                 <p>retry timeout in seconds</p>
               </div>
             </li>
+            <li>
+              <b><code>rate_limit_on</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Turn on rate limit for requests</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_min</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Minimum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_max</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Maximum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>session</code></b>
+                  (<code><span title="requests.Session">Session</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>A requests session if available, to help
+ensure against having too many open connections</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
 
-            <details class="quote">
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>The rate limiter will wait for a random interval between
+rate_limit_min and rate_limit_max. Obviously, if you want
+a constant interval, set them to be equal.</p>
+</details>
+
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __init__(self, url:str, coll:str, key=None, **kwargs):
     '''
@@ -5619,7 +5557,29 @@ eg: https://borealisdata.ca
     ----------------
     timeout : int
         retry timeout in seconds
+
+    rate_limit_on: bool
+        Turn on rate limit for requests
+
+    rate_limit_min : int
+        Minimum time between requests in seconds
+
+    rate_limit_max : int
+        Maximum time between requests in seconds
+
+    session : requests.Session
+        A requests session if available, to help
+        ensure against having too many open connections
+
+    Notes
+    -----
+    The rate limiter will wait for a random interval between
+    rate_limit_min and rate_limit_max. Obviously, if you want
+    a constant interval, set them to be equal.
+
     '''
+    self.kwargs = kwargs
+    self.limit = RateLimiter(**kwargs)
     self.coll = coll
     self.url = self.__clean_url(url)
     self.headers = None
@@ -5633,11 +5593,13 @@ eg: https://borealisdata.ca
         self.retry_strategy = RETRY
     else:
         self.retry_strategy = kwargs['retry']
-    self.session = requests.Session()
-    self.session.mount('https://',
-                       requests.adapters.HTTPAdapter(max_retries=self.retry_strategy))
     self.collections = None
-    self.studies = None</code></pre>
+    self.session = kwargs.get('session', requests.Session())
+    self.session.mount('https://',
+                       requests.adapters.HTTPAdapter(max_retries=RETRY))
+    self.studies = None
+    self.__root = None
+    self.all_colls = [self.root]</code></pre>
             </details>
     </div>
 
@@ -5681,7 +5643,7 @@ eg: https://borealisdata.ca
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def get_collection_listing(self, coll_id):
     '''
@@ -5692,12 +5654,26 @@ eg: https://borealisdata.ca
     coll_id : str
         Short name or id of a dataverse collection
     '''
+    self.limit.rate_limit()
     cl = self.session.get(f'{self.url}/api/dataverses/{coll_id}/contents',
-                              headers=self.headers)
+                           headers=self.headers,
+                           timeout=self.kwargs.get('timeout', 15))
     cl.raise_for_status()
     pids = [f"{z['protocol']}:{z['authority']}/{z['identifier']}"
             for z in cl.json()['data'] if z['type'] == 'dataset']
-    out = [(self.get_study_info(pid), pid) for pid in pids]
+    #Pass collection info into the study because that's not available from
+    #a metadata download
+    smkwargs = [{'collection_name':_[0] , 'collection_short_name':_[1]}
+                for _ in self.collections if coll_id == _[1]][0]
+    #out = [(self.get_study_info(pid, **smkwargs), pid) for pid in pids]
+    out = []
+    for pid in tqdm.tqdm(pids,
+                         desc=smkwargs.get('collection_short_name', 'collection'),
+                         unit='study',
+                         leave=False,
+                         colour='red',
+                         bar_format=BAR_FORMAT):
+        out.append((self.get_study_info(pid, **smkwargs), pid))
     for _ in out:
         _[0].update({'pid': _[1]})
     return [x[0] for x in out]</code></pre>
@@ -5710,7 +5686,7 @@ eg: https://borealisdata.ca
 
 
 <h4 id="dataverse_utils.collections.DvCollection.get_collections" class="doc doc-heading">
-            <code class=" language-python">get_collections(coll=None, output=None, **kwargs)</code>
+            <code class=" language-python">get_collections(coll=None, output=None)</code>
 
 <a href="#dataverse_utils.collections.DvCollection.get_collections" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -5750,25 +5726,15 @@ eg: https://borealisdata.ca
                 <p>output list to append to</p>
               </div>
             </li>
-            <li>
-              <b><code>**kwargs</code></b>
-                  (<code><span title="dict">dict</span></code>, default:
-                      <code>{}</code>
-)
-              –
-              <div class="doc-md-description">
-                <p>Other keyword arguments</p>
-              </div>
-            </li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def get_collections(self, coll:str=None, output=None, **kwargs)-&gt;list:#pylint: disable=unused-argument
+              <pre class="codehilite"><code class="language-python">def get_collections(self, coll:str=None, output=None)-&gt;list:#pylint: disable=unused-argument
     '''
     Get a [recursive] listing of all dataverses in a collection.
 
@@ -5778,16 +5744,15 @@ eg: https://borealisdata.ca
         Collection short name or id
     output : list, optional, default=[]
         output list to append to
-    **kwargs : dict
-        Other keyword arguments
-
     '''
     if not output:
         output = []
     if not coll:
         coll = self.coll
+    self.limit.rate_limit()
     x = self.session.get(f'{self.url}/api/dataverses/{coll}/contents',
-                             headers=self.headers)
+                            headers=self.headers,
+                            timeout=self.kwargs.get('timeout', 15))
     data = x.json().get('data')
     #---
     #Because it's possible that permissions errors can cause API read errors,
@@ -5801,7 +5766,6 @@ eg: https://borealisdata.ca
                 out=self.__get_shortname(_['id'])
                 dvs.append((_['title'], out))
             except Exception as e:
-
                 obscure_error = f'''
                                     An error has occured where a collection can be
                                     identified by ID but its name cannot be determined.
@@ -5814,12 +5778,13 @@ eg: https://borealisdata.ca
 
                                     Problematic collection id number: {_.get("id",
                                     "not available")}'''
-                print(50*'-')
-                print(textwrap.dedent(obscure_error))
+                #to sys.stdout?
+                print(50*'-', file=sys.stderr)
+                print(textwrap.dedent(obscure_error), file=sys.stderr)
                 print(e)
                 LOGGER.error(textwrap.fill(textwrap.dedent(obscure_error).strip()))
                 traceback.print_exc()
-                print(50*'-')
+                print(50*'-', file=sys.stderr)
                 raise e
     #---
     if not dvs:
@@ -5830,6 +5795,8 @@ eg: https://borealisdata.ca
         LOGGER.debug('recursive')
         self.get_collections(dv[1], output)
     self.collections = output
+    if self.root not in self.collections:
+        self.collections.insert(0, self.root)
     return output</code></pre>
             </details>
     </div>
@@ -5876,7 +5843,7 @@ eg: https://borealisdata.ca
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def get_studies(self, root:str=None):
     '''
@@ -5890,10 +5857,15 @@ eg: https://borealisdata.ca
     all_studies = []
     if not root:
         root=self.coll
-    all_studies = self.get_collection_listing(root)
-    #collections = self.get_collections(root, self.url)
+    #Redundant, as root is now added to get_collections
+    #all_studies = self.get_collection_listing(root)
+    all_studies = []
     collections = self.get_collections(root)
-    for collection in collections:
+    for collection in tqdm.tqdm(collections,
+                         desc='collections',
+                         unit='collection',
+                         leave=False,
+                         bar_format=BAR_FORMAT):
         all_studies.extend(self.get_collection_listing(collection[1]))
     self.studies = all_studies
     return all_studies</code></pre>
@@ -5906,7 +5878,7 @@ eg: https://borealisdata.ca
 
 
 <h4 id="dataverse_utils.collections.DvCollection.get_study_info" class="doc doc-heading">
-            <code class=" language-python">get_study_info(pid)</code>
+            <code class=" language-python">get_study_info(pid, **kwargs)</code>
 
 <a href="#dataverse_utils.collections.DvCollection.get_study_info" class="headerlink" title="Permanent link">&para;</a></h4>
 
@@ -5934,15 +5906,22 @@ eg: https://borealisdata.ca
                 <p>Persistent ID of a Dataverse study</p>
               </div>
             </li>
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Other useful information to pass onto StudyMetadata, such as collection info, etc.</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def get_study_info(self, pid):
+              <pre class="codehilite"><code class="language-python">def get_study_info(self, pid, **kwargs):
     '''
     Returns a StudyMetadata object with complete metadata for a study.
 
@@ -5950,13 +5929,19 @@ eg: https://borealisdata.ca
     ----------
     pid : str
         Persistent ID of a Dataverse study
+
+    **kwargs
+        Other useful information to pass onto StudyMetadata, such as collection info, etc.
     '''
+    self.limit.rate_limit()
     meta = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                        params={'persistentId': pid},
-                        headers=self.headers)
+                            params={'persistentId': pid},
+                            headers=self.headers,
+                            timeout=self.kwargs.get('timeout', 15))
     meta.raise_for_status()
     LOGGER.debug(pid)
-    return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url)</code></pre>
+    return StudyMetadata(study_meta=meta.json(), key=self.__key, url=self.url,
+                         session=self.session, **kwargs)</code></pre>
             </details>
     </div>
 
@@ -5967,6 +5952,7 @@ eg: https://borealisdata.ca
   </div>
 
     </div>
+
 
 </div>
 
@@ -5986,9 +5972,9 @@ eg: https://borealisdata.ca
               Bases: <code><span title="dict">dict</span></code></p>
 
 
+
         <p>Download and analyze a file from a dataverse installation and
 produce useful metadata.</p>
-
 
 
 
@@ -6003,7 +5989,7 @@ produce useful metadata.</p>
     Download and analyze a file from a dataverse installation and
     produce useful metadata.
     '''
-
+    #pylint: disable=too-many-instance-attributes
     def __init__(self, **kwargs):
         '''
         Intialize the object.
@@ -6024,7 +6010,7 @@ produce useful metadata.</p>
         key : str
             API key for downloading
 
-        fid : int
+        id : int
             Integer file id
 
         pid : str
@@ -6036,16 +6022,34 @@ produce useful metadata.</p>
         filesize_bytes : int
             File size in bytes
 
+        rate_limit_on: bool
+            Turn on rate limit for requests
+
+        rate_limit_min : int
+            Minimum time between requests in seconds
+
+        rate_limit_max : int
+            Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
+
         Notes
         -----
         Either `local` must be supplied, or `url`, `key` and at least one of
-        `fid` or `pid` must be supplied
+        `id` or `pid` must be supplied
+
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
 
         '''
-
+        #pylint disable=too-many-instance-attributes
         #self.url = self.__clean_url(url)
         self.headers = UAHEADER.copy()
         self.kwargs = kwargs
+        self.limit = RateLimiter(**kwargs)
         if self.kwargs.get('key'):
             self.headers.update({'X-Dataverse-key':self.kwargs['key']})
         self.local = None
@@ -6055,7 +6059,7 @@ produce useful metadata.</p>
                    '(pid or id)) or (local) keyword parameters.')
             raise TypeError(err)
         self.tempfile = None
-        self.session = requests.Session()
+        self.session = kwargs.get('session', requests.Session())
         self.session.mount('https://',
                            requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.checkable = {'.sav': self.stat_file_metadata,
@@ -6167,17 +6171,20 @@ produce useful metadata.</p>
         start = datetime.datetime.now()
         params = {'format':'original'}
         url = self.__clean_url(self.kwargs['url'])
+        self.limit.rate_limit()
         if self.kwargs.get('pid'):
             params.update({'persistentId':self.kwargs['pid']})
             data = self.session.get(f'{url}/api/access/datafile/:persistentId',
                                     headers=self.headers,
                                     params=params,
-                                    stream=True)
+                                    stream=True,
+                                    timeout=self.kwargs.get('timeout', 15))
         else:
             data = self.session.get(f'{url}/api/access/datafile/{self.kwargs["id"]}',
                                     headers=self.headers,
                                     params=params,
-                                    stream=True)
+                                    stream=True,
+                                    timeout=self.kwargs.get('timeout', 15))
         data.raise_for_status()
         finish = datetime.datetime.now()
         self.filename = self.__get_filename(data.headers)
@@ -6187,7 +6194,9 @@ produce useful metadata.</p>
             filesize = self.kwargs.get('filesize_bytes',
                                        data.headers.get('content-length', 9e9))
             filesize = int(filesize) # comes out as string from header
-            with tqdm.tqdm(total=filesize, unit='B', unit_scale=True, desc=self.filename) as t:
+            with tqdm.tqdm(total=filesize, unit='B', unit_scale=True,
+                           desc=self.filename, leave=False,
+                           bar_format=BAR_FORMAT) as t:
                 for _ in data.iter_content(block_size):
                     self.tempfile.file.write(_)
                     t.update(len(_))
@@ -6236,6 +6245,14 @@ produce useful metadata.</p>
         self.update(outmeta)
         return
 
+    def get_encoding(self, fpath):
+        '''
+        Return the encoding of a file so that pandas
+        won't crash. Hopefully.
+
+        fpath : str
+            file path
+        '''
 
     def generic_metadata(self, ext)-&gt;None:
         '''
@@ -6251,14 +6268,20 @@ produce useful metadata.</p>
         #    data = pd.read_csv(self.__whichfile, sep='\t')
         #else:
         #    data = pd.read_csv(self.__whichfile)
-
+        encme = {'.tsv': {'sep': '\t'},
+                 '.csv': {}}
+        if ext.lower() in encme:
+            with open(self.__whichfile, 'rb') as f:
+                encoding = {'encoding':'utf-8'}
+                encoding.update({'encoding':cn.detect(f.read()).get('encoding', 'utf-8')})
+                encme[ext.lower()].update(encoding)
         lookuptable ={'.tsv': {'func': pd.read_csv,
-                                'kwargs' : {'sep':'\t'}},
-                        '.csv': {'func' : pd.read_csv},
-                        '.rda': {'func' : pyreadr.read_r},
+                                'kwargs' : encme['.tsv']},
+                      '.csv': {'func' : pd.read_csv, 'kwargs' : encme['.csv']},
+                      '.rda': {'func' : pyreadr.read_r},
                        '.rdata':{'func' : pyreadr.read_r}}
         data = lookuptable[ext]['func'](self.__whichfile,
-                                              **lookuptable[ext].get('kwargs', {}))
+                                                  **lookuptable[ext].get('kwargs', {}))
         if ext  in ['.rda', '.rdata']:
             data = data[None] #why pyreadr why
         outmeta = {}
@@ -6302,35 +6325,13 @@ produce useful metadata.</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
 
 
 
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="dataverse_utils.collections.FileAnalysis.__whichfile" class="doc doc-heading">
-            <code class=" language-python">__whichfile</code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-<a href="#dataverse_utils.collections.FileAnalysis.__whichfile" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Returns the location of the path being analyzed.</p>
-
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-attribute">
 
@@ -6360,92 +6361,6 @@ produce useful metadata.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="dataverse_utils.collections.FileAnalysis.__check" class="doc doc-heading">
-            <code class=" language-python">__check()</code>
-
-<a href="#dataverse_utils.collections.FileAnalysis.__check" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Determines if this is one of the filetypes which supports extra metadata.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __check(self):
-    '''
-    Determines if this is one of the filetypes which supports extra metadata.
-    '''
-    if pathlib.Path(self.filename).suffix.lower() in self.checkable:
-        return True
-    return False</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.FileAnalysis.__clean_url" class="doc doc-heading">
-            <code class=" language-python">__clean_url(badurl)</code>
-
-<a href="#dataverse_utils.collections.FileAnalysis.__clean_url" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Sanitize URL. Ensures ssl and no trailing slash.</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>badurl</code></b>
-                  (<code><span title="str">str</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>URL</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __clean_url(self, badurl:str)-&gt;str:
-    '''
-    Sanitize URL. Ensures ssl and no trailing slash.
-
-    Parameters
-    ----------
-    badurl: str
-        URL
-    '''
-    clean = badurl.strip().strip('/')
-    if not clean.startswith('https://'):
-        clean = f'https://{clean}'
-    return clean</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="dataverse_utils.collections.FileAnalysis.__del__" class="doc doc-heading">
             <code class=" language-python">__del__()</code>
 
@@ -6457,7 +6372,7 @@ produce useful metadata.</p>
         <p>Cleanup old temporary files on object deletion.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __del__(self):
     '''
@@ -6465,100 +6380,6 @@ produce useful metadata.</p>
     '''
     self.session.close()
     del self.tempfile</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.FileAnalysis.__get_filename" class="doc doc-heading">
-            <code class=" language-python">__get_filename(head)</code>
-
-<a href="#dataverse_utils.collections.FileAnalysis.__get_filename" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Determines whether or not this is a file that should be
-downloaded for further checking.</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>head</code></b>
-                  (<code><span title="dict">dict</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>Header from GET request</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Returns:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-                  <code>True if extended metadata can be obtained</code>
-              –
-              <div class="doc-md-description">
-                
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __get_filename(self, head:dict)-&gt;typing.Union[str, None]:
-    '''
-    Determines whether or not this is a file that should be
-    downloaded for further checking.
-
-    Parameters
-    ----------
-    head : dict
-        Header from GET request
-
-    Returns
-    -------
-    True if extended metadata can be obtained
-    '''
-    fname = head.get('content-type')
-    if fname:
-        if 'name=' in fname:
-            start = head['content-type'].find('name=')+5
-            end = head['content-type'].find(';', start)
-            if end != -1:
-                fname = head['content-type'][start:end].strip('"')
-            else:
-                fname = head['content-type'][start:].strip('"')
-    fname = self.kwargs.get('filename', fname)
-    return fname</code></pre>
             </details>
     </div>
 
@@ -6639,7 +6460,7 @@ downloaded for further checking.</p>
               </div>
             </li>
             <li>
-              <b><code>fid</code></b>
+              <b><code>id</code></b>
                   (<code><span title="int">int</span></code>)
               –
               <div class="doc-md-description">
@@ -6670,6 +6491,38 @@ downloaded for further checking.</p>
                 <p>File size in bytes</p>
               </div>
             </li>
+            <li>
+              <b><code>rate_limit_on</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Turn on rate limit for requests</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_min</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Minimum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_max</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Maximum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>session</code></b>
+                  (<code><span title="requests.Session">Session</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>A requests session if available, to help
+ensure against having too many open connections</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -6679,10 +6532,13 @@ downloaded for further checking.</p>
 <details class="note" open>
   <summary>Notes</summary>
   <p>Either <code>local</code> must be supplied, or <code>url</code>, <code>key</code> and at least one of
-<code>fid</code> or <code>pid</code> must be supplied</p>
+<code>id</code> or <code>pid</code> must be supplied</p>
+<p>The rate limiter will wait for a random interval between
+rate_limit_min and rate_limit_max. Obviously, if you want
+a constant interval, set them to be equal.</p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __init__(self, **kwargs):
     '''
@@ -6704,7 +6560,7 @@ downloaded for further checking.</p>
     key : str
         API key for downloading
 
-    fid : int
+    id : int
         Integer file id
 
     pid : str
@@ -6716,16 +6572,34 @@ downloaded for further checking.</p>
     filesize_bytes : int
         File size in bytes
 
+    rate_limit_on: bool
+        Turn on rate limit for requests
+
+    rate_limit_min : int
+        Minimum time between requests in seconds
+
+    rate_limit_max : int
+        Maximum time between requests in seconds
+
+    session : requests.Session
+        A requests session if available, to help
+        ensure against having too many open connections
+
     Notes
     -----
     Either `local` must be supplied, or `url`, `key` and at least one of
-    `fid` or `pid` must be supplied
+    `id` or `pid` must be supplied
+
+    The rate limiter will wait for a random interval between
+    rate_limit_min and rate_limit_max. Obviously, if you want
+    a constant interval, set them to be equal.
 
     '''
-
+    #pylint disable=too-many-instance-attributes
     #self.url = self.__clean_url(url)
     self.headers = UAHEADER.copy()
     self.kwargs = kwargs
+    self.limit = RateLimiter(**kwargs)
     if self.kwargs.get('key'):
         self.headers.update({'X-Dataverse-key':self.kwargs['key']})
     self.local = None
@@ -6735,7 +6609,7 @@ downloaded for further checking.</p>
                '(pid or id)) or (local) keyword parameters.')
         raise TypeError(err)
     self.tempfile = None
-    self.session = requests.Session()
+    self.session = kwargs.get('session', requests.Session())
     self.session.mount('https://',
                        requests.adapters.HTTPAdapter(max_retries=RETRY))
     self.checkable = {'.sav': self.stat_file_metadata,
@@ -6747,39 +6621,6 @@ downloaded for further checking.</p>
                       '.rda': self.generic_metadata}
     self.filename = None #get it later
     self.enhance()</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.FileAnalysis.__sufficient" class="doc doc-heading">
-            <code class=" language-python">__sufficient()</code>
-
-<a href="#dataverse_utils.collections.FileAnalysis.__sufficient" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Checks if sufficient information is supplied for intialization, with
-local files taking preference over remote.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __sufficient(self)-&gt;bool:
-    '''
-    Checks if sufficient information is supplied for intialization, with
-    local files taking preference over remote.
-    '''
-    if self.kwargs.get('local'):
-        return True
-    if (self.kwargs['url'] and self.kwargs['key']
-       and (self.kwargs.get('pid') or self.kwargs.get('id'))):
-        return True
-    return False</code></pre>
             </details>
     </div>
 
@@ -6806,7 +6647,7 @@ local : str
     Path to local file</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def download(self, block_size:int=1024, force=False, local=None)-&gt; None:
     '''
@@ -6833,17 +6674,20 @@ local : str
     start = datetime.datetime.now()
     params = {'format':'original'}
     url = self.__clean_url(self.kwargs['url'])
+    self.limit.rate_limit()
     if self.kwargs.get('pid'):
         params.update({'persistentId':self.kwargs['pid']})
         data = self.session.get(f'{url}/api/access/datafile/:persistentId',
                                 headers=self.headers,
                                 params=params,
-                                stream=True)
+                                stream=True,
+                                timeout=self.kwargs.get('timeout', 15))
     else:
         data = self.session.get(f'{url}/api/access/datafile/{self.kwargs["id"]}',
                                 headers=self.headers,
                                 params=params,
-                                stream=True)
+                                stream=True,
+                                timeout=self.kwargs.get('timeout', 15))
     data.raise_for_status()
     finish = datetime.datetime.now()
     self.filename = self.__get_filename(data.headers)
@@ -6853,7 +6697,9 @@ local : str
         filesize = self.kwargs.get('filesize_bytes',
                                    data.headers.get('content-length', 9e9))
         filesize = int(filesize) # comes out as string from header
-        with tqdm.tqdm(total=filesize, unit='B', unit_scale=True, desc=self.filename) as t:
+        with tqdm.tqdm(total=filesize, unit='B', unit_scale=True,
+                       desc=self.filename, leave=False,
+                       bar_format=BAR_FORMAT) as t:
             for _ in data.iter_content(block_size):
                 self.tempfile.file.write(_)
                 t.update(len(_))
@@ -6879,7 +6725,7 @@ ie, &ldquo;enhancing&rdquo; the metadata. Use this instead of going through the
 steps manually.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def enhance(self):
     '''
@@ -6935,7 +6781,7 @@ self.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def generic_metadata(self, ext)-&gt;None:
     '''
@@ -6951,14 +6797,20 @@ self.</p>
     #    data = pd.read_csv(self.__whichfile, sep='\t')
     #else:
     #    data = pd.read_csv(self.__whichfile)
-
+    encme = {'.tsv': {'sep': '\t'},
+             '.csv': {}}
+    if ext.lower() in encme:
+        with open(self.__whichfile, 'rb') as f:
+            encoding = {'encoding':'utf-8'}
+            encoding.update({'encoding':cn.detect(f.read()).get('encoding', 'utf-8')})
+            encme[ext.lower()].update(encoding)
     lookuptable ={'.tsv': {'func': pd.read_csv,
-                            'kwargs' : {'sep':'\t'}},
-                    '.csv': {'func' : pd.read_csv},
-                    '.rda': {'func' : pyreadr.read_r},
+                            'kwargs' : encme['.tsv']},
+                  '.csv': {'func' : pd.read_csv, 'kwargs' : encme['.csv']},
+                  '.rda': {'func' : pyreadr.read_r},
                    '.rdata':{'func' : pyreadr.read_r}}
     data = lookuptable[ext]['func'](self.__whichfile,
-                                          **lookuptable[ext].get('kwargs', {}))
+                                              **lookuptable[ext].get('kwargs', {}))
     if ext  in ['.rda', '.rdata']:
         data = data[None] #why pyreadr why
     outmeta = {}
@@ -6969,6 +6821,38 @@ self.</p>
         desc = {k:str(v) for k, v in dict(data[dt].describe()).items()}
         outmeta['variables'][dt].update(desc)
     self.update(outmeta)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.collections.FileAnalysis.get_encoding" class="doc doc-heading">
+            <code class=" language-python">get_encoding(fpath)</code>
+
+<a href="#dataverse_utils.collections.FileAnalysis.get_encoding" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the encoding of a file so that pandas
+won&rsquo;t crash. Hopefully.</p>
+<p>fpath : str
+    file path</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def get_encoding(self, fpath):
+    '''
+    Return the encoding of a file so that pandas
+    won't crash. Hopefully.
+
+    fpath : str
+        file path
+    '''</code></pre>
             </details>
     </div>
 
@@ -7012,7 +6896,7 @@ self.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def stat_file_metadata(self, ext:str)-&gt;dict:
     '''
@@ -7056,6 +6940,7 @@ self.</p>
 
     </div>
 
+
 </div>
 
 <div class="doc doc-object doc-class">
@@ -7074,8 +6959,8 @@ self.</p>
               Bases: <code><span title="Exception">Exception</span></code></p>
 
 
-        <p>MetadataError</p>
 
+        <p>MetadataError</p>
 
 
 
@@ -7093,6 +6978,259 @@ self.</p>
 
     </div>
 
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="dataverse_utils.collections.RateLimiter" class="doc doc-heading">
+            <code>RateLimiter</code>
+
+
+<a href="#dataverse_utils.collections.RateLimiter" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Pauses for a random interval</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+                <pre class="codehilite"><code class="language-python">class RateLimiter:
+    '''
+    Pauses for a random interval
+    '''
+    #pylint: disable=too-few-public-methods
+    def __init__(self, **kwargs):
+        '''
+        Parameters
+        ----------
+        **kwargs
+
+        Other parameters
+        ----------------
+        rate_limit_on: bool
+            Turn on rate limit for requests
+
+        rate_limit_min : int
+            Minimum time between requests in seconds
+
+        rate_limit_max : int
+            Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
+
+        Notes
+        -----
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
+        '''
+        self.kwargs = kwargs
+
+        if not self.kwargs.get('rate_limit_on', False):
+            self.kwargs['rate_limit_on'] = False
+            self.kwargs['rate_limit_min'] = 0
+            self.kwargs['rate_limit_max'] = 0
+
+    def rate_limit(self):
+        '''
+        Sleep before requests for the time set by the rate limits
+        '''
+        time.sleep(random.uniform(self.kwargs['rate_limit_min'],
+                                  self.kwargs['rate_limit_max']))</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.collections.RateLimiter.__init__" class="doc doc-heading">
+            <code class=" language-python">__init__(**kwargs)</code>
+
+<a href="#dataverse_utils.collections.RateLimiter.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name"></th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>rate_limit_on</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Turn on rate limit for requests</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_min</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Minimum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_max</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Maximum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>session</code></b>
+                  (<code><span title="requests.Session">Session</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>A requests session if available, to help
+ensure against having too many open connections</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>The rate limiter will wait for a random interval between
+rate_limit_min and rate_limit_max. Obviously, if you want
+a constant interval, set them to be equal.</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def __init__(self, **kwargs):
+    '''
+    Parameters
+    ----------
+    **kwargs
+
+    Other parameters
+    ----------------
+    rate_limit_on: bool
+        Turn on rate limit for requests
+
+    rate_limit_min : int
+        Minimum time between requests in seconds
+
+    rate_limit_max : int
+        Maximum time between requests in seconds
+
+    session : requests.Session
+        A requests session if available, to help
+        ensure against having too many open connections
+
+    Notes
+    -----
+    The rate limiter will wait for a random interval between
+    rate_limit_min and rate_limit_max. Obviously, if you want
+    a constant interval, set them to be equal.
+    '''
+    self.kwargs = kwargs
+
+    if not self.kwargs.get('rate_limit_on', False):
+        self.kwargs['rate_limit_on'] = False
+        self.kwargs['rate_limit_min'] = 0
+        self.kwargs['rate_limit_max'] = 0</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.collections.RateLimiter.rate_limit" class="doc doc-heading">
+            <code class=" language-python">rate_limit()</code>
+
+<a href="#dataverse_utils.collections.RateLimiter.rate_limit" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sleep before requests for the time set by the rate limits</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def rate_limit(self):
+    '''
+    Sleep before requests for the time set by the rate limits
+    '''
+    time.sleep(random.uniform(self.kwargs['rate_limit_min'],
+                              self.kwargs['rate_limit_max']))</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
 </div>
 
 <div class="doc doc-object doc-class">
@@ -7109,8 +7247,8 @@ self.</p>
     <div class="doc doc-contents ">
 
 
-        <p>Make  formatted README documents out of a StudyMetadata object.</p>
 
+        <p>Make  formatted README documents out of a StudyMetadata object.</p>
 
 
 
@@ -7204,6 +7342,40 @@ self.</p>
             return f'{inkey}:  \n'
         return f'{inkey}: '
 
+    def __extract_files(self):
+        '''
+        Extract file level metadata, and write to self.__files.
+        '''
+        #Ported from StudyMetadata as it was used to make a nice README
+
+        outie = []
+        for v in self.meta.study_meta['data']['latestVersion']['files']:
+            innie = {}
+            fpath = v.get('directoryLabel', '').strip('/')
+            innie['filename'] = v['dataFile'].get('originalFileName', v['dataFile']['filename'])
+            #innie['full_path'] = '/'.join([fpath, innie['filename']])
+            #In case it's pathless, drop any leading slash, because
+            #'' is not the same as None, and None can't be joined.
+            innie['filename'] = '/'.join([fpath, innie['filename']]).strip('/')
+            innie['file_label'] = v.get('label')
+            innie['description'] = v.get('description')
+            innie['filesize_bytes'] = v['dataFile'].get('originalFileSize',
+                                                         v['dataFile']['filesize'])
+            innie['chk_type'] = v['dataFile']['checksum']['type']
+            innie['chk_digest'] =v['dataFile']['checksum']['value']
+            innie['id'] = v['dataFile']['id']
+            innie['pid'] = v['dataFile'].get('persistentId')
+            innie['has_tab_file'] = v['dataFile'].get('tabularData', False)
+            innie['study_pid'] = (f"{self.meta.study_meta['data']['protocol']}:"
+                                 f"{self.meta.study_meta['data']['authority']}/"
+                                 f"{self.meta.study_meta['data']['identifier']}")
+            innie['tags'] = ', '.join(v.get('categories', []))
+            if not innie['tags']:
+                del innie['tags']#tagless
+            #innie['path'] = v.get('directoryLabel', '')
+            outie.append(innie)
+        return outie
+
     @property
     def file_metadata_md(self)-&gt;str:
         '''
@@ -7211,7 +7383,8 @@ self.</p>
         markdown text string.
         '''
         fmeta = []
-        for fil in self.meta.files:
+        #for fil in self.meta.files:
+        for fil in self.__extract_files():
             fileout = {}
             fileout['File'] = fil['filename']
             for k, v in fil.items():
@@ -7225,12 +7398,12 @@ self.</p>
                 del fileout['Persistent Identifier']
             # Should I only have remote material here? What about
             # local files?
-            if self.kwargs.get('local'):
-                #TODO, if local
-                fpath = pathlib.Path(self.kwargs['local'])
-                #And from here you have to walk the tree to get the file in fil['filename']
-                #One day I will do this
-            elif self.meta.kwargs.get('url'): # Should this be optional? ie,
+            #if self.kwargs.get('local'):
+            #    #TODO, if local
+            #    fpath = pathlib.Path(self.kwargs['local'])
+            #    #And from here you have to walk the tree to get the file in fil['filename']
+            #    #One day I will do this
+            if self.meta.kwargs.get('url'): # Should this be optional? ie,
                                               # and self.kwargs.get('download') or summat
                 d_dict = FileAnalysis(url=self.meta.kwargs['url'],
                                       key=self.meta.kwargs.get('key'),
@@ -7266,6 +7439,12 @@ self.</p>
         entire StudyMetadata object.
         '''
         metatmp = self.meta.copy()
+        #Delete redundant info fields added when harvesting Study Metadata
+        for _ in ['pid', 'is_current_version', 'version_statement']:
+            try:
+                del metatmp[_]
+            except KeyError:
+                continue
         neworder = self.reorder_fields(metatmp)
         addme = self.concatenator(metatmp)
         metatmp.update(addme)
@@ -7391,7 +7570,8 @@ self.</p>
                    'Country':'Country(ies)',
                    'State':'State(s)',
                    'City':'City(ies)',
-                   'Geographic Unit':'Geographic unit(s)'}
+                   'Geographic Unit':'Geographic unit(s)',
+                   'State(s)ment' : 'Statement'}
         for k, v in fixthese.items():
             wordsp = wordsp.replace(k, v)
         return wordsp.strip()
@@ -7455,6 +7635,19 @@ self.</p>
             outlist.append(vals)
         return outlist
 
+    @property
+    def readme_pdf(self)-&gt;io.BytesIO:
+        '''
+        Make the PDF of a README and save it to a file-like object
+        '''
+        output = markdown_pdf.MarkdownPdf(toc_level=1)
+        content = markdown_pdf.Section(self.readme_md, toc=False)
+        output.add_section(content)
+        out = io.BytesIO()
+        output.save_bytes(out)
+        out.seek(0)
+        return out
+
     def write_pdf(self, dest:str)-&gt;None:
         '''
         Make the PDF of a README and save it to a file.
@@ -7467,10 +7660,9 @@ self.</p>
             ~/tmp/README_I_AM_METADATA.pdf
         '''
         dest = pathlib.Path(dest).expanduser().absolute()
-        output = markdown_pdf.MarkdownPdf(toc_level=1)
-        content = markdown_pdf.Section(self.readme_md, toc=False)
-        output.add_section(content)
-        output.save(dest)
+        with open(dest, 'wb') as f:
+            f.write(self.readme_pdf.read())
+        self.readme_pdf.seek(0)
 
     def write_md(self, dest:str)-&gt;None:
         '''
@@ -7490,7 +7682,7 @@ self.</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -7544,127 +7736,30 @@ entire StudyMetadata object.</p>
 
 </div>
 
+<div class="doc doc-object doc-attribute">
 
 
 
-<div class="doc doc-object doc-function">
+<h4 id="dataverse_utils.collections.ReadmeCreator.readme_pdf" class="doc doc-heading">
+            <code class=" language-python">readme_pdf</code>
 
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
-<h4 id="dataverse_utils.collections.ReadmeCreator.__fix_relation_type" class="doc doc-heading">
-            <code class=" language-python">__fix_relation_type(badstr)</code>
-
-<a href="#dataverse_utils.collections.ReadmeCreator.__fix_relation_type" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>For some reason, Dataverse puts camelCase values in the &lsquo;values&rsquo; field
-for publication relation. This will make it more readable.</p>
-
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>badstr</code></b>
-                  (<code><span title="str">str</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>Input string; problematic values will be fixed, all others returned as-is.</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __fix_relation_type(self, badstr:str)-&gt;str:
-    '''
-    For some reason, Dataverse puts camelCase values in the 'values' field
-    for publication relation. This will make it more readable.
-
-    Parameters
-    ----------
-    badstr : str
-        Input string; problematic values will be fixed, all others returned as-is.
-    '''
-    fixthese = ['IsCitedBy', 'IsSupplementTo', 'IsSupplementedBy', 'IsReferencedBy']
-    for val in fixthese:
-        badstr=badstr.replace(val, self.rename_field(val))
-    return badstr</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.ReadmeCreator.__html_to_md" class="doc doc-heading">
-            <code class=" language-python">__html_to_md(inval)</code>
-
-<a href="#dataverse_utils.collections.ReadmeCreator.__html_to_md" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#dataverse_utils.collections.ReadmeCreator.readme_pdf" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Convert any HTML to markdown, or as much as possible.</p>
+        <p>Make the PDF of a README and save it to a file-like object</p>
 
-
-<table class="field-list">
-  <colgroup>
-    <col class="field-name" />
-    <col class="field-body" />
-  </colgroup>
-  <tbody valign="top">
-    <tr class="field">
-      <th class="field-name">Parameters:</th>
-      <td class="field-body">
-        <ul class="first simple">
-            <li>
-              <b><code>inval</code></b>
-                  (<code><span title="str">str</span></code>)
-              –
-              <div class="doc-md-description">
-                <p>HTML string to convert</p>
-              </div>
-            </li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __html_to_md(self, inval:str)-&gt;str:
-    '''
-    Convert any HTML to markdown, or as much as possible.
-
-    Parameters
-    ----------
-    inval : str
-        HTML string to convert
-    '''
-    if isinstance(inval, str):
-        #markdownify kwargs are here:
-        #https://github.com/matthewwithanm/python-markdownify
-        return markdownify.markdownify(inval)
-    return str(inval)</code></pre>
-            </details>
     </div>
 
 </div>
+
+
+
 
 <div class="doc doc-object doc-function">
 
@@ -7769,7 +7864,7 @@ local files instead of downloading.</p>
   <p>Either <code>local</code> must be supplied, or <code>url</code>, <code>pid</code> and <code>key</code> must supplied</p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __init__(self, study_metadata_obj: StudyMetadata, **kwargs):
     '''
@@ -7835,7 +7930,7 @@ with each coordinate suffixed by its direction (eg: &lsquo;42.97 E&rsquo;), with
 separated by commas and multiple boxes separated by semi-colons.</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def bbox(self)-&gt;dict:
     '''
@@ -7910,7 +8005,7 @@ fields.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def concatenator(self, meta:dict)-&gt;dict:
     '''
@@ -7992,7 +8087,7 @@ licence and terms of use.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def make_md_heads(self, inkey:str)-&gt;str:
     '''
@@ -8062,7 +8157,7 @@ instead of stopping at the shortest iterable.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def max_zip(self, *args):
     '''
@@ -8130,7 +8225,7 @@ eg: termsOfUse -&gt; Terms of Use</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def rename_field(self, instr:str)-&gt;str:
     '''
@@ -8163,7 +8258,8 @@ eg: termsOfUse -&gt; Terms of Use</p>
                'Country':'Country(ies)',
                'State':'State(s)',
                'City':'City(ies)',
-               'Geographic Unit':'Geographic unit(s)'}
+               'Geographic Unit':'Geographic unit(s)',
+               'State(s)ment' : 'Statement'}
     for k, v in fixthese.items():
         wordsp = wordsp.replace(k, v)
     return wordsp.strip()</code></pre>
@@ -8214,7 +8310,7 @@ combining.</p>
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def reorder_fields(self, indict:dict)-&gt;list:
     '''
@@ -8286,7 +8382,7 @@ eg: /Users/foo/study/README.md or
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def write_md(self, dest:str)-&gt;None:
     '''
@@ -8347,7 +8443,7 @@ eg: /Users/foo/study/README.pdf or
   </tbody>
 </table>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def write_pdf(self, dest:str)-&gt;None:
     '''
@@ -8361,10 +8457,9 @@ eg: /Users/foo/study/README.pdf or
         ~/tmp/README_I_AM_METADATA.pdf
     '''
     dest = pathlib.Path(dest).expanduser().absolute()
-    output = markdown_pdf.MarkdownPdf(toc_level=1)
-    content = markdown_pdf.Section(self.readme_md, toc=False)
-    output.add_section(content)
-    output.save(dest)</code></pre>
+    with open(dest, 'wb') as f:
+        f.write(self.readme_pdf.read())
+    self.readme_pdf.seek(0)</code></pre>
             </details>
     </div>
 
@@ -8375,6 +8470,7 @@ eg: /Users/foo/study/README.pdf or
   </div>
 
     </div>
+
 
 </div>
 
@@ -8394,8 +8490,8 @@ eg: /Users/foo/study/README.pdf or
               Bases: <code><span title="dict">dict</span></code></p>
 
 
-        <p>The metadata container for a single study.</p>
 
+        <p>The metadata container for a single study.</p>
 
 
 
@@ -8409,6 +8505,7 @@ eg: /Users/foo/study/README.pdf or
     '''
     The metadata container for a single study.
     '''
+    #pylint: disable=too-many-instance-attributes
     def __init__(self, **kwargs):
         '''
         Intializize a StudyMetadata object.
@@ -8433,29 +8530,81 @@ eg: /Users/foo/study/README.pdf or
         key : str
             Dataverse instance API key (needed for unpublished studies)
 
+        rate_limit_on: bool
+            Turn on rate limit for requests
+
+        rate_limit_min : int
+            Minimum time between requests in seconds
+
+        rate_limit_max : int
+            Maximum time between requests in seconds
+
+        session : requests.Session
+            A requests session if available, to help
+            ensure against having too many open connections
+
         Notes
         -----
         Either `study_meta` is required OR `pid` and `url`. `key` _may_ be required
         if either a draft study is being accessed or the Dataverse installation
         requires API keys for all requests.
+
+        The rate limiter will wait for a random interval between
+        rate_limit_min and rate_limit_max. Obviously, if you want
+        a constant interval, set them to be equal.
+
         '''
         self.kwargs = kwargs
+        self.session = kwargs.get('session', requests.Session())
+        self.session.mount('https://',
+                           requests.adapters.HTTPAdapter(max_retries=RETRY))
+        self.limit = RateLimiter(**kwargs)
         self.study_meta  = kwargs.get('study_meta')
+        self.all_versions = kwargs.get('all_versions')
         self.url = kwargs.get('url')
         self.pid = kwargs.get('pid')
+        #If only there would be an easy way to check if something was deaccessioned
+        #without yet another request. But right now, let's assume it's fine.
+        #See below (under Key Error) where it get set
+        self.deaccession_flag = 0
+        if self.study_meta:
+            #self.pid = kwargs.get('pid', (f"{self.study_meta['data']['protocol']}:"
+            #                         f"{self.study_meta['data']['authority']}"
+            #                         f"/{self.study_meta['data']['identifier']}") if not
+            #                         self.pid else self.pid)
+            try:
+                self.pid = (f"{self.study_meta['data']['protocol']}:"
+                            f"{self.study_meta['data']['authority']}"
+                            f"/{self.study_meta['data']['identifier']}")
+            except (KeyError,) as e:
+                raise MetadataError(f'Key error: {e}') from e
+
         self.headers = UAHEADER.copy()
         if not (('study_meta' in kwargs) or ('url' in kwargs and 'pid' in kwargs)):
             raise TypeError('At least one of a URL/pid combo (url, pid) (and possibly key) or '
             'study metadata json (study_meta) is required.')
-        if not self.study_meta:
-            self.study_meta = self.__obtain_metadata()
+        if not self.study_meta or not self.all_versions:
+            self.study_meta, self.all_versions = self.__obtain_metadata()
         try:
-            self.extract_metadata()
+            self.update(self.extract_metadata(self.study_meta['data']['latestVersion']))
         except KeyError as e:
-            raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
-                           f'{e} key not found.\n'
-                           f'Offending JSON: {self.study_meta}') from e
+            if (self.study_meta.get('status') == 'OK' and not
+                self.study_meta['data'].get('latestVersion')):
+                # Latest version is not available because API strips out all
+                # citation metadata for deaccessioned studies but doesn't
+                # actually indicate this in any obvious manner
+                # This is further complicated because *all* the metadata
+                # we want is in the metadata blocks, which won't exist in the JSON
+                # because for some idiotic reason it's OK to expose it in the GUI
+                # but not via API.
+                self.deaccession_flag = 1
+            else:
+                raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
+                               f'{e} key not found.\n'
+                               f'Offending JSON: {self.study_meta}') from e
         self.__files = None
+        self.__all_files = None
+        self.index = {_: n for n, _ in enumerate(self.versions)}
 
     def __obtain_metadata(self):
         '''
@@ -8464,15 +8613,24 @@ eg: /Users/foo/study/README.pdf or
         if self.kwargs.get('key'):
             self.headers.update({'X-Dataverse-key':self.kwargs['key']})
         params = {'persistentId': self.pid}
-        self.session = requests.Session()
-        self.session.mount('https://',
-                           requests.adapters.HTTPAdapter(max_retries=RETRY))
         self.url = self.url.strip('/')
         if not self.url.startswith('https://'):
             self.url = f'https://{self.url}'
+        self.limit.rate_limit()
+        LOGGER.debug('Attempting %s/api/datasets/, params %s, headers %s',
+                     self.url, params, self.headers)
         data = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                                headers=self.headers, params=params)
-        return data.json()
+                                headers=self.headers, params=params,
+                                timeout=self.kwargs.get('timeout', 15))
+        data.raise_for_status()
+        self.limit.rate_limit()
+        LOGGER.debug('Attempting %s/api/datasets/:persistentId/versions, params %s, headers %s',
+                     self.url, params, self.headers)
+        all_versions = self.session.get(f'{self.url}/api/datasets/:persistentId/versions',
+                                        headers=self.headers, params=params,
+                                        timeout=self.kwargs.get('timeout', 15))
+        all_versions.raise_for_status()
+        return data.json(), all_versions.json()
 
     def __has_metadata(self)-&gt;bool:
         '''
@@ -8495,28 +8653,42 @@ eg: /Users/foo/study/README.pdf or
             return True
         return False
 
-    def extract_metadata(self):
+    def extract_metadata(self, chunk:dict )-&gt;dict:
         '''
-        Convenience function for parsing the study metadata of the latest version.
+        Convenience function for parsing the study metadata
 
-        Results are written to self, accessible as a dictionary.
+        Takes a version chunk or the latest version metadata
+
         '''
+        tmp = {}
         if not self.__has_metadata():
-            return
-
-
-        for v in self.study_meta['data']['latestVersion']['metadataBlocks'].values():
+            return tmp
+        for v in chunk['metadataBlocks'].values():
             for field in v['fields']:
-                self.extract_field_metadata(field)
-        self.__extract_licence_info()
-        self.__version()
-        #['data']['latestVersion']['versionNumber']
-        #['data']['latestVersion']['versionMinorNumber']
+                tmp.update(self.extract_field_metadata(field))
+        tmp.update(self.__extract_licence_info(chunk))
+        if chunk.get('versionNumber'):
+            tmp['versionStatement'] = f"{chunk['versionNumber']}.{chunk['versionMinorNumber']}"
+        else:
+            tmp['versionStatement'] = f"{chunk.get('versionState', '')}"
+        #ADD fields here if they are not in the metadata and you need them
+        tmp['pid'] = self.pid #Because you need generally need this
+        #Collection info
+        for _ in ['collection_name', 'collection_short_name']:
+            if self.kwargs.get(_):
+                tmp[_] = self.kwargs[_]
+        #Latest version number or state for easy filtering @@@
+        tmp['is_current_version'] = tmp['versionStatement'] == self.current_version
+        return tmp
 
     def extract_field_metadata(self, field):
         '''
         Extract the metadata from a single field and make it into a human-readable dict.
-        Output updates self.
+
+        Parameters
+        ----------
+        field : dict
+            Dataverse metadata field
         '''
         #pylint: disable=too-many-branches, too-many-nested-blocks
         #typeClass: compound = dict, primitive = string
@@ -8527,9 +8699,10 @@ eg: /Users/foo/study/README.pdf or
         #[[x['typeName'], x['typeClass'], x['multiple']] for x in citation['fields']]
         # {('primitive', False), ('compound', True), ('compound', False),
         # ('primitive', True), ('controlledVocabulary', True)}
+        out = {}
         if not field['multiple']:
             if field['typeClass']=='primitive':
-                self.update({field['typeName']: field['value']})
+                out.update({field['typeName']: field['value']})
             if field['typeClass'] == 'compound':
                 for v2 in field['value']:
                     self.extract_field_metadata(field['value'][v2])
@@ -8546,19 +8719,73 @@ eg: /Users/foo/study/README.pdf or
                             else:
                                 #sometimes value is None because reasons.
                                 interim[v3['typeName']] = [v3.get('value', [] )]
-                            LOGGER.debug(interim)
+                            #LOGGER.debug(interim)
                 for k9, v9 in interim.items():
-                    self.update({k9: '; '.join(v9)})
+                    out.update({k9: '; '.join(v9)})
 
             if field['typeClass'] == 'primitive':
-                self.update({field['typeName'] :  '; '.join(field['value'])})
+                out.update({field['typeName'] :  '; '.join(field['value'])})
 
         if field['typeClass'] == 'controlledVocabulary':
             if isinstance(field['value'], list):
-                self.update({field['typeName'] : '; '.join(field['value'])})
+                out.update({field['typeName'] : '; '.join(field['value'])})
             else:
-                self.update({field['typeName'] : field['value']})
+                out.update({field['typeName'] : field['value']})
         # And that should cover every option!
+        return out
+
+    def version_metadata(self, version_stmt:str)-&gt;dict:
+        '''
+        Returns the study metadata for a particular version. Returns
+        None if version does not exist
+
+        Parameters
+        ----------
+        version_stmt : str
+            Version statement: eg "1.1"
+        '''
+        if version_stmt not in self.versions:
+            return {}
+        study_ver_meta = self.all_versions['data'][self.index[version_stmt]]
+        return self.extract_metadata(study_ver_meta)
+
+    def version_files(self, version_stmt:str)-&gt;list:
+        '''
+        Returns a list of files for a particular version
+        '''
+        if version_stmt not in self.versions:
+            return []
+
+        return [_ for _ in  self.all_files if _['versionStatement'] == version_stmt]
+
+    @property
+    def current_version(self)-&gt;str:
+        '''
+        Return a formatted version statement for the most recent version
+        '''
+        try:
+            return (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
+                    f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
+        except (KeyError, ValueError):
+            try:
+                return f"{self.study_meta['data']['latestVersion']['versionState']}"
+            except (ValueError, KeyError):
+                return 'DEACCESSIONED'
+
+    @property
+    def versions(self)-&gt;list:
+        '''
+        Return a *list* of formatted version strings
+        '''
+        out = []
+        for _ in self.all_versions['data']:
+            if _.get('versionNumber'):
+                out.append(f"{_['versionNumber']}.{_['versionMinorNumber']}")
+            else:
+                out.append(_['versionState'])
+        #return [f"{_['versionNumber']}.{_['versionMinorNumber']}"
+        #                 for _ in self.all_versions['data']]
+        return out
 
     @property
     def files(self)-&gt;list:
@@ -8569,6 +8796,93 @@ eg: /Users/foo/study/README.pdf or
             self.__extract_files()
         return self.__files
 
+    @property
+    def all_files(self)-&gt;list:
+        '''
+        Return a list of dict with file metadata for *all* versions
+        '''
+        add_fields = ['versionNumber', 'versionMinorNumber',
+                      'storageIdentifier',
+                      'internalVersionNumber', 'versionState',
+                      'latestVersionPublishingState', 'lastUpdateTime',
+                      'createTime', 'publicationDate', 'citationDate']
+        if not self.__all_files:
+            all_files = []
+            for _ in self.all_versions['data']:
+                filelist = self.extract_files(_.get('files', []))
+                for oldfile in filelist:
+                    oldfile.update({k:v for k,v in _.items() if k in add_fields})
+                    try:
+                        vs = f'{_["versionNumber"]}.{_["versionMinorNumber"]}'
+                    except KeyError:
+                        vs = _.get('versionState', '')
+                    #vs = _.get('versionNumber', _.get('versionState', ''))
+                    oldfile.update({'versionStatement' : vs})
+                all_files.extend(filelist)
+            self.__all_files = all_files
+        return self.__all_files
+
+
+    def flatten(self, indict:dict, orig_order=None, sep_char='_')-&gt;dict:
+        '''
+        Flatten a dictionary of aritrary size. Flattened
+        keys will be separated by sepchar.
+
+        So {'a':2 , 'b':{'c':'3', 'd':4}} would return:
+        {'a':2, 'b_c':'3', 'b_d':4}
+
+        Parameters
+        ----------
+        indict : dict
+            The nested dict to be flattened
+        orig_order : list
+            order in which you want the dict keys;
+            dict keys starting with these values will be
+            placed in this sequence. Generally not required.
+        sep_char : str
+            Key separator
+        '''
+        if not orig_order:
+            orig_order = list(indict)
+        #base case
+        if all(not isinstance(v, dict) for v in indict.values()):
+            return indict
+
+        tmpdict = {k:v for k, v in indict.items() if not isinstance(v,dict)}
+        fixme = {k:v for k, v in indict.items() if isinstance(v, dict)}
+        for k, v in fixme.items():
+            for k2, v2 in v.items():
+                tmpdict.update({f'{k}{sep_char}{k2}': v2})
+        outdict = {}
+        #outdict.update(tmpdict)
+        #re-order to make it nice
+        for order in orig_order:
+            for k, v in tmpdict.items():
+                if k.startswith(order):
+                    outdict.update({k:v})
+        outdict.update(tmpdict)
+        return self.flatten(copy.deepcopy(outdict), list(outdict))
+
+    def extract_files(self, filelist:list)-&gt;dict:
+        '''
+        Generic file metadata extractor
+
+        Parameters
+        ----------
+        filelist : list
+            List containing file level metadata. Typically ['data']['latestVersion']['files']
+            or similar
+
+        Notes
+        -----
+        Will attach the study pid to the file list for easier joining
+        '''
+
+        files = [self.flatten(_) for _ in filelist]
+        for ff in files:
+            ff.update({'dataset_pid': self.pid})
+        return files
+
     def __extract_files(self):
         '''
         Extract file level metadata, and write to self.__files.
@@ -8577,40 +8891,22 @@ eg: /Users/foo/study/README.pdf or
         #but files would (usually) be an arbitrary number of files.
         #That bothers me on an intellectual level. Therefore, it will be attribute.
         #Iterate over StudyMetadata.files if you want to know the contents
-        if not self.__files:
-            outie = []
-            for v in self.study_meta['data']['latestVersion']['files']:
-                innie = {}
-                fpath = v.get('directoryLabel', '').strip('/')
-                innie['filename'] = v['dataFile'].get('originalFileName', v['dataFile']['filename'])
-                #innie['full_path'] = '/'.join([fpath, innie['filename']])
-                #In case it's pathless, drop any leading slash, because
-                #'' is not the same as None, and None can't be joined.
-                innie['filename'] = '/'.join([fpath, innie['filename']]).strip('/')
-                innie['file_label'] = v.get('label')
-                innie['description'] = v.get('description')
-                innie['filesize_bytes'] = v['dataFile'].get('originalFileSize',
-                                                             v['dataFile']['filesize'])
-                innie['chk_type'] = v['dataFile']['checksum']['type']
-                innie['chk_digest'] =v['dataFile']['checksum']['value']
-                innie['id'] = v['dataFile']['id']
-                innie['pid'] = v['dataFile'].get('persistentId')
-                innie['has_tab_file'] = v['dataFile'].get('tabularData', False)
-                innie['study_pid'] = (f"{self.study_meta['data']['protocol']}:"
-                                     f"{self.study_meta['data']['authority']}/"
-                                     f"{self.study_meta['data']['identifier']}")
-                innie['tags'] = ', '.join(v.get('categories', []))
-                if not innie['tags']:
-                    del innie['tags']#tagless
-                #innie['path'] = v.get('directoryLabel', '')
-                outie.append(innie)
-            self.__files = outie
+        if not self.__files and not self.deaccession_flag:
+            self.__files = self.extract_files(self.study_meta['data']
+                                                   ['latestVersion']['files'])
+        if self.deaccession_flag:
+            self.__files = []
 
-    def __extract_licence_info(self):
+    def __extract_licence_info(self, indict)-&gt;dict:
         '''
         Extract all the licence information fields and add them
         to self['licence'] *if present*.
+
+        Parameters
+        ----------
+        indict : dictionary holding study metadata
         '''
+        out = {}
         lic_fields = ('termsOfUse',
                       'confidentialityDeclaration',
                       'specialPermissions',
@@ -8625,39 +8921,73 @@ eg: /Users/foo/study/README.pdf or
                       'sizeOfCollection',
                       'studyCompletion',
                       'fileAccessRequest')
-        for field in self.study_meta['data']['latestVersion']:
+        for field in indict:
             if field in lic_fields:
-                self[field] = self.study_meta['data']['latestVersion'][field]
-        common_lic = self.study_meta['data']['latestVersion'].get('license')
+                out[field] = indict[field]
+        common_lic = indict.get('license')
         if isinstance(common_lic, str) and common_lic != 'NONE':
-            self['licence'] = common_lic
+            out['licence'] = common_lic
         elif isinstance(common_lic, dict):
-            self['licence'] = self.study_meta['data']['latestVersion']['license'].get('name')
-            link = self.study_meta['data']['latestVersion']['license'].get('uri')
+            out['licence'] = indict['license'].get('name')
+            link = indict['license'].get('uri')
             if link:
-                self['licenceLink'] = link
-
-    def __version(self):
-        '''
-        Obtain the current version and add it to self['studyVersion'].
-        '''
-        if self.study_meta['data']['latestVersion']['versionState'] == 'RELEASED':
-            self['studyVersion'] = (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
-                           f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
-            return
-        self['studyVersion'] = self.study_meta['data']['latestVersion']['versionState']
-        return</code></pre>
+                out['licenceLink'] = link
+        return out</code></pre>
               </details>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
 
 
 
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="dataverse_utils.collections.StudyMetadata.all_files" class="doc doc-heading">
+            <code class=" language-python">all_files</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#dataverse_utils.collections.StudyMetadata.all_files" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a list of dict with file metadata for <em>all</em> versions</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="dataverse_utils.collections.StudyMetadata.current_version" class="doc doc-heading">
+            <code class=" language-python">current_version</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#dataverse_utils.collections.StudyMetadata.current_version" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return a formatted version statement for the most recent version</p>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-attribute">
 
@@ -8681,161 +9011,30 @@ eg: /Users/foo/study/README.pdf or
 
 </div>
 
+<div class="doc doc-object doc-attribute">
 
 
 
-<div class="doc doc-object doc-function">
+<h4 id="dataverse_utils.collections.StudyMetadata.versions" class="doc doc-heading">
+            <code class=" language-python">versions</code>
 
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
-<h4 id="dataverse_utils.collections.StudyMetadata.__extract_files" class="doc doc-heading">
-            <code class=" language-python">__extract_files()</code>
-
-<a href="#dataverse_utils.collections.StudyMetadata.__extract_files" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Extract file level metadata, and write to self.__files.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __extract_files(self):
-    '''
-    Extract file level metadata, and write to self.__files.
-    '''
-    #Note: ALL other dict values for this object are single values,
-    #but files would (usually) be an arbitrary number of files.
-    #That bothers me on an intellectual level. Therefore, it will be attribute.
-    #Iterate over StudyMetadata.files if you want to know the contents
-    if not self.__files:
-        outie = []
-        for v in self.study_meta['data']['latestVersion']['files']:
-            innie = {}
-            fpath = v.get('directoryLabel', '').strip('/')
-            innie['filename'] = v['dataFile'].get('originalFileName', v['dataFile']['filename'])
-            #innie['full_path'] = '/'.join([fpath, innie['filename']])
-            #In case it's pathless, drop any leading slash, because
-            #'' is not the same as None, and None can't be joined.
-            innie['filename'] = '/'.join([fpath, innie['filename']]).strip('/')
-            innie['file_label'] = v.get('label')
-            innie['description'] = v.get('description')
-            innie['filesize_bytes'] = v['dataFile'].get('originalFileSize',
-                                                         v['dataFile']['filesize'])
-            innie['chk_type'] = v['dataFile']['checksum']['type']
-            innie['chk_digest'] =v['dataFile']['checksum']['value']
-            innie['id'] = v['dataFile']['id']
-            innie['pid'] = v['dataFile'].get('persistentId')
-            innie['has_tab_file'] = v['dataFile'].get('tabularData', False)
-            innie['study_pid'] = (f"{self.study_meta['data']['protocol']}:"
-                                 f"{self.study_meta['data']['authority']}/"
-                                 f"{self.study_meta['data']['identifier']}")
-            innie['tags'] = ', '.join(v.get('categories', []))
-            if not innie['tags']:
-                del innie['tags']#tagless
-            #innie['path'] = v.get('directoryLabel', '')
-            outie.append(innie)
-        self.__files = outie</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.StudyMetadata.__extract_licence_info" class="doc doc-heading">
-            <code class=" language-python">__extract_licence_info()</code>
-
-<a href="#dataverse_utils.collections.StudyMetadata.__extract_licence_info" class="headerlink" title="Permanent link">&para;</a></h4>
+<a href="#dataverse_utils.collections.StudyMetadata.versions" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Extract all the licence information fields and add them
-to self[&lsquo;licence&rsquo;] <em>if present</em>.</p>
+        <p>Return a <em>list</em> of formatted version strings</p>
 
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __extract_licence_info(self):
-    '''
-    Extract all the licence information fields and add them
-    to self['licence'] *if present*.
-    '''
-    lic_fields = ('termsOfUse',
-                  'confidentialityDeclaration',
-                  'specialPermissions',
-                  'restrictions',
-                  'citationRequirements',
-                  'depositorRequirements', 'conditions',
-                  'disclaimer',
-                  'dataAccessPlace',
-                  'originalArchive',
-                  'availabilityStatus',
-                  'contactForAccess',
-                  'sizeOfCollection',
-                  'studyCompletion',
-                  'fileAccessRequest')
-    for field in self.study_meta['data']['latestVersion']:
-        if field in lic_fields:
-            self[field] = self.study_meta['data']['latestVersion'][field]
-    common_lic = self.study_meta['data']['latestVersion'].get('license')
-    if isinstance(common_lic, str) and common_lic != 'NONE':
-        self['licence'] = common_lic
-    elif isinstance(common_lic, dict):
-        self['licence'] = self.study_meta['data']['latestVersion']['license'].get('name')
-        link = self.study_meta['data']['latestVersion']['license'].get('uri')
-        if link:
-            self['licenceLink'] = link</code></pre>
-            </details>
     </div>
 
 </div>
 
-<div class="doc doc-object doc-function">
 
 
-<h4 id="dataverse_utils.collections.StudyMetadata.__has_metadata" class="doc doc-heading">
-            <code class=" language-python">__has_metadata()</code>
-
-<a href="#dataverse_utils.collections.StudyMetadata.__has_metadata" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Returns a boolean to ensure if there <em>is</em> study metadata.
-Deacessioned items are notable for their lack of any indication
-that they are deacessioned. However, they lack the &ldquo;latestVersion&rdquo; key,
-which serves as a proxy. Ideally.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __has_metadata(self)-&gt;bool:
-    '''
-    Returns a boolean to ensure if there *is* study metadata.
-    Deacessioned items are notable for their lack of any indication
-    that they are deacessioned. However, they lack the "latestVersion" key,
-    which serves as a proxy. Ideally.
-    '''
-    #try:
-    #    t = self.study_meta['data']
-    #    del t #OMG This is so dumb
-    #except KeyError as e:
-    #    raise e
-
-    if not self.study_meta.get('data'):
-        raise KeyError('data')
-
-    testfields = ['id', 'identifier', 'authority', 'latestVersion']
-    if all(self.study_meta['data'].get(_) for _ in testfields):
-        return True
-    return False</code></pre>
-            </details>
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-function">
 
@@ -8916,6 +9115,38 @@ which serves as a proxy. Ideally.</p>
                 <p>Dataverse instance API key (needed for unpublished studies)</p>
               </div>
             </li>
+            <li>
+              <b><code>rate_limit_on</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Turn on rate limit for requests</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_min</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Minimum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>rate_limit_max</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Maximum time between requests in seconds</p>
+              </div>
+            </li>
+            <li>
+              <b><code>session</code></b>
+                  (<code><span title="requests.Session">Session</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>A requests session if available, to help
+ensure against having too many open connections</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -8927,9 +9158,12 @@ which serves as a proxy. Ideally.</p>
   <p>Either <code>study_meta</code> is required OR <code>pid</code> and <code>url</code>. <code>key</code> <em>may</em> be required
 if either a draft study is being accessed or the Dataverse installation
 requires API keys for all requests.</p>
+<p>The rate limiter will wait for a random interval between
+rate_limit_min and rate_limit_max. Obviously, if you want
+a constant interval, set them to be equal.</p>
 </details>
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def __init__(self, **kwargs):
     '''
@@ -8955,97 +9189,81 @@ requires API keys for all requests.</p>
     key : str
         Dataverse instance API key (needed for unpublished studies)
 
+    rate_limit_on: bool
+        Turn on rate limit for requests
+
+    rate_limit_min : int
+        Minimum time between requests in seconds
+
+    rate_limit_max : int
+        Maximum time between requests in seconds
+
+    session : requests.Session
+        A requests session if available, to help
+        ensure against having too many open connections
+
     Notes
     -----
     Either `study_meta` is required OR `pid` and `url`. `key` _may_ be required
     if either a draft study is being accessed or the Dataverse installation
     requires API keys for all requests.
+
+    The rate limiter will wait for a random interval between
+    rate_limit_min and rate_limit_max. Obviously, if you want
+    a constant interval, set them to be equal.
+
     '''
     self.kwargs = kwargs
+    self.session = kwargs.get('session', requests.Session())
+    self.session.mount('https://',
+                       requests.adapters.HTTPAdapter(max_retries=RETRY))
+    self.limit = RateLimiter(**kwargs)
     self.study_meta  = kwargs.get('study_meta')
+    self.all_versions = kwargs.get('all_versions')
     self.url = kwargs.get('url')
     self.pid = kwargs.get('pid')
+    #If only there would be an easy way to check if something was deaccessioned
+    #without yet another request. But right now, let's assume it's fine.
+    #See below (under Key Error) where it get set
+    self.deaccession_flag = 0
+    if self.study_meta:
+        #self.pid = kwargs.get('pid', (f"{self.study_meta['data']['protocol']}:"
+        #                         f"{self.study_meta['data']['authority']}"
+        #                         f"/{self.study_meta['data']['identifier']}") if not
+        #                         self.pid else self.pid)
+        try:
+            self.pid = (f"{self.study_meta['data']['protocol']}:"
+                        f"{self.study_meta['data']['authority']}"
+                        f"/{self.study_meta['data']['identifier']}")
+        except (KeyError,) as e:
+            raise MetadataError(f'Key error: {e}') from e
+
     self.headers = UAHEADER.copy()
     if not (('study_meta' in kwargs) or ('url' in kwargs and 'pid' in kwargs)):
         raise TypeError('At least one of a URL/pid combo (url, pid) (and possibly key) or '
         'study metadata json (study_meta) is required.')
-    if not self.study_meta:
-        self.study_meta = self.__obtain_metadata()
+    if not self.study_meta or not self.all_versions:
+        self.study_meta, self.all_versions = self.__obtain_metadata()
     try:
-        self.extract_metadata()
+        self.update(self.extract_metadata(self.study_meta['data']['latestVersion']))
     except KeyError as e:
-        raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
-                       f'{e} key not found.\n'
-                       f'Offending JSON: {self.study_meta}') from e
-    self.__files = None</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.StudyMetadata.__obtain_metadata" class="doc doc-heading">
-            <code class=" language-python">__obtain_metadata()</code>
-
-<a href="#dataverse_utils.collections.StudyMetadata.__obtain_metadata" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Obtain study metadata as required.</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __obtain_metadata(self):
-    '''
-    Obtain study metadata as required.
-    '''
-    if self.kwargs.get('key'):
-        self.headers.update({'X-Dataverse-key':self.kwargs['key']})
-    params = {'persistentId': self.pid}
-    self.session = requests.Session()
-    self.session.mount('https://',
-                       requests.adapters.HTTPAdapter(max_retries=RETRY))
-    self.url = self.url.strip('/')
-    if not self.url.startswith('https://'):
-        self.url = f'https://{self.url}'
-    data = self.session.get(f'{self.url}/api/datasets/:persistentId',
-                            headers=self.headers, params=params)
-    return data.json()</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="dataverse_utils.collections.StudyMetadata.__version" class="doc doc-heading">
-            <code class=" language-python">__version()</code>
-
-<a href="#dataverse_utils.collections.StudyMetadata.__version" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Obtain the current version and add it to self[&lsquo;studyVersion&rsquo;].</p>
-
-
-            <details class="quote">
-              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def __version(self):
-    '''
-    Obtain the current version and add it to self['studyVersion'].
-    '''
-    if self.study_meta['data']['latestVersion']['versionState'] == 'RELEASED':
-        self['studyVersion'] = (f"{self.study_meta['data']['latestVersion']['versionNumber']}."
-                       f"{self.study_meta['data']['latestVersion']['versionMinorNumber']}")
-        return
-    self['studyVersion'] = self.study_meta['data']['latestVersion']['versionState']
-    return</code></pre>
+        if (self.study_meta.get('status') == 'OK' and not
+            self.study_meta['data'].get('latestVersion')):
+            # Latest version is not available because API strips out all
+            # citation metadata for deaccessioned studies but doesn't
+            # actually indicate this in any obvious manner
+            # This is further complicated because *all* the metadata
+            # we want is in the metadata blocks, which won't exist in the JSON
+            # because for some idiotic reason it's OK to expose it in the GUI
+            # but not via API.
+            self.deaccession_flag = 1
+        else:
+            raise MetadataError(f'Unable to parse study metadata. Do you need an API key?\n'
+                           f'{e} key not found.\n'
+                           f'Offending JSON: {self.study_meta}') from e
+    self.__files = None
+    self.__all_files = None
+    self.index = {_: n for n, _ in enumerate(self.versions)}</code></pre>
             </details>
     </div>
 
@@ -9062,16 +9280,43 @@ requires API keys for all requests.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Extract the metadata from a single field and make it into a human-readable dict.
-Output updates self.</p>
+        <p>Extract the metadata from a single field and make it into a human-readable dict.</p>
 
 
-            <details class="quote">
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>field</code></b>
+                  (<code><span title="dict">dict</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Dataverse metadata field</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
               <pre class="codehilite"><code class="language-python">def extract_field_metadata(self, field):
     '''
     Extract the metadata from a single field and make it into a human-readable dict.
-    Output updates self.
+
+    Parameters
+    ----------
+    field : dict
+        Dataverse metadata field
     '''
     #pylint: disable=too-many-branches, too-many-nested-blocks
     #typeClass: compound = dict, primitive = string
@@ -9082,9 +9327,10 @@ Output updates self.</p>
     #[[x['typeName'], x['typeClass'], x['multiple']] for x in citation['fields']]
     # {('primitive', False), ('compound', True), ('compound', False),
     # ('primitive', True), ('controlledVocabulary', True)}
+    out = {}
     if not field['multiple']:
         if field['typeClass']=='primitive':
-            self.update({field['typeName']: field['value']})
+            out.update({field['typeName']: field['value']})
         if field['typeClass'] == 'compound':
             for v2 in field['value']:
                 self.extract_field_metadata(field['value'][v2])
@@ -9101,18 +9347,90 @@ Output updates self.</p>
                         else:
                             #sometimes value is None because reasons.
                             interim[v3['typeName']] = [v3.get('value', [] )]
-                        LOGGER.debug(interim)
+                        #LOGGER.debug(interim)
             for k9, v9 in interim.items():
-                self.update({k9: '; '.join(v9)})
+                out.update({k9: '; '.join(v9)})
 
         if field['typeClass'] == 'primitive':
-            self.update({field['typeName'] :  '; '.join(field['value'])})
+            out.update({field['typeName'] :  '; '.join(field['value'])})
 
     if field['typeClass'] == 'controlledVocabulary':
         if isinstance(field['value'], list):
-            self.update({field['typeName'] : '; '.join(field['value'])})
+            out.update({field['typeName'] : '; '.join(field['value'])})
         else:
-            self.update({field['typeName'] : field['value']})</code></pre>
+            out.update({field['typeName'] : field['value']})
+    # And that should cover every option!
+    return out</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.collections.StudyMetadata.extract_files" class="doc doc-heading">
+            <code class=" language-python">extract_files(filelist)</code>
+
+<a href="#dataverse_utils.collections.StudyMetadata.extract_files" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Generic file metadata extractor</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>filelist</code></b>
+                  (<code><span title="list">list</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>List containing file level metadata. Typically [&lsquo;data&rsquo;]['latestVersion'][&lsquo;files&rsquo;]
+or similar</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Will attach the study pid to the file list for easier joining</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def extract_files(self, filelist:list)-&gt;dict:
+    '''
+    Generic file metadata extractor
+
+    Parameters
+    ----------
+    filelist : list
+        List containing file level metadata. Typically ['data']['latestVersion']['files']
+        or similar
+
+    Notes
+    -----
+    Will attach the study pid to the file list for easier joining
+    '''
+
+    files = [self.flatten(_) for _ in filelist]
+    for ff in files:
+        ff.update({'dataset_pid': self.pid})
+    return files</code></pre>
             </details>
     </div>
 
@@ -9122,34 +9440,243 @@ Output updates self.</p>
 
 
 <h4 id="dataverse_utils.collections.StudyMetadata.extract_metadata" class="doc doc-heading">
-            <code class=" language-python">extract_metadata()</code>
+            <code class=" language-python">extract_metadata(chunk)</code>
 
 <a href="#dataverse_utils.collections.StudyMetadata.extract_metadata" class="headerlink" title="Permanent link">&para;</a></h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Convenience function for parsing the study metadata of the latest version.</p>
-<p>Results are written to self, accessible as a dictionary.</p>
+        <p>Convenience function for parsing the study metadata</p>
+<p>Takes a version chunk or the latest version metadata</p>
 
 
-            <details class="quote">
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def extract_metadata(self):
+              <pre class="codehilite"><code class="language-python">def extract_metadata(self, chunk:dict )-&gt;dict:
     '''
-    Convenience function for parsing the study metadata of the latest version.
+    Convenience function for parsing the study metadata
 
-    Results are written to self, accessible as a dictionary.
+    Takes a version chunk or the latest version metadata
+
     '''
+    tmp = {}
     if not self.__has_metadata():
-        return
-
-
-    for v in self.study_meta['data']['latestVersion']['metadataBlocks'].values():
+        return tmp
+    for v in chunk['metadataBlocks'].values():
         for field in v['fields']:
-            self.extract_field_metadata(field)
-    self.__extract_licence_info()
-    self.__version()</code></pre>
+            tmp.update(self.extract_field_metadata(field))
+    tmp.update(self.__extract_licence_info(chunk))
+    if chunk.get('versionNumber'):
+        tmp['versionStatement'] = f"{chunk['versionNumber']}.{chunk['versionMinorNumber']}"
+    else:
+        tmp['versionStatement'] = f"{chunk.get('versionState', '')}"
+    #ADD fields here if they are not in the metadata and you need them
+    tmp['pid'] = self.pid #Because you need generally need this
+    #Collection info
+    for _ in ['collection_name', 'collection_short_name']:
+        if self.kwargs.get(_):
+            tmp[_] = self.kwargs[_]
+    #Latest version number or state for easy filtering @@@
+    tmp['is_current_version'] = tmp['versionStatement'] == self.current_version
+    return tmp</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.collections.StudyMetadata.flatten" class="doc doc-heading">
+            <code class=" language-python">flatten(indict, orig_order=None, sep_char='_')</code>
+
+<a href="#dataverse_utils.collections.StudyMetadata.flatten" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Flatten a dictionary of aritrary size. Flattened
+keys will be separated by sepchar.</p>
+<p _a_:2_="'a':2," _b_c_:_3_="'b_c':'3'," _b_d_:4="'b_d':4">So {&lsquo;a&rsquo;:2 , &lsquo;b&rsquo;:{&lsquo;c&rsquo;:&lsquo;3&rsquo;, &lsquo;d&rsquo;:4}} would return:</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>indict</code></b>
+                  (<code><span title="dict">dict</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The nested dict to be flattened</p>
+              </div>
+            </li>
+            <li>
+              <b><code>orig_order</code></b>
+                  (<code><span title="list">list</span></code>, default:
+                      <code>None</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>order in which you want the dict keys;
+dict keys starting with these values will be
+placed in this sequence. Generally not required.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>sep_char</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;_&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Key separator</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def flatten(self, indict:dict, orig_order=None, sep_char='_')-&gt;dict:
+    '''
+    Flatten a dictionary of aritrary size. Flattened
+    keys will be separated by sepchar.
+
+    So {'a':2 , 'b':{'c':'3', 'd':4}} would return:
+    {'a':2, 'b_c':'3', 'b_d':4}
+
+    Parameters
+    ----------
+    indict : dict
+        The nested dict to be flattened
+    orig_order : list
+        order in which you want the dict keys;
+        dict keys starting with these values will be
+        placed in this sequence. Generally not required.
+    sep_char : str
+        Key separator
+    '''
+    if not orig_order:
+        orig_order = list(indict)
+    #base case
+    if all(not isinstance(v, dict) for v in indict.values()):
+        return indict
+
+    tmpdict = {k:v for k, v in indict.items() if not isinstance(v,dict)}
+    fixme = {k:v for k, v in indict.items() if isinstance(v, dict)}
+    for k, v in fixme.items():
+        for k2, v2 in v.items():
+            tmpdict.update({f'{k}{sep_char}{k2}': v2})
+    outdict = {}
+    #outdict.update(tmpdict)
+    #re-order to make it nice
+    for order in orig_order:
+        for k, v in tmpdict.items():
+            if k.startswith(order):
+                outdict.update({k:v})
+    outdict.update(tmpdict)
+    return self.flatten(copy.deepcopy(outdict), list(outdict))</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.collections.StudyMetadata.version_files" class="doc doc-heading">
+            <code class=" language-python">version_files(version_stmt)</code>
+
+<a href="#dataverse_utils.collections.StudyMetadata.version_files" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns a list of files for a particular version</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def version_files(self, version_stmt:str)-&gt;list:
+    '''
+    Returns a list of files for a particular version
+    '''
+    if version_stmt not in self.versions:
+        return []
+
+    return [_ for _ in  self.all_files if _['versionStatement'] == version_stmt]</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.collections.StudyMetadata.version_metadata" class="doc doc-heading">
+            <code class=" language-python">version_metadata(version_stmt)</code>
+
+<a href="#dataverse_utils.collections.StudyMetadata.version_metadata" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns the study metadata for a particular version. Returns
+None if version does not exist</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>version_stmt</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Version statement: eg &ldquo;1.1&rdquo;</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/collections.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def version_metadata(self, version_stmt:str)-&gt;dict:
+    '''
+    Returns the study metadata for a particular version. Returns
+    None if version does not exist
+
+    Parameters
+    ----------
+    version_stmt : str
+        Version statement: eg "1.1"
+    '''
+    if version_stmt not in self.versions:
+        return {}
+    study_ver_meta = self.all_versions['data'][self.index[version_stmt]]
+    return self.extract_metadata(study_ver_meta)</code></pre>
             </details>
     </div>
 
@@ -9160,6 +9687,7 @@ Output updates self.</p>
   </div>
 
     </div>
+
 
 </div>
 
