@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.22.8"
+version = "0.22.9a0"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -20,7 +20,8 @@ dependencies = [
     "tqdm (>=4.67.3,<5.0.0)",
     "dryad2dataverse (>=0.8.4,<0.9.0)",
     "chardet (>=5.2)",
-    "requests (>=2.33,<3.0)"
+    "requests (>=2.33,<3.0)",
+    "urllib3 (>=2.7.0,<3.0.0)"
 ]
 #Chardet and requests will need to be changed when requests goes to 2.32; at that
 #point just remove chardet 
