@@ -85,7 +85,10 @@ def parse() -> argparse.ArgumentParser():
                         help='Maximum time between requests in seconds: Default 1',
                         default=1,
                         type=float)
-
+    parser.add_argument('--timeout',
+                        help='Timeout for lengthy requests, default 300s',
+                        default=300,
+                        type=float)
     group = parser.add_argument_group(title='Harvest options',
                                       description=textwrap.fill(
                                       'You can obtain info for *either* a recursive crawl '
@@ -212,7 +215,8 @@ def main():
         coll_me = dvc.DvCollection(args.url, args.collection, args.key,
                                    rate_limit_on=not args.rate_limit_off,
                                    rate_limit_min=args.rate_limit_min,
-                                   rate_limit_max=args.rate_limit_max)
+                                   rate_limit_max=args.rate_limit_max,
+                                   timeout=args.timeout)
         try:
             coll_me.get_studies()
             all_studies = coll_me.studies
