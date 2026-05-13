@@ -79,10 +79,12 @@ def parse() -> argparse.ArgumentParser():
                               'Requests are randomly between min and max. Default is ON.'))
     parser.add_argument('--rate-limit-min',
                         help='Minimum time before requests in seconds. Default 0.25',
-                        default=0.25)
+                        default=0.25,
+                        type=float)
     parser.add_argument('--rate-limit-max',
                         help='Maximum time between requests in seconds: Default 1',
-                        default=1)
+                        default=1,
+                        type=float)
 
     group = parser.add_argument_group(title='Harvest options',
                                       description=textwrap.fill(

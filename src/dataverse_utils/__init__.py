@@ -15,7 +15,7 @@ USERAGENT = (f'dataverse_utils/v{__version__} ({sys.platform.capitalize()}); '
 UAHEADER = {'User-agent' : USERAGENT}
 
 SCRIPT_VERSIONS={
-'dv_collection_info' : (0, 4, 0),
+'dv_collection_info' : (0, 4, 1),
 'dv_del' : (0, 2, 4),
 'dv_ldc_uploader' : (0, 4, 1),
 'dv_list_files' : (0, 1, 1),
