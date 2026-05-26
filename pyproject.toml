@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.22.11"
+version = "0.22.12"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -37,6 +37,7 @@ psycopg2-binary = ">=2.9.10"
 
 [project.scripts]
 
+dv_bulk_release = 'dataverse_utils.scripts.dv_bulk_release:main'
 dv_collection_info = 'dataverse_utils.scripts.dv_collection_info:main'
 dv_del = 'dataverse_utils.scripts.dv_del:main'
 dv_ldc_uploader = 'dataverse_utils.scripts.dv_ldc_uploader:main'

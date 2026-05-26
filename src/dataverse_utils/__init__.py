@@ -7,7 +7,7 @@ import pathlib
 import sys
 from dataverse_utils.dataverse_utils import *
 
-VERSION = (0, 22, 11)
+VERSION = (0, 22, 12)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 USERAGENT = (f'dataverse_utils/v{__version__} ({sys.platform.capitalize()}); '
@@ -15,7 +15,7 @@ USERAGENT = (f'dataverse_utils/v{__version__} ({sys.platform.capitalize()}); '
 UAHEADER = {'User-agent' : USERAGENT}
 
 SCRIPT_VERSIONS={
-#'dv_bulk_release' : (0, 1, 0),
+'dv_bulk_release' : (0, 1, 0),
 'dv_collection_info' : (0, 5, 0),
 'dv_del' : (0, 2, 4),
 'dv_ldc_uploader' : (0, 4, 1),
