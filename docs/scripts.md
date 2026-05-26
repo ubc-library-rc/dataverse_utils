@@ -19,6 +19,34 @@ Note that these programs have been primarily tested on Linux and MacOS, with [Wi
 
 In alphabetical order:
 
+## dv_bulk_release
+
+A utility to release multiple studies at once, or a single study (mutually exclusive). In order to publish studies, the owning collection *must* be published already, as it's not possible to publish to something that itself is not published.
+
+Because this utility eschews downloading metadata from a study to see if it is, in fact, a draft study, errors and successes are just dumped to the console. Sould you be publishing a *lot* of studies, you may want to pipe to a text file for later reference.
+
+```nohighlight
+usage: dv_bulk_release [-h] -k KEY [-c COLLECTION | -p PID] [-i] [-u DVURL] [-m MAJMIN] [-v]
+
+Bulk publish an entire Dataverse collection or just a single study. Failure to publish (for whatever reason) results in a console message, as does success. By default, publishing
+version is "major" unless specified, subject to the inbuilt limitations of a Dataverse installation. Note that the owning **collection** must be published first. It is not possible to
+publish studies when their containers are not yet published.
+
+options:
+  -h, --help            show this help message and exit
+  -k, --key KEY         Dataverse user API key
+  -c, --collection COLLECTION
+                        Dataverse collection short name from which contains draft records. eg. "ldc"
+  -p, --persistentId PID
+                        Handle or DOI to publish in format hdl:11272.1/FK2/12345
+  -i, --interactive     Confirm each study publication
+  -u, --url DVURL       URL to base Dataverse installation. Default: https://borealisdata.ca
+  -m, --major-minor MAJMIN
+                        Keyword indicating major or minopublished. "major" or "minor". Default: major
+  -v, --version         Show version number and exit
+```
+
+
 ## dv_collection_info
 
 A recursive file metadata utility. You can specify the head of a tree and the harvester will harvest either the \[latest\] or *all* study metadata, including files. Output consists of either two text files (TSV or custom separator) or a single SQLite3 database. It is also possible to harvest the metadata of a single item. An API key currently required.
