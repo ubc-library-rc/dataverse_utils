@@ -1,6 +1,6 @@
 [project]
 name = "dataverse-utils"
-version = "0.22.12"
+version = "0.23.0"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
@@ -21,7 +21,8 @@ dependencies = [
     "dryad2dataverse (>=0.8.6,<0.9.0)",
     "requests (>=2.33,<3.0)",
     "urllib3 (>=2.7.0,<3.0.0)",
-    "idna (>=3.16,<4.0)"
+    "idna (>=3.16,<4.0)",
+    "bagit (>=1.9.0,<2.0.0)"
 ]
 
 keywords =['Harvard Dataverse', 'Dataverse', 'research data management', 'data repository'] 
@@ -36,7 +37,7 @@ optional = true
 psycopg2-binary = ">=2.9.10"
 
 [project.scripts]
-
+dv_bagit = 'dataverse_utils.scripts.dv_bagit:main'
 dv_bulk_release = 'dataverse_utils.scripts.dv_bulk_release:main'
 dv_collection_info = 'dataverse_utils.scripts.dv_collection_info:main'
 dv_del = 'dataverse_utils.scripts.dv_del:main'

@@ -4,5 +4,6 @@
 ::: dataverse_utils.dvdata
 ::: dataverse_utils.ldc
 ::: dataverse_utils.collections
+::: dataverse_utils.archive
 
 

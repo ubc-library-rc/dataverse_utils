@@ -19,6 +19,113 @@ Note that these programs have been primarily tested on Linux and MacOS, with [Wi
 
 In alphabetical order:
 
+## dv_bagit
+Create [Bagit](https://datatracker.ietf.org/doc/html/rfc8493#section-2.1.1) archival packages from a Dataverse study. Unlike the Bagit export built into a Dataverse installation, `dv_bagit`
+
+* Will create a local Bagit archive at a directory of your choice
+* Can create a bag which contains *all* versions of a data set
+* Does not require super-user permission; only FileDownloader permission is required
+* Can automatically compress bags into zip files
+* On update, only *new* files and metadata are downloaded
+* Bags will still be updated if a compressed bag is found in the target directory
+* Bag manifests will be calculated on the hash algorithm used in the Dataverse installation (usually, but not necessarily, md5)
+
+All files from the data set will stored in the `files` directory, with metadata describing the files in the cleverly-named `metadata` directory.
+This visual example of <https://borealisdata.ca/dataset.xhtml?persistentId=doi:10.5683/SP3/YIIYOX> (2026-06-24) clearly shows the structure of a dataset with multiple versions as a Bagit bag.
+
+```nohighlight
+doi-10.5683_SP3_YIIYOX/
+├── bag-info.txt
+├── bagit.txt
+├── data
+│   ├── files
+│   │   ├── -data-dictionary.txt
+│   │   ├── -README.txt
+│   │   ├── dataprep_initial-clean_step-1.R
+│   │   ├── dataprep_initial-clean_step-2.R
+│   │   ├── dataprep_new-var-names.csv
+│   │   ├── dataprep_step-1-cleaned.csv
+│   │   ├── dataprep-qualtrics-export_metadata-only.csv
+│   │   ├── NA_FocusGroupHandout.rtf
+│   │   ├── NA_FocusGroupQuestions.rtf
+│   │   ├── NA_Survey.rtf
+│   │   ├── NeedsAssessment_SurveyData.csv
+│   │   ├── project_focus-group-handout.rtf
+│   │   ├── project_focus-group-questions.rtf
+│   │   ├── project_graphs-script.rmd
+│   │   ├── project_survey-data_data-dictionary.txt
+│   │   └── project_survey.rtf
+│   └── metadata
+│       ├── 1.0
+│       │   ├── file_metadata_1.0.json
+│       │   └── metadata_version_1.0.json
+│       ├── 1.1
+│       │   ├── file_metadata_1.1.json
+│       │   └── metadata_version_1.1.json
+│       ├── 1.2
+│       │   ├── file_metadata_1.2.json
+│       │   └── metadata_version_1.2.json
+│       ├── 1.3
+│       │   ├── file_metadata_1.3.json
+│       │   └── metadata_version_1.3.json
+│       ├── 1.4
+│       │   ├── file_metadata_1.4.json
+│       │   └── metadata_version_1.4.json
+│       ├── 2.0
+│       │   ├── file_metadata_2.0.json
+│       │   └── metadata_version_2.0.json
+│       ├── 3.0
+│       │   ├── file_metadata_3.0.json
+│       │   └── metadata_version_3.0.json
+│       ├── 3.1
+│       │   ├── file_metadata_3.1.json
+│       │   └── metadata_version_3.1.json
+│       ├── file_metadata_all_versions.json
+│       └── study_metadata_all_versions.json
+├── manifest-md5.txt
+├── manifest-sha256.txt
+├── manifest-sha512.txt
+├── tagmanifest-md5.txt
+├── tagmanifest-sha256.txt
+└── tagmanifest-sha512.txt
+
+12 directories, 42 files
+```
+The files directory will *not* contain duplicate files, as files with identical hex digests are not downloaded. Original metadata can be recreated by pairing the file hex digest with the information found in the file metadata JSON. In this way, it's possible to have a one to many relationship if, for some reason, there are duplicate files in a dataset without the overhead of having identical files in the bag.
+
+It's also possible to add contact email (as this may be suppressed in metadata harvest) as well as a contact phone number if required. Harvest is by PID(s), rather than by collection. See the help below for more details.
+
+To update a bag, simply run the command again. If a bag directory or zipfile is present in the target directory, then the bag will be updated with any new information.
+
+`dv_bagit` has a short built-in delay after each file download and only one file is downloaded at a time; this is to avoid placing strain on target systems resources.
+
+```nohighlight
+usage: dv_bagit [-h] [-u URL] [-v] -k KEY [-a] [-t TARGET_DIR] [-c] [--contact-email CONTACT_EMAIL] [--contact-phone CONTACT_PHONE] pids [pids ...]
+
+ Downloads a Dataverse study given by persistentID(s), ie, DOI or handle, then
+downloads files and metadata and creates Bagit archive.  Archives are stored in
+directories with the name [protocol]-[authority]_[identifier], where slashes are
+replaced by underscores.  For full details on the Bagit specification, please
+see https://datatracker.ietf.org/doc/html/rfc8493
+
+positional arguments:
+  pids                  Dataverse study persistent identifier(s) (DOI/handle)
+
+options:
+  -h, --help            show this help message and exit
+  -u, --url URL         Dataverse installation base url. defaults to "https://abacus.library.ubc.ca"
+  -v, --version         Show version number and exit
+  -k, --key KEY         API key
+  -a, --all-versions    Include *all** versions, not just the current version
+  -t, --target-dir TARGET_DIR
+                        Target directory for bag. Default: current directory
+  -c, --compress        Compress Bagit archive into a zip file
+  --contact-email CONTACT_EMAIL
+                        Bag contact email. Defaults to datasetContactEmail if present. Optional
+  --contact-phone CONTACT_PHONE
+                        Bag contact telephone number. Optional
+```
+
 ## dv_bulk_release
 
 A utility to release multiple studies at once, or a single study (mutually exclusive). In order to publish studies, the owning collection *must* be published already, as it's not possible to publish to something that itself is not published.
