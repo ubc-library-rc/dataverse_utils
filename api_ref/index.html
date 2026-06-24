@@ -266,6 +266,40 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dataverse_utils.archive">archive</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.archive.Archive">Archive</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.target_dir">target_dir</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.__init__">__init__</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.bagit_meta">bagit_meta</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.compress_bag">compress_bag</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.download_file">download_file</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.process_files">process_files</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.produce_digest">produce_digest</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.refresh_bag">refresh_bag</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.save_file_to_bag">save_file_to_bag</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.verify_download">verify_download</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.archive.Archive.write_metadata">write_metadata</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.archive.DigestMismatchError">DigestMismatchError</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dataverse_utils.archive.PIDError">PIDError</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                 </li>
               </ul>
@@ -9685,6 +9719,1321 @@ None if version does not exist</p>
 
 
   </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="dataverse_utils.archive" class="doc doc-heading">
+            <code>dataverse_utils.archive</code>
+
+
+<a href="#dataverse_utils.archive" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Bagit archiver class for dataverse_utils</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="dataverse_utils.archive.Archive" class="doc doc-heading">
+            <code>Archive</code>
+
+
+<a href="#dataverse_utils.archive.Archive" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>All in one</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+                <pre class="codehilite"><code class="language-python">class Archive:
+    '''
+    All in one
+   '''
+    def __init__(self, **kwargs):
+        '''
+        Bagit archive creator
+
+        Parameters
+        ----------
+        **kwargs
+            Required parameters:
+            url : str
+                URL of Dataverse instance
+            key : str
+                API key with appropriate privileges
+            target_dir : str
+                Destination directory for Bagit archive
+            pid : str
+                DOI or handle of study object to Bag
+
+        Optional parameters
+        -------------------
+        **kwargs
+            session : requests.Session
+            all_versions : bool
+                Create bag using *all* versions, not just current versions
+            contact_email : str
+                Contact email for Bag. Depending on the Dataverse installation,
+                email harvest may be suppressed via API.
+            contact_phone : str
+                Contact number for Bag, in international format.
+                ie +1 604 555 5555
+                   +49 30 5555 5555
+
+        Notes
+        -----
+        Workflow usually will proceed like this:
+        ```
+        bag = Archive(**kwargs) #whatever kwargs is
+        bag.write_metadata()
+        bag.process_files()
+        bag.bagit_meta()
+        bag.refresh_bag()
+        if args.compress:
+            bag.compress_bag(expunge=True)
+        ```
+
+        '''
+        self.kwargs = kwargs
+        self.study = None
+        self.__tpid = self.kwargs['pid'].replace(':','-').replace('/','_')
+        self.__validate_pid()
+        self.study = dvc.StudyMetadata(**self.kwargs)
+        #Default for Dataverse is md5
+        self.kwargs['digest_type'] = kwargs.get('digest_type', 'md5')
+        #unzip an archive in the target dir so that you don't
+        #waste time downloading needlessly
+        self.__zip = pathlib.Path(self.kwargs['target_dir'], f'{self.__tpid}.zip')
+        x=self.__zip
+        if self.__zip.exists():
+            self.__unzip_existing_bag()
+        self.bag = self.__bag()
+        self.session = kwargs.get('session', requests.Session())
+        self.session.mount('https://',
+                           requests.adapters.HTTPAdapter(max_retries=dvc.RETRY))
+        self.limiter = dvc.RateLimiter(rate_limit_on=kwargs.get('rate_limit_on', True),
+                                      rate_limit_min=kwargs.get('rate_limit_min',0.3),
+                                      rate_limit_max=kwargs.get('rate_limit_max', 2))
+
+    def __validate_pid(self):
+        '''Basic PID format check'''
+        if self.kwargs['pid'][:3].lower() not in ['hdl', 'doi']:
+            raise PIDError(f'{self.kwargs["pid"]} is not a valid PID')
+
+    def __bag(self):
+        '''Create a Bagit bag'''
+        try:
+            baggy = bagit.Bag(self.target_dir)
+
+        except bagit.BagError:
+            self.__make_dir()
+            baggy = bagit.make_bag(self.target_dir)
+            baggy.save(manifests=True)
+
+        if self.kwargs['digest_type'] not in baggy.algorithms:
+            baggy.algorithms.append(self.kwargs['digest_type'])
+            #bagit source line 1258
+        return baggy
+
+    @property
+    def target_dir(self):
+        '''
+        Create a clean target directory
+        '''
+        return pathlib.Path(self.kwargs['target_dir'], self.__tpid).expanduser().absolute()
+
+    def __make_dir(self):
+        '''
+        Create target dir
+        '''
+        self.target_dir.mkdir(exist_ok=True)
+
+    def write_metadata(self):
+        '''
+        Write study metadata
+        '''
+        #Bag should exist, everything gets dumped into 'data'
+        mpath = pathlib.Path(self.target_dir, 'data','metadata')
+        mpath.mkdir(exist_ok=True)
+        if self.kwargs['all_versions']:
+            for meta in [('study_metadata_all_versions',  self.study.all_versions),
+                         ('file_metadata_all_versions', self.study.all_files)]:
+                with open(pathlib.Path(mpath, f'{meta[0]}.json'),
+                          mode='w', encoding='utf-8') as f:
+                    json.dump(meta[1], f)
+            for ver in self.study.versions:
+                wpath = pathlib.Path(mpath, ver)
+                wpath.mkdir(exist_ok=True)
+                with open(pathlib.Path(wpath,f'metadata_version_{ver}.json'),
+                                       mode='w', encoding='utf-8') as f:
+                    json.dump(self.study.version_metadata(ver),f)
+                with open(pathlib.Path(wpath, f'file_metadata_{ver}.json'),
+                          mode='w', encoding='utf-8') as f:
+                    _maj, _min = (int(_) for _ in ver.split('.'))
+                    fmeta ={'files': [_['files'] for _ in self.study.all_versions['data']
+                            if _['versionNumber']==_maj and
+                            _['versionMinorNumber']==_min][0]}
+                    json.dump(fmeta,f)
+
+        else:
+            with open(pathlib.Path(mpath,'study_metadata.json'),
+                       mode='w', encoding='utf-8') as f:
+                json.dump(self.study.study_meta, f)
+
+    def __should_download(self, hexdigest=str, digest_type:str=None)-&gt;bool:
+        '''
+        Checks if file is present in bag and needs to be downloaded
+        '''
+        if not digest_type:
+            digest_type = self.kwargs['digest_type']
+        if not self.bag:
+            return True
+        if hexdigest not in [_.get(digest_type.lower(),'') for _ in self.bag.entries.values()]:
+            return True
+        return False
+
+    def download_file(self, fid=int)-&gt;requests.models.Response:
+        '''
+        Download files
+
+        Parameters
+        ----------
+        fid : int
+            Dataverse file ID
+        '''
+        #check hash with hashlib
+        data = self.session.get(f'{self.kwargs["url"]}/api/access/datafile/{fid}',
+                                    headers=self.study.headers,
+                                    params={'format':'original'},
+                                    stream=True,
+                                    timeout=self.kwargs.get('timeout', 15))
+        self.limiter.rate_limit()
+        return data
+
+    def produce_digest(self, fobj:bytes, prot:str = 'md5') -&gt; str:
+        '''
+        Returns hex digest
+
+        Parameters
+        ----------
+        prot : str
+            Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
+            'sha384','sha512', 'blake2b', 'blake2s', 'md5'.
+            default='md5'
+        blocksize : int
+            Read block size in bytes
+        '''
+        ok_hash = {'sha1' : hashlib.sha1(),
+                   'sha224' : hashlib.sha224(),
+                   'sha256' : hashlib.sha256(),
+                   'sha384' : hashlib.sha384(),
+                   'sha512' : hashlib.sha512(),
+                   'blake2b' : hashlib.blake2b(),
+                   'blake2s' : hashlib.blake2s(),
+                   'md5': hashlib.md5()}
+        #blocksize: int = 2**16
+        #fobj.seek(0)
+        try:
+            _hash = ok_hash[prot]
+        except (UnboundLocalError, KeyError):
+            message = ('Unsupported hash type. Valid values are '
+                       f'{list(ok_hash)}.')
+            LOGGER.exception('Unsupported hash type. Valid values are %s', message)
+            raise
+
+        #fblock = fobj.read(blocksize)
+        #while fblock:
+        #    _hash.update(fblock)
+        #    fblock = fobj.read(blocksize)
+        #return _hash.hexdigest()
+        _hash.update(fobj)
+        return _hash.hexdigest()
+
+    def verify_download(self, fobj:bytes, prot:str, correct_digest:str)-&gt;bool:
+        '''Validate files by comparing calculated digests with the stated ones
+
+        Parameters
+        ----------
+        fobj : bytes
+            Bytes to compare, normally requests.content
+        prot : str
+            Protocol (ie, md5, etc)
+        correct_digest : str
+            Correct hex digest
+        '''
+        calc = self.produce_digest(fobj, prot.lower())
+        if calc != correct_digest:
+            LOGGER.error('%s comparison error: %s should be %s',
+                         prot, calc, correct_digest)
+            return False
+        LOGGER.info('%s match: %s', prot, calc)
+        return True
+
+    def save_file_to_bag(self, fobj:bytes, validate:bool=True, **kwargs):
+        '''
+        Save the file to the bag file store
+
+        Parameters
+        ----------
+        fobj : bytes
+            Requests.content
+        validate : bool
+            Re-validate the hex digest against the *written* file
+        kwargs : dict
+            File information. Must include either 'dataFile_originalFileName, 'label' or
+            'dataFile_filename'. If validating, must *also* include
+            'dataFile_checksum_type' and 'dataFile_checksum_value'
+            Naming priority is in that order, as nature intended.
+
+        Notes
+        -----
+        Files are saved to the directory called *files* inside the
+        data directory in the bag.
+        '''
+        fname = kwargs.get('dataFile_originalFileName',
+                           kwargs.get('label', kwargs['dataFile_filename']))
+        files_loc = pathlib.Path(self.target_dir, 'data','files')
+        if not files_loc.exists():
+            files_loc.mkdir(exist_ok=True)
+        writefile = pathlib.Path(files_loc, fname)
+        with open(writefile, mode='wb') as f:
+            f.write(fobj)
+        if validate:
+            with open(writefile, mode='rb') as f:
+                if not self.verify_download(f.read(),
+                                           kwargs['dataFile_checksum_type'],
+                                           kwargs['dataFile_checksum_value']):
+                    LOGGER.error('Hex digest mismatch between written file and downloaded file')
+                    LOGGER.error('File information: {kwargs}')
+                    msg=('Hex digest mismatch between written file and '
+                        f'downloaded file. file id: {kwargs.get("dataFile_id", "N/A")}, '
+                        f'study PID: {kwargs.get("dataFile_persistentId", "N/A")}')
+                    raise DigestMismatchError(msg)
+
+    def process_files(self):
+        '''
+        Iterate over files to download and write them, if necessary,
+        to physical media
+        '''
+        # self.study['current_version']
+        file_list = ([_ for _ in self.study.all_files if
+                    _['versionStatement'] == self.study.current_version]
+                    if not self.kwargs['all_versions']
+                    else self.study.all_files)
+
+        for file in tqdm.tqdm(file_list,
+                              desc='Download check',
+                              unit='file',
+                              leave=False,
+                              bar_format=dvc.BAR_FORMAT):
+            down = self.__should_download(file['dataFile_checksum_value'],
+                                        file.get('dataFile_checksum_type', 'md5'))
+            if down:
+                download = self.download_file(file['dataFile_id'])
+                #breakpoint()
+                if not self.verify_download(download.content,
+                                            file['dataFile_checksum_type'].lower(),
+                                            file['dataFile_checksum_value']):
+                    LOGGER.error('Validation error for file with ID %s', file['dataFile_id'])
+                    raise DigestMismatchError(f'Validation error for {file}')
+                self.save_file_to_bag(download.content, **file)
+
+    def bagit_meta(self):
+        '''Add applicable metadata for the Bagit bag'''
+        #See spec:  https://datatracker.ietf.org/doc/html/rfc8493#section-2.1.1
+        self.bag.info['Contact-Name'] = self.study.get('authorName')
+        self.bag.info['Contact-Email'] = self.kwargs.get('contact_email',
+                                              self.study.get('datasetContactEmail'))
+        self.bag.info['Contact-Phone'] = self.kwargs.get('contact_phone')
+        #bag date automatically set
+        #self.bag.info['Bagging-Date'] = datetime.datetime.now().strftime('%Y-%M-%d')
+        size = sum(pathlib.Path(a[0], c).stat().st_size
+                   for a in pathlib.Path.walk(self.target_dir)
+                   for c in a[2])
+        self.bag.info['Bag-Size'] = f'{size/1024**2} MB'
+        self.bag.info['Source-Organization'] = self.kwargs['url']
+        if self.study.get('dsDescriptionValue'):
+            desc = bs4.BeautifulSoup(self.study['dsDescriptionValue'], 'html.parser').text
+            self.bag.info['External-Description'] = desc
+        self.bag.info['External-Identifier'] = self.study.pid
+        repl_dict = {}
+        for k, v in self.bag.info.items():
+            if v:
+                repl_dict.update({k:v})
+        self.bag.info = repl_dict
+
+    def refresh_bag(self):
+        '''Refresh to keep it fresh'''
+        self.bag.save(manifests=True)
+
+    def __unzip_existing_bag(self):
+        with zipfile.ZipFile(self.__zip) as zz:
+            #Note! self.kwargs['target_dir'], or the top level not including PID
+            zz.extractall(path=self.kwargs['target_dir'])
+
+    def compress_bag(self, expunge=False):
+        '''Compress the bag into a zip file.
+        The zip file will have the same ID as the bag directory,
+        ['pid'].replace(':','-').replace('/','_')
+
+        Parameters
+        ----------
+        expunge : bool
+            If True, delete uncompressed Bagit archve
+        '''
+        with zipfile.ZipFile(self.__zip,
+                             mode='w',
+                             compression=zipfile.ZIP_DEFLATED,
+                             allowZip64=True,
+                             compresslevel=9) as zipper:
+            #You could iterate without the second loop but it's much
+            #nicer if you can use tqdm
+            top_level = self.target_dir.name
+            filedict = []
+            for p in self.target_dir.walk():
+                for f in p[2]:
+                    file = pathlib.Path(p[0],f)
+                    _index = file.parts.index(top_level)
+                    name = pathlib.Path('/'.join(file.parts[_index:]))
+                    filedict.append({'file':file, 'arcname':name})
+            #Iterate over this dict because it's all in one place
+            for _ in tqdm.tqdm(filedict,
+                              desc='Files',
+                              unit='file',
+                              leave=False,
+                              bar_format=dvc.BAR_FORMAT):
+                zipper.write(_['file'], arcname=_['arcname'])
+        if expunge:
+            for d in self.target_dir.walk():
+                for f in d[2]:
+                    delme = pathlib.Path(d[0], f)
+                    if delme.exists():
+                        delme.unlink()
+            for d in self.target_dir.walk(top_down=False):
+                for sd in d[1]:
+                    delme = pathlib.Path(d[0], sd)
+                    if delme.exists():
+                        delme.rmdir()
+            self.target_dir.rmdir()</code></pre>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="dataverse_utils.archive.Archive.target_dir" class="doc doc-heading">
+            <code class=" language-python">target_dir</code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#dataverse_utils.archive.Archive.target_dir" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Create a clean target directory</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.__init__" class="doc doc-heading">
+            <code class=" language-python">__init__(**kwargs)</code>
+
+<a href="#dataverse_utils.archive.Archive.__init__" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Bagit archive creator</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>**kwargs</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Required parameters:
+url : str
+    URL of Dataverse instance
+key : str
+    API key with appropriate privileges
+target_dir : str
+    Destination directory for Bagit archive
+pid : str
+    DOI or handle of study object to Bag</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="optional-parameters" open>
+  <summary>Optional parameters</summary>
+  <p><em><em>kwargs
+    session : requests.Session
+    all_versions : bool
+        Create bag using </em>all</em> versions, not just current versions
+    contact_email : str
+        Contact email for Bag. Depending on the Dataverse installation,
+        email harvest may be suppressed via API.
+    contact_phone : str
+        Contact number for Bag, in international format.
+        ie +1 604 555 5555
+           +49 30 5555 5555</p>
+</details>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Workflow usually will proceed like this:</p>
+<pre><code>bag = Archive(**kwargs) #whatever kwargs is
+bag.write_metadata()
+bag.process_files()
+bag.bagit_meta()
+bag.refresh_bag()
+if args.compress:
+    bag.compress_bag(expunge=True)
+</code></pre>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def __init__(self, **kwargs):
+    '''
+    Bagit archive creator
+
+    Parameters
+    ----------
+    **kwargs
+        Required parameters:
+        url : str
+            URL of Dataverse instance
+        key : str
+            API key with appropriate privileges
+        target_dir : str
+            Destination directory for Bagit archive
+        pid : str
+            DOI or handle of study object to Bag
+
+    Optional parameters
+    -------------------
+    **kwargs
+        session : requests.Session
+        all_versions : bool
+            Create bag using *all* versions, not just current versions
+        contact_email : str
+            Contact email for Bag. Depending on the Dataverse installation,
+            email harvest may be suppressed via API.
+        contact_phone : str
+            Contact number for Bag, in international format.
+            ie +1 604 555 5555
+               +49 30 5555 5555
+
+    Notes
+    -----
+    Workflow usually will proceed like this:
+    ```
+    bag = Archive(**kwargs) #whatever kwargs is
+    bag.write_metadata()
+    bag.process_files()
+    bag.bagit_meta()
+    bag.refresh_bag()
+    if args.compress:
+        bag.compress_bag(expunge=True)
+    ```
+
+    '''
+    self.kwargs = kwargs
+    self.study = None
+    self.__tpid = self.kwargs['pid'].replace(':','-').replace('/','_')
+    self.__validate_pid()
+    self.study = dvc.StudyMetadata(**self.kwargs)
+    #Default for Dataverse is md5
+    self.kwargs['digest_type'] = kwargs.get('digest_type', 'md5')
+    #unzip an archive in the target dir so that you don't
+    #waste time downloading needlessly
+    self.__zip = pathlib.Path(self.kwargs['target_dir'], f'{self.__tpid}.zip')
+    x=self.__zip
+    if self.__zip.exists():
+        self.__unzip_existing_bag()
+    self.bag = self.__bag()
+    self.session = kwargs.get('session', requests.Session())
+    self.session.mount('https://',
+                       requests.adapters.HTTPAdapter(max_retries=dvc.RETRY))
+    self.limiter = dvc.RateLimiter(rate_limit_on=kwargs.get('rate_limit_on', True),
+                                  rate_limit_min=kwargs.get('rate_limit_min',0.3),
+                                  rate_limit_max=kwargs.get('rate_limit_max', 2))</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.bagit_meta" class="doc doc-heading">
+            <code class=" language-python">bagit_meta()</code>
+
+<a href="#dataverse_utils.archive.Archive.bagit_meta" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Add applicable metadata for the Bagit bag</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def bagit_meta(self):
+    '''Add applicable metadata for the Bagit bag'''
+    #See spec:  https://datatracker.ietf.org/doc/html/rfc8493#section-2.1.1
+    self.bag.info['Contact-Name'] = self.study.get('authorName')
+    self.bag.info['Contact-Email'] = self.kwargs.get('contact_email',
+                                          self.study.get('datasetContactEmail'))
+    self.bag.info['Contact-Phone'] = self.kwargs.get('contact_phone')
+    #bag date automatically set
+    #self.bag.info['Bagging-Date'] = datetime.datetime.now().strftime('%Y-%M-%d')
+    size = sum(pathlib.Path(a[0], c).stat().st_size
+               for a in pathlib.Path.walk(self.target_dir)
+               for c in a[2])
+    self.bag.info['Bag-Size'] = f'{size/1024**2} MB'
+    self.bag.info['Source-Organization'] = self.kwargs['url']
+    if self.study.get('dsDescriptionValue'):
+        desc = bs4.BeautifulSoup(self.study['dsDescriptionValue'], 'html.parser').text
+        self.bag.info['External-Description'] = desc
+    self.bag.info['External-Identifier'] = self.study.pid
+    repl_dict = {}
+    for k, v in self.bag.info.items():
+        if v:
+            repl_dict.update({k:v})
+    self.bag.info = repl_dict</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.compress_bag" class="doc doc-heading">
+            <code class=" language-python">compress_bag(expunge=False)</code>
+
+<a href="#dataverse_utils.archive.Archive.compress_bag" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compress the bag into a zip file.
+The zip file will have the same ID as the bag directory,
+[&lsquo;pid&rsquo;].replace(&lsquo;:&rsquo;,&rsquo;-&lsquo;).replace(&lsquo;/&rsquo;,&rsquo;_&rsquo;)</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>expunge</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>False</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>If True, delete uncompressed Bagit archve</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def compress_bag(self, expunge=False):
+    '''Compress the bag into a zip file.
+    The zip file will have the same ID as the bag directory,
+    ['pid'].replace(':','-').replace('/','_')
+
+    Parameters
+    ----------
+    expunge : bool
+        If True, delete uncompressed Bagit archve
+    '''
+    with zipfile.ZipFile(self.__zip,
+                         mode='w',
+                         compression=zipfile.ZIP_DEFLATED,
+                         allowZip64=True,
+                         compresslevel=9) as zipper:
+        #You could iterate without the second loop but it's much
+        #nicer if you can use tqdm
+        top_level = self.target_dir.name
+        filedict = []
+        for p in self.target_dir.walk():
+            for f in p[2]:
+                file = pathlib.Path(p[0],f)
+                _index = file.parts.index(top_level)
+                name = pathlib.Path('/'.join(file.parts[_index:]))
+                filedict.append({'file':file, 'arcname':name})
+        #Iterate over this dict because it's all in one place
+        for _ in tqdm.tqdm(filedict,
+                          desc='Files',
+                          unit='file',
+                          leave=False,
+                          bar_format=dvc.BAR_FORMAT):
+            zipper.write(_['file'], arcname=_['arcname'])
+    if expunge:
+        for d in self.target_dir.walk():
+            for f in d[2]:
+                delme = pathlib.Path(d[0], f)
+                if delme.exists():
+                    delme.unlink()
+        for d in self.target_dir.walk(top_down=False):
+            for sd in d[1]:
+                delme = pathlib.Path(d[0], sd)
+                if delme.exists():
+                    delme.rmdir()
+        self.target_dir.rmdir()</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.download_file" class="doc doc-heading">
+            <code class=" language-python">download_file(fid=int)</code>
+
+<a href="#dataverse_utils.archive.Archive.download_file" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Download files</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>fid</code></b>
+                  (<code><span title="int">int</span></code>, default:
+                      <code><span title="int">int</span></code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Dataverse file ID</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def download_file(self, fid=int)-&gt;requests.models.Response:
+    '''
+    Download files
+
+    Parameters
+    ----------
+    fid : int
+        Dataverse file ID
+    '''
+    #check hash with hashlib
+    data = self.session.get(f'{self.kwargs["url"]}/api/access/datafile/{fid}',
+                                headers=self.study.headers,
+                                params={'format':'original'},
+                                stream=True,
+                                timeout=self.kwargs.get('timeout', 15))
+    self.limiter.rate_limit()
+    return data</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.process_files" class="doc doc-heading">
+            <code class=" language-python">process_files()</code>
+
+<a href="#dataverse_utils.archive.Archive.process_files" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Iterate over files to download and write them, if necessary,
+to physical media</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def process_files(self):
+    '''
+    Iterate over files to download and write them, if necessary,
+    to physical media
+    '''
+    # self.study['current_version']
+    file_list = ([_ for _ in self.study.all_files if
+                _['versionStatement'] == self.study.current_version]
+                if not self.kwargs['all_versions']
+                else self.study.all_files)
+
+    for file in tqdm.tqdm(file_list,
+                          desc='Download check',
+                          unit='file',
+                          leave=False,
+                          bar_format=dvc.BAR_FORMAT):
+        down = self.__should_download(file['dataFile_checksum_value'],
+                                    file.get('dataFile_checksum_type', 'md5'))
+        if down:
+            download = self.download_file(file['dataFile_id'])
+            #breakpoint()
+            if not self.verify_download(download.content,
+                                        file['dataFile_checksum_type'].lower(),
+                                        file['dataFile_checksum_value']):
+                LOGGER.error('Validation error for file with ID %s', file['dataFile_id'])
+                raise DigestMismatchError(f'Validation error for {file}')
+            self.save_file_to_bag(download.content, **file)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.produce_digest" class="doc doc-heading">
+            <code class=" language-python">produce_digest(fobj, prot='md5')</code>
+
+<a href="#dataverse_utils.archive.Archive.produce_digest" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns hex digest</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>prot</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;md5&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Hash type. Supported hashes: &lsquo;sha1&rsquo;, &lsquo;sha224&rsquo;, &lsquo;sha256&rsquo;,
+&lsquo;sha384&rsquo;,&rsquo;sha512&rsquo;, &lsquo;blake2b&rsquo;, &lsquo;blake2s&rsquo;, &lsquo;md5&rsquo;.
+default=&rsquo;md5&rsquo;</p>
+              </div>
+            </li>
+            <li>
+              <b><code>blocksize</code></b>
+                  (<code><span title="int">int</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Read block size in bytes</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def produce_digest(self, fobj:bytes, prot:str = 'md5') -&gt; str:
+    '''
+    Returns hex digest
+
+    Parameters
+    ----------
+    prot : str
+        Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
+        'sha384','sha512', 'blake2b', 'blake2s', 'md5'.
+        default='md5'
+    blocksize : int
+        Read block size in bytes
+    '''
+    ok_hash = {'sha1' : hashlib.sha1(),
+               'sha224' : hashlib.sha224(),
+               'sha256' : hashlib.sha256(),
+               'sha384' : hashlib.sha384(),
+               'sha512' : hashlib.sha512(),
+               'blake2b' : hashlib.blake2b(),
+               'blake2s' : hashlib.blake2s(),
+               'md5': hashlib.md5()}
+    #blocksize: int = 2**16
+    #fobj.seek(0)
+    try:
+        _hash = ok_hash[prot]
+    except (UnboundLocalError, KeyError):
+        message = ('Unsupported hash type. Valid values are '
+                   f'{list(ok_hash)}.')
+        LOGGER.exception('Unsupported hash type. Valid values are %s', message)
+        raise
+
+    #fblock = fobj.read(blocksize)
+    #while fblock:
+    #    _hash.update(fblock)
+    #    fblock = fobj.read(blocksize)
+    #return _hash.hexdigest()
+    _hash.update(fobj)
+    return _hash.hexdigest()</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.refresh_bag" class="doc doc-heading">
+            <code class=" language-python">refresh_bag()</code>
+
+<a href="#dataverse_utils.archive.Archive.refresh_bag" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Refresh to keep it fresh</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def refresh_bag(self):
+    '''Refresh to keep it fresh'''
+    self.bag.save(manifests=True)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.save_file_to_bag" class="doc doc-heading">
+            <code class=" language-python">save_file_to_bag(fobj, validate=True, **kwargs)</code>
+
+<a href="#dataverse_utils.archive.Archive.save_file_to_bag" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Save the file to the bag file store</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>fobj</code></b>
+                  (<code><span title="bytes">bytes</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Requests.content</p>
+              </div>
+            </li>
+            <li>
+              <b><code>validate</code></b>
+                  (<code><span title="bool">bool</span></code>, default:
+                      <code>True</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Re-validate the hex digest against the <em>written</em> file</p>
+              </div>
+            </li>
+            <li>
+              <b><code>kwargs</code></b>
+                  (<code><span title="dict">dict</span></code>, default:
+                      <code>{}</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>File information. Must include either &lsquo;dataFile_originalFileName, &lsquo;label&rsquo; or
+&lsquo;dataFile_filename&rsquo;. If validating, must <em>also</em> include
+&lsquo;dataFile_checksum_type&rsquo; and &lsquo;dataFile_checksum_value&rsquo;
+Naming priority is in that order, as nature intended.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Files are saved to the directory called <em>files</em> inside the
+data directory in the bag.</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def save_file_to_bag(self, fobj:bytes, validate:bool=True, **kwargs):
+    '''
+    Save the file to the bag file store
+
+    Parameters
+    ----------
+    fobj : bytes
+        Requests.content
+    validate : bool
+        Re-validate the hex digest against the *written* file
+    kwargs : dict
+        File information. Must include either 'dataFile_originalFileName, 'label' or
+        'dataFile_filename'. If validating, must *also* include
+        'dataFile_checksum_type' and 'dataFile_checksum_value'
+        Naming priority is in that order, as nature intended.
+
+    Notes
+    -----
+    Files are saved to the directory called *files* inside the
+    data directory in the bag.
+    '''
+    fname = kwargs.get('dataFile_originalFileName',
+                       kwargs.get('label', kwargs['dataFile_filename']))
+    files_loc = pathlib.Path(self.target_dir, 'data','files')
+    if not files_loc.exists():
+        files_loc.mkdir(exist_ok=True)
+    writefile = pathlib.Path(files_loc, fname)
+    with open(writefile, mode='wb') as f:
+        f.write(fobj)
+    if validate:
+        with open(writefile, mode='rb') as f:
+            if not self.verify_download(f.read(),
+                                       kwargs['dataFile_checksum_type'],
+                                       kwargs['dataFile_checksum_value']):
+                LOGGER.error('Hex digest mismatch between written file and downloaded file')
+                LOGGER.error('File information: {kwargs}')
+                msg=('Hex digest mismatch between written file and '
+                    f'downloaded file. file id: {kwargs.get("dataFile_id", "N/A")}, '
+                    f'study PID: {kwargs.get("dataFile_persistentId", "N/A")}')
+                raise DigestMismatchError(msg)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.verify_download" class="doc doc-heading">
+            <code class=" language-python">verify_download(fobj, prot, correct_digest)</code>
+
+<a href="#dataverse_utils.archive.Archive.verify_download" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Validate files by comparing calculated digests with the stated ones</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>fobj</code></b>
+                  (<code><span title="bytes">bytes</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Bytes to compare, normally requests.content</p>
+              </div>
+            </li>
+            <li>
+              <b><code>prot</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Protocol (ie, md5, etc)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>correct_digest</code></b>
+                  (<code><span title="str">str</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>Correct hex digest</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def verify_download(self, fobj:bytes, prot:str, correct_digest:str)-&gt;bool:
+    '''Validate files by comparing calculated digests with the stated ones
+
+    Parameters
+    ----------
+    fobj : bytes
+        Bytes to compare, normally requests.content
+    prot : str
+        Protocol (ie, md5, etc)
+    correct_digest : str
+        Correct hex digest
+    '''
+    calc = self.produce_digest(fobj, prot.lower())
+    if calc != correct_digest:
+        LOGGER.error('%s comparison error: %s should be %s',
+                     prot, calc, correct_digest)
+        return False
+    LOGGER.info('%s match: %s', prot, calc)
+    return True</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.archive.Archive.write_metadata" class="doc doc-heading">
+            <code class=" language-python">write_metadata()</code>
+
+<a href="#dataverse_utils.archive.Archive.write_metadata" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Write study metadata</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def write_metadata(self):
+    '''
+    Write study metadata
+    '''
+    #Bag should exist, everything gets dumped into 'data'
+    mpath = pathlib.Path(self.target_dir, 'data','metadata')
+    mpath.mkdir(exist_ok=True)
+    if self.kwargs['all_versions']:
+        for meta in [('study_metadata_all_versions',  self.study.all_versions),
+                     ('file_metadata_all_versions', self.study.all_files)]:
+            with open(pathlib.Path(mpath, f'{meta[0]}.json'),
+                      mode='w', encoding='utf-8') as f:
+                json.dump(meta[1], f)
+        for ver in self.study.versions:
+            wpath = pathlib.Path(mpath, ver)
+            wpath.mkdir(exist_ok=True)
+            with open(pathlib.Path(wpath,f'metadata_version_{ver}.json'),
+                                   mode='w', encoding='utf-8') as f:
+                json.dump(self.study.version_metadata(ver),f)
+            with open(pathlib.Path(wpath, f'file_metadata_{ver}.json'),
+                      mode='w', encoding='utf-8') as f:
+                _maj, _min = (int(_) for _ in ver.split('.'))
+                fmeta ={'files': [_['files'] for _ in self.study.all_versions['data']
+                        if _['versionNumber']==_maj and
+                        _['versionMinorNumber']==_min][0]}
+                json.dump(fmeta,f)
+
+    else:
+        with open(pathlib.Path(mpath,'study_metadata.json'),
+                   mode='w', encoding='utf-8') as f:
+            json.dump(self.study.study_meta, f)</code></pre>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="dataverse_utils.archive.DigestMismatchError" class="doc doc-heading">
+            <code>DigestMismatchError</code>
+
+
+<a href="#dataverse_utils.archive.DigestMismatchError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="Exception">Exception</span></code></p>
+
+
+
+        <p>Raise on hex digest mismatches</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+                <pre class="codehilite"><code class="language-python">class DigestMismatchError(Exception):
+    '''Raise on hex digest mismatches'''</code></pre>
+              </details>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="dataverse_utils.archive.PIDError" class="doc doc-heading">
+            <code>PIDError</code>
+
+
+<a href="#dataverse_utils.archive.PIDError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="Exception">Exception</span></code></p>
+
+
+
+        <p>Raise on invalid PIDs being passed</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/dataverse_utils/archive.py</code></summary>
+                <pre class="codehilite"><code class="language-python">class PIDError(Exception):
+    '''Raise on invalid PIDs being passed'''</code></pre>
+              </details>
 
     </div>
 
