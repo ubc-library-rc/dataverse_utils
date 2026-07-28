@@ -7,7 +7,7 @@ import pathlib
 import sys
 from dataverse_utils.dataverse_utils import *
 
-VERSION = (0, 23, 0)
+VERSION = (0, 24, 0)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 USERAGENT = (f'dataverse_utils/v{__version__} ({sys.platform.capitalize()}); '
@@ -27,7 +27,7 @@ SCRIPT_VERSIONS={
 'dv_release' : (0, 1, 3),
 'dv_replace_licence' : (0, 1, 1),
 'dv_readme_creator' : (0, 1, 1),
-'dv_study_migrator' : (0, 4, 1),
+'dv_study_migrator' : (0, 5, 0),
 'dv_upload_tsv' : (0, 5, 0)}
 
 def script_ver_stmt(name:str)->str:
