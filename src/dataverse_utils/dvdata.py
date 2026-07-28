@@ -113,7 +113,12 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         if self['target_version'] >= 5.010:
             self.fix_licence()
         if self['target_version'] >= 5.013:
-            self.production_location()
+            self.fix_production_location()
+        if self['target_version'] >= 5.14:
+            self.fix_series()
+        if self['target_version'] >= 6.2:
+            self.fix_geography()
+        #breakpoint()
 
     def _orig_json(self) -> dict:
         '''
@@ -191,7 +196,7 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         return pids
 
     ######
-    #JSON metdata fixes for different versions
+    #JSON metadata fixes for different versions
     ######
     def fix_licence(self)->None:
         '''
@@ -213,7 +218,7 @@ class Study(dict): #pylint:  disable=too-few-public-methods
             #This shouldn't happen, but UBC has datasets from the early 1970s
             self['upload_json']['datasetVersion']['termsOfUse'] = 'Not available'
 
-    def production_location(self)->None:
+    def fix_production_location(self)->None:
         '''
         Changes "multiple" to True where typeName == 'productionPlace' in
         Study['upload_json'] Changes are done
@@ -242,6 +247,34 @@ class Study(dict): #pylint:  disable=too-few-public-methods
                 ['citation']['fields'][indy]['value'] = [self['upload_json']['datasetVersion']\
                                                          ['metadataBlocks']['citation']\
                                                          ['fields'][indy]['value']]
+
+
+    def fix_series(self)->None:
+        '''
+        Turn series into a multiple (as of v5.14)
+        '''
+        to_series=['series'] # typeNames which must be converted
+        indices = []
+        for ind, val in enumerate(self['upload_json']['datasetVersion']\
+                                      ['metadataBlocks']['citation']['fields']):
+            if val['typeName'] in to_series:
+                indices.append(ind)
+        for nprob in indices:
+            newvalue = self['upload_json']['datasetVersion']\
+                    ['metadataBlocks']['citation']['fields'][nprob]
+            newvalue['multiple'] = True
+            newvalue['value']= [newvalue['value']]
+            self['upload_json']['datasetVersion']['metadataBlocks']\
+                ['citation']['fields'][nprob] = newvalue
+
+    def fix_geography(self)->None:
+        '''
+        Fix the north and south "longitude" problem. Required after v6.2
+        '''
+
+    ############
+    #END FIXES
+    ############
 
 class File(dict):
     '''
