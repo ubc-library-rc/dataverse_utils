@@ -2,6 +2,7 @@
 Copies an entire record and migrates it *including the data*
 '''
 import argparse
+import logging
 import textwrap
 import sys
 import requests
@@ -61,6 +62,18 @@ def parsley() -> argparse.ArgumentParser():
                         help='API key for target Dataverse installation.')
     parser.add_argument('-o', '--timeout', default=100,
                         help='Request timeout in seconds. Default 100.')
+    parser.add_argument('-l', '--log',
+                        help=textwrap.fill(textwrap.dedent(
+                        '''If you would like a log, provide a log file name here.
+                        If no file name is provided, no log is created.
+                        '''), 80),
+                        default=None)
+    parser.add_argument('--log-level',
+                         help=textwrap.fill(textwrap.dedent(
+                        '''Log level. Acceptable values for log level are: debug, info,
+                        warning, error, critical. Default value: warning.
+                        '''),80),
+                        default='warning')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-c', '--collection',
                         help=('Short name of target Dataverse collection (eg: dli).'),
@@ -73,6 +86,29 @@ def parsley() -> argparse.ArgumentParser():
                         version=dataverse_utils.script_ver_stmt(parser.prog),
                         help='Show version number and exit')
     return parser
+
+def logme(pargs:argparse.Namespace)->logging.Logger:
+    '''
+    Text logger
+    '''
+    logger=logging.getLogger(__name__)
+    l_format = logging.Formatter('%(name)s - %(asctime)s'
+                                 ' - %(levelname)s - %(funcName)s - '
+                                 '%(message)s')
+    lookup = {'debug' : logging.DEBUG,
+              'info' : logging.INFO,
+              'warning': logging.WARNING,
+              'error': logging.ERROR,
+              'critical': logging.CRITICAL}
+    level = lookup.get(pargs.log_level.lower(), logging.WARNING)
+    logger.setLevel(level)
+    if pargs.log:
+        text = logging.FileHandler(pargs.log, encoding='utf-8', delay=True)
+        text.setFormatter(l_format)
+        logger.addHandler(text)
+        return logger
+    logger.addHandler(logging.NullHandler())
+    return logger
 
 def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments, too-many-positional-arguments
                           source_url, source_key,
@@ -116,7 +152,7 @@ def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments
                                     tags=file.get('categories')
                                     )
 
-def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
+def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100, log=None):
     '''
     Removes all files from a dataverse record
 
@@ -135,8 +171,12 @@ def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100):
                                timeout=timeout)
         try:
             badf.raise_for_status()
-        except requests.exceptions.HTTPError:
-            print(f'File delete error for {record["pid"]}, fileid: {badfile}: Exiting',
+        except requests.exceptions.HTTPError as exc:
+            msg = f'File delete error for {record["pid"]}, fileid: {badfile}'
+            if log:
+                log.exception(exc)
+                log.critical(msg)
+            print(f'{msg}: Exiting',
                   file = sys.stderr)
             sys.exit()
 
@@ -149,6 +189,7 @@ def main():
     args.target_url = args.target_url.strip('/ ')
     target_headers={'X-Dataverse-key': args.target_key}
     target_headers.update(dataverse_utils.UAHEADER)
+    logger = logme(args)
 
     studs = [dataverse_utils.dvdata.Study(x, args.source_url, args.source_key)
              for x in args.pids]
@@ -157,14 +198,18 @@ def main():
 
     if args.collection:
         for stud in studs:
+            logger.info('Uploading %s', stud['pid'])
             upload = requests.post(f'{args.target_url}/api/dataverses/{args.collection}/datasets',
                                    json=stud['upload_json'],
                                    headers=target_headers,
                                    timeout=args.timeout)
             try:
                 upload.raise_for_status()
-            except requests.exceptions.HTTPError:
-                print(f'Study upload error for {stud["pid"]}: Exiting',
+            except requests.exceptions.HTTPError as exc:
+                msg = f'Study upload error for {stud["pid"]}'
+                logger.exception(exc)
+                logger.critical(msg)
+                print(f'{msg}: Exiting',
                       file = sys.stderr)
                 print(upload.json())
                 sys.exit()
@@ -181,7 +226,7 @@ def main():
         for rec in zip(args.replace, studs):
             oldrec = dataverse_utils.dvdata.Study(rec[0], args.target_url,
                                                 args.target_key)
-            remove_target_files(oldrec, args.timeout)
+            remove_target_files(oldrec, args.timeout, log=logger)
             #  payload = {'metadataBlocks': _output_json(record)['datasetVersion']\
             # ['metadataBlocks']}
 
@@ -193,8 +238,11 @@ def main():
                                    timeout=args.timeout)
             try:
                 upload.raise_for_status()
-            except requests.exceptions.HTTPError:
-                print(f'Study upload error for {rec[0]} / {rec[1]["pid"]}: Exiting',
+            except requests.exceptions.HTTPError as exc:
+                msg = f'Study upload error for {rec[0]} / {rec[1]["pid"]}'
+                logger.exception(exc)
+                logger.critical(msg)
+                print(f'{msg}: Exiting',
                       file = sys.stderr)
                 sys.exit()
             for fil in rec[1]['file_info']:
