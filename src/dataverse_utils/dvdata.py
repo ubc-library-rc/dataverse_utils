@@ -110,15 +110,16 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         '''
         self['target_version'] = Study.get_version(url, timeout)
         # Now fix the metadata to work with various versions
-        if self['target_version'] >= 5.010:
+        #note: versions a.00b00c where the zeroes are zero padding
+        #so 5.010 = 5.10, 6.008001 = 6.8.1 etc
+        if self['source_version'] < 5.010 <= self['target_version']:
             self.fix_licence()
-        if self['target_version'] >= 5.013:
+        if self['source_version'] < 5.013 <= self['target_version']:
             self.fix_production_location()
-        if self['target_version'] >= 5.14:
+        if self['source_version'] < 5.014 <= self['target_version']:
             self.fix_series()
-        if self['target_version'] >= 6.2:
+        if self['source_version'] < 6.008 <= self['target_version']:
             self.fix_geography()
-        #breakpoint()
 
     def _orig_json(self) -> dict:
         '''
@@ -248,7 +249,6 @@ class Study(dict): #pylint:  disable=too-few-public-methods
                                                          ['metadataBlocks']['citation']\
                                                          ['fields'][indy]['value']]
 
-
     def fix_series(self)->None:
         '''
         Turn series into a multiple (as of v5.14)
@@ -271,7 +271,25 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         '''
         Fix the north and south "longitude" problem. Required after v6.2
         '''
-
+        newfields = []
+        for val in self['upload_json']['datasetVersion']['metadataBlocks']['geospatial']['fields']:
+            if val['typeName'] != 'geographicBoundingBox':
+                newfields.append(val)
+                continue
+            for coord in val['value']:
+                newcoord = {}
+                for k, v in coord.items():
+                    if k not in ['northLongitude', 'southLongitude']:
+                        newcoord.update({k:v})
+                    else:
+                        v_prime = v.copy()
+                        v_prime['typeName'] = v_prime['typeName'].replace('Longitude','Latitude')
+                        newcoord.update({k.replace('Longitude', 'Latitude'): v_prime})
+            newval = val.copy()
+            newval['value'] = []
+            newval['value'].append(newcoord)
+            newfields.append(newval)
+        self['upload_json']['datasetVersion']['metadataBlocks']['geospatial']['fields'] = newfields
     ############
     #END FIXES
     ############
