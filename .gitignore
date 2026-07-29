@@ -1,4 +1,5 @@
 .DS_Store
+**/*.bak
 **/.DS_Store
 *egg*
 *pyc
