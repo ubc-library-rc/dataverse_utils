@@ -536,7 +536,8 @@ options:
 If for some reason you need to copy everything from a Dataverse record to a different Dataverse installation or a different collection, this utility will do it for you. Metadata, file names, paths, restrictions etc will all be copied. There are some limitations, though, as only the most recent version will be copied and date handling is done on the target server. The utility will either copy records specifice with a persistent identifer (PID) to a target collection on the same or another server, or replace records with an existing PID.
 
 ```nohighlight
-usage: dv_study_migrator [-h] -s SOURCE_URL -a SOURCE_KEY -t TARGET_URL -b TARGET_KEY [-o TIMEOUT] (-c COLLECTION | -r REPLACE [REPLACE ...]) [-v] pids [pids ...]
+usage: dv_study_migrator [-h] -s SOURCE_URL -a SOURCE_KEY -t TARGET_URL -b TARGET_KEY [-o TIMEOUT] [-l LOG] [--log-level LOG_LEVEL] (-c COLLECTION | -r REPLACE [REPLACE ...]) [-v]
+                         pids [pids ...]
 
 Record migrator for Dataverse.
 
@@ -554,19 +555,24 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -s SOURCE_URL, --source_url SOURCE_URL
+  -s, --source_url SOURCE_URL
                         Source Dataverse installation base URL.
-  -a SOURCE_KEY, --source_key SOURCE_KEY
+  -a, --source_key SOURCE_KEY
                         API key for source Dataverse installation.
-  -t TARGET_URL, --target_url TARGET_URL
+  -t, --target_url TARGET_URL
                         Source Dataverse installation base URL.
-  -b TARGET_KEY, --target_key TARGET_KEY
+  -b, --target_key TARGET_KEY
                         API key for target Dataverse installation.
-  -o TIMEOUT, --timeout TIMEOUT
+  -o, --timeout TIMEOUT
                         Request timeout in seconds. Default 100.
-  -c COLLECTION, --collection COLLECTION
+  -l, --log LOG         If you would like a log, provide a log file name here.
+                        If no file name is provided, no log is created.
+  --log-level LOG_LEVEL
+                        Log level. Acceptable values for log level are: debug, info,
+                        warning, error, critical. Default value: warning.
+  -c, --collection COLLECTION
                         Short name of target Dataverse collection (eg: dli).
-  -r REPLACE [REPLACE ...], --replace REPLACE [REPLACE ...]
+  -r, --replace REPLACE [REPLACE ...]
                         Replace data in these target PIDs with data from the
                         source PIDS. Number of PIDs listed here must match
                         the number of PID arguments to follow. That is, the number
@@ -575,7 +581,7 @@ options:
                         [rest of command] -r doi:123.34/etc hdl:12323/AB/SOMETHI
                         will replace the record with identifier 'doi' with the data from 'hdl'.
                         
-                        Make sure you don't use this as the penultimate switch, because 
+                        Make sure you don't use this as the penultimate switch, because
                         then it's not possible to disambiguate PIDS from this argument
                         and positional arguments.
                         ie, something like dv_study_migrator -r blah blah -s http//test.invalid etc.
