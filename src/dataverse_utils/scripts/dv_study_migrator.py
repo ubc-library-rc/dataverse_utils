@@ -33,7 +33,7 @@ def parsley() -> argparse.ArgumentParser():
                              [rest of command] -r doi:123.34/etc hdl:12323/AB/SOMETHI
                              will replace the record with identifier 'doi' with the data from 'hdl'.
 
-                             Make sure you don't use this as the penultimate switch, because 
+                             Make sure you don't use this as the penultimate switch, because
                              then it's not possible to disambiguate PIDS from this argument
                              and positional arguments.
                              ie, something like dv_study_migrator -r blah blah -s http//test.invalid etc.
@@ -105,9 +105,11 @@ def logme(pargs:argparse.Namespace)->logging.Logger:
     if pargs.log:
         text = logging.FileHandler(pargs.log, encoding='utf-8', delay=True)
         text.setFormatter(l_format)
-        logger.addHandler(text)
+        logging.basicConfig(handlers=[text]) #set once!
+        for _ in ['dataverse_utils.dvdata', 'dataverse_utils', 'requests']:
+            logging.getLogger(_).setLevel(level)
         return logger
-    logger.addHandler(logging.NullHandler())
+    logging.basicConfig(handlers=[logging.NullHandler()])
     return logger
 
 def upload_file_to_target(indict:dict, pid,#pylint: disable = too-many-arguments, too-many-positional-arguments
@@ -195,7 +197,6 @@ def main():
              for x in args.pids]
     for stud in studs:
         stud.set_version(args.target_url)
-
     if args.collection:
         for stud in studs:
             logger.info('Uploading %s', stud['pid'])
@@ -209,9 +210,10 @@ def main():
                 msg = f'Study upload error for {stud["pid"]}'
                 logger.exception(exc)
                 logger.critical(msg)
+                logger.critical('Return JSON: %s', upload.json())
                 print(f'{msg}: Exiting',
                       file = sys.stderr)
-                print(upload.json())
+                print(upload.json(), file=sys.stderr)
                 sys.exit()
             doi = upload.json()['data']['persistentId']
             for fil in stud['file_info']:
@@ -250,6 +252,5 @@ def main():
                 upload_file_to_target(fil, rec[0],
                                       args.source_url, args.source_key,
                                       args.target_url, args.target_key)
-
 if __name__ == '__main__':
     main()
