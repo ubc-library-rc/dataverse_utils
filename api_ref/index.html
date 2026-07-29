@@ -110,11 +110,15 @@
         <ul>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.__init__">__init__</a>
     </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.fix_geography">fix_geography</a>
+    </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.fix_licence">fix_licence</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.get_version">get_version</a>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.fix_production_location">fix_production_location</a>
     </li>
-    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.production_location">production_location</a>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.fix_series">fix_series</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.get_version">get_version</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#dataverse_utils.dvdata.Study.set_version">set_version</a>
     </li>
@@ -2994,10 +2998,16 @@ is represented with a dictionary.</p>
         '''
         self['target_version'] = Study.get_version(url, timeout)
         # Now fix the metadata to work with various versions
-        if self['target_version'] &gt;= 5.010:
+        #note: versions a.00b00c where the zeroes are zero padding
+        #so 5.010 = 5.10, 6.008001 = 6.8.1 etc
+        if self['source_version'] &lt; 5.010 &lt;= self['target_version']:
             self.fix_licence()
-        if self['target_version'] &gt;= 5.013:
-            self.production_location()
+        if self['source_version'] &lt; 5.013 &lt;= self['target_version']:
+            self.fix_production_location()
+        if self['source_version'] &lt; 5.014 &lt;= self['target_version']:
+            self.fix_series()
+        if self['source_version'] &lt; 6.008 &lt;= self['target_version']:
+            self.fix_geography()
 
     def _orig_json(self) -&gt; dict:
         '''
@@ -3075,7 +3085,7 @@ is represented with a dictionary.</p>
         return pids
 
     ######
-    #JSON metdata fixes for different versions
+    #JSON metadata fixes for different versions
     ######
     def fix_licence(self)-&gt;None:
         '''
@@ -3097,7 +3107,7 @@ is represented with a dictionary.</p>
             #This shouldn't happen, but UBC has datasets from the early 1970s
             self['upload_json']['datasetVersion']['termsOfUse'] = 'Not available'
 
-    def production_location(self)-&gt;None:
+    def fix_production_location(self)-&gt;None:
         '''
         Changes "multiple" to True where typeName == 'productionPlace' in
         Study['upload_json'] Changes are done
@@ -3125,7 +3135,49 @@ is represented with a dictionary.</p>
             self['upload_json']['datasetVersion']['metadataBlocks']\
                 ['citation']['fields'][indy]['value'] = [self['upload_json']['datasetVersion']\
                                                          ['metadataBlocks']['citation']\
-                                                         ['fields'][indy]['value']]</code></pre>
+                                                         ['fields'][indy]['value']]
+
+    def fix_series(self)-&gt;None:
+        '''
+        Turn series into a multiple (as of v5.14)
+        '''
+        to_series=['series'] # typeNames which must be converted
+        indices = []
+        for ind, val in enumerate(self['upload_json']['datasetVersion']\
+                                      ['metadataBlocks']['citation']['fields']):
+            if val['typeName'] in to_series:
+                indices.append(ind)
+        for nprob in indices:
+            newvalue = self['upload_json']['datasetVersion']\
+                    ['metadataBlocks']['citation']['fields'][nprob]
+            newvalue['multiple'] = True
+            newvalue['value']= [newvalue['value']]
+            self['upload_json']['datasetVersion']['metadataBlocks']\
+                ['citation']['fields'][nprob] = newvalue
+
+    def fix_geography(self)-&gt;None:
+        '''
+        Fix the north and south "longitude" problem. Required after v6.2
+        '''
+        newfields = []
+        for val in self['upload_json']['datasetVersion']['metadataBlocks']['geospatial']['fields']:
+            if val['typeName'] != 'geographicBoundingBox':
+                newfields.append(val)
+                continue
+            for coord in val['value']:
+                newcoord = {}
+                for k, v in coord.items():
+                    if k not in ['northLongitude', 'southLongitude']:
+                        newcoord.update({k:v})
+                    else:
+                        v_prime = v.copy()
+                        v_prime['typeName'] = v_prime['typeName'].replace('Longitude','Latitude')
+                        newcoord.update({k.replace('Longitude', 'Latitude'): v_prime})
+            newval = val.copy()
+            newval['value'] = []
+            newval['value'].append(newcoord)
+            newfields.append(newval)
+        self['upload_json']['datasetVersion']['metadataBlocks']['geospatial']['fields'] = newfields</code></pre>
               </details>
 
 
@@ -3279,6 +3331,50 @@ is represented with a dictionary.</p>
 <div class="doc doc-object doc-function">
 
 
+<h4 id="dataverse_utils.dvdata.Study.fix_geography" class="doc doc-heading">
+            <code class=" language-python">fix_geography()</code>
+
+<a href="#dataverse_utils.dvdata.Study.fix_geography" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Fix the north and south &ldquo;longitude&rdquo; problem. Required after v6.2</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def fix_geography(self)-&gt;None:
+    '''
+    Fix the north and south "longitude" problem. Required after v6.2
+    '''
+    newfields = []
+    for val in self['upload_json']['datasetVersion']['metadataBlocks']['geospatial']['fields']:
+        if val['typeName'] != 'geographicBoundingBox':
+            newfields.append(val)
+            continue
+        for coord in val['value']:
+            newcoord = {}
+            for k, v in coord.items():
+                if k not in ['northLongitude', 'southLongitude']:
+                    newcoord.update({k:v})
+                else:
+                    v_prime = v.copy()
+                    v_prime['typeName'] = v_prime['typeName'].replace('Longitude','Latitude')
+                    newcoord.update({k.replace('Longitude', 'Latitude'): v_prime})
+        newval = val.copy()
+        newval['value'] = []
+        newval['value'].append(newcoord)
+        newfields.append(newval)
+    self['upload_json']['datasetVersion']['metadataBlocks']['geospatial']['fields'] = newfields</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="dataverse_utils.dvdata.Study.fix_licence" class="doc doc-heading">
             <code class=" language-python">fix_licence()</code>
 
@@ -3319,6 +3415,101 @@ non-standard licences may be replaced with None.</p>
     if not self['upload_json']['datasetVersion']['termsOfUse']:
         #This shouldn't happen, but UBC has datasets from the early 1970s
         self['upload_json']['datasetVersion']['termsOfUse'] = 'Not available'</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.dvdata.Study.fix_production_location" class="doc doc-heading">
+            <code class=" language-python">fix_production_location()</code>
+
+<a href="#dataverse_utils.dvdata.Study.fix_production_location" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Changes &ldquo;multiple&rdquo; to True where typeName == &lsquo;productionPlace&rsquo; in
+Study[&lsquo;upload_json&rsquo;] Changes are done
+<em>in place</em>.</p>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Multiple production places came into effect with Dataverse v5.13</p>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def fix_production_location(self)-&gt;None:
+    '''
+    Changes "multiple" to True where typeName == 'productionPlace' in
+    Study['upload_json'] Changes are done
+    *in place*.
+
+    Notes
+    -----
+    Multiple production places came into effect with Dataverse v5.13
+    '''
+    #{'typeName': 'productionPlace', 'multiple': True, 'typeClass': 'primitive',
+    #'value': ['Vancouver, BC', 'Ottawa, ON']}
+
+    # get index
+    indy = None
+    for ind, val in enumerate(self['upload_json']['datasetVersion']\
+                                  ['metadataBlocks']['citation']['fields']):
+        if val['typeName'] == 'productionPlace':
+            indy = ind
+            break
+
+    if indy and not self['upload_json']['datasetVersion']['metadataBlocks']\
+            ['citation']['fields'][indy]['multiple']:
+        self['upload_json']['datasetVersion']['metadataBlocks']\
+            ['citation']['fields'][indy]['multiple'] = True
+        self['upload_json']['datasetVersion']['metadataBlocks']\
+            ['citation']['fields'][indy]['value'] = [self['upload_json']['datasetVersion']\
+                                                     ['metadataBlocks']['citation']\
+                                                     ['fields'][indy]['value']]</code></pre>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="dataverse_utils.dvdata.Study.fix_series" class="doc doc-heading">
+            <code class=" language-python">fix_series()</code>
+
+<a href="#dataverse_utils.dvdata.Study.fix_series" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Turn series into a multiple (as of v5.14)</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
+              <pre class="codehilite"><code class="language-python">def fix_series(self)-&gt;None:
+    '''
+    Turn series into a multiple (as of v5.14)
+    '''
+    to_series=['series'] # typeNames which must be converted
+    indices = []
+    for ind, val in enumerate(self['upload_json']['datasetVersion']\
+                                  ['metadataBlocks']['citation']['fields']):
+        if val['typeName'] in to_series:
+            indices.append(ind)
+    for nprob in indices:
+        newvalue = self['upload_json']['datasetVersion']\
+                ['metadataBlocks']['citation']['fields'][nprob]
+        newvalue['multiple'] = True
+        newvalue['value']= [newvalue['value']]
+        self['upload_json']['datasetVersion']['metadataBlocks']\
+            ['citation']['fields'][nprob] = newvalue</code></pre>
             </details>
     </div>
 
@@ -3422,63 +3613,6 @@ def get_version(cls, url:str, timeout:int=100)-&gt;float:
 <div class="doc doc-object doc-function">
 
 
-<h4 id="dataverse_utils.dvdata.Study.production_location" class="doc doc-heading">
-            <code class=" language-python">production_location()</code>
-
-<a href="#dataverse_utils.dvdata.Study.production_location" class="headerlink" title="Permanent link">&para;</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Changes &ldquo;multiple&rdquo; to True where typeName == &lsquo;productionPlace&rsquo; in
-Study[&lsquo;upload_json&rsquo;] Changes are done
-<em>in place</em>.</p>
-
-
-<details class="note" open>
-  <summary>Notes</summary>
-  <p>Multiple production places came into effect with Dataverse v5.13</p>
-</details>
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>src/dataverse_utils/dvdata.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def production_location(self)-&gt;None:
-    '''
-    Changes "multiple" to True where typeName == 'productionPlace' in
-    Study['upload_json'] Changes are done
-    *in place*.
-
-    Notes
-    -----
-    Multiple production places came into effect with Dataverse v5.13
-    '''
-    #{'typeName': 'productionPlace', 'multiple': True, 'typeClass': 'primitive',
-    #'value': ['Vancouver, BC', 'Ottawa, ON']}
-
-    # get index
-    indy = None
-    for ind, val in enumerate(self['upload_json']['datasetVersion']\
-                                  ['metadataBlocks']['citation']['fields']):
-        if val['typeName'] == 'productionPlace':
-            indy = ind
-            break
-
-    if indy and not self['upload_json']['datasetVersion']['metadataBlocks']\
-            ['citation']['fields'][indy]['multiple']:
-        self['upload_json']['datasetVersion']['metadataBlocks']\
-            ['citation']['fields'][indy]['multiple'] = True
-        self['upload_json']['datasetVersion']['metadataBlocks']\
-            ['citation']['fields'][indy]['value'] = [self['upload_json']['datasetVersion']\
-                                                     ['metadataBlocks']['citation']\
-                                                     ['fields'][indy]['value']]</code></pre>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="dataverse_utils.dvdata.Study.set_version" class="doc doc-heading">
             <code class=" language-python">set_version(url, timeout=100)</code>
 
@@ -3542,10 +3676,16 @@ formats self[&lsquo;upload_json&rsquo;] to correct JSON format</p>
     '''
     self['target_version'] = Study.get_version(url, timeout)
     # Now fix the metadata to work with various versions
-    if self['target_version'] &gt;= 5.010:
+    #note: versions a.00b00c where the zeroes are zero padding
+    #so 5.010 = 5.10, 6.008001 = 6.8.1 etc
+    if self['source_version'] &lt; 5.010 &lt;= self['target_version']:
         self.fix_licence()
-    if self['target_version'] &gt;= 5.013:
-        self.production_location()</code></pre>
+    if self['source_version'] &lt; 5.013 &lt;= self['target_version']:
+        self.fix_production_location()
+    if self['source_version'] &lt; 5.014 &lt;= self['target_version']:
+        self.fix_series()
+    if self['source_version'] &lt; 6.008 &lt;= self['target_version']:
+        self.fix_geography()</code></pre>
             </details>
     </div>
 
