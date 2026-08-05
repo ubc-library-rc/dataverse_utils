@@ -11,7 +11,7 @@ import json
 import logging
 import mimetypes
 import os
-#import sys
+import sys
 import time
 
 import requests
@@ -328,7 +328,7 @@ def uningest_file(dv_url, fid, apikey, study='n/a'):
         LOGGER.error('Uningestion error: %s', uningest.reason)
         print(uningest.reason)
 
-def upload_file(fpath, hdl, **kwargs):
+def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many-statements
     '''
     Uploads file to Dataverse study and sets file metadata and tags.
 
@@ -432,15 +432,17 @@ def upload_file(fpath, hdl, **kwargs):
                            timeout=kwargs.get('timeout',1000))
     try:
         print(upload.json())
-    except json.decoder.JSONDecodeError:
+    except json.decoder.JSONDecodeError as exc:
         #This can happend when Glassfish crashes
         LOGGER.critical(upload.text)
-        print(upload.text)
+        LOGGER.critical('URL: %s', f"{dvurl}/api/datasets/:persistentId/add")
+        print(upload.text, file=sys.stderr)
         err = ('It\'s possible Glassfish may have crashed. '
                'Check server logs for anomalies')
         LOGGER.exception(err)
-        print(err)
-        raise
+        print(err, file=sys.stderr)
+        print(f'URL {dvurl}/api/datasets/:persistentId/add', file=sys.stderr)
+        raise json.decoder.JSONDecodeError from exc
     #SPSS files still process despite spoof, so there's
     #a forcible unlock check
     fid = upload.json()['data']['files'][0]['dataFile']['id']

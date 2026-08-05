@@ -15,7 +15,7 @@ import tempfile
 import time
 import textwrap
 import typing
-import traceback
+#import traceback
 import warnings
 
 import bs4
@@ -189,16 +189,36 @@ class DvCollection:
             clean = f'https://{clean}'
         return clean
 
-    def __get_shortname(self, dvid):
+    def get_shortname(self, dvid):
         '''
         Get collection short name.
         '''
+        #pylint: disable=broad-exception-raised, broad-exception-caught
         self.limit.rate_limit()
-        shortname = self.session.get(f'{self.url}/api/dataverses/{dvid}',
-                                     headers=self.headers,
-                                     timeout=self.kwargs.get('timeout', 15))
-        shortname.raise_for_status()
-        return shortname.json()['data']['alias']
+        obscure_error = f'''
+            An error has occured where a collection can be
+            identified by ID but its name cannot be determined.
+            This is (normally) caused by a configuration error where
+            administrator permissions are not correctly inherited by
+            the child collection.
+
+            Please check with the system administrator to determine
+            any exact issues.
+
+            Problematic collection id number: {dvid}
+                        '''
+
+        sn = self.session.get(f'{self.url}/api/dataverses/{dvid}',
+                              headers=self.headers,
+                              timeout=self.kwargs.get('timeout', 15))
+        sn.raise_for_status()
+        try:
+            return sn.json()['data']['alias']
+        except Exception as exc:
+            LOGGER.critical(textwrap.dedent(obscure_error).strip().replace('\n',' '))
+            print(textwrap.dedent(obscure_error).strip(), file=sys.stderr)
+            print(exc, file=sys.stderr)
+            raise Exception from exc
 
     def get_collections(self, coll:str=None, output=None)->list:#pylint: disable=unused-argument
         '''
@@ -228,31 +248,8 @@ class DvCollection:
         dvs =[]
         for _ in data:
             if _['type'] == 'dataverse':
-                try:
-                    out=self.__get_shortname(_['id'])
-                    dvs.append((_['title'], out))
-                except Exception as e:
-                    obscure_error = f'''
-                                        An error has occured where a collection can be
-                                        identified by ID but its name cannot be determined.
-                                        This is (normally) caused by a configuration error where
-                                        administrator permissions are not correctly inherited by
-                                        the child collection.
-
-                                        Please check with the system administrator to determine
-                                        any exact issues.
-
-                                        Problematic collection id number: {_.get("id",
-                                        "not available")}'''
-                    #to sys.stdout?
-                    print(50*'-', file=sys.stderr)
-                    print(textwrap.dedent(obscure_error), file=sys.stderr)
-                    print(e)
-                    LOGGER.error(textwrap.fill(textwrap.dedent(obscure_error).strip()))
-                    traceback.print_exc()
-                    print(50*'-', file=sys.stderr)
-                    raise e
-        #---
+                out=self.get_shortname(_['id'])
+                dvs.append((_['title'], out))
         if not dvs:
             dvs = []
         output.extend(dvs)
@@ -264,6 +261,114 @@ class DvCollection:
         if self.root not in self.collections:
             self.collections.insert(0, self.root)
         return output
+
+    def walk(self, coll:str=None, path:str=None,
+             output:list=None)->list:
+        '''
+        Equivalent of os.walk() but for a collection
+
+        Parameters
+        ----------
+        coll : str
+            Short name of collection to walk. Default self.coll
+        path : str
+            Concatenated path of top level (eg, 'root/sub/sub2')
+        output : list
+            List of tuples from output for recursive addition
+            (path, [subpath1,...,subpathn], [pid1,...,pidn])
+        '''
+        #Why traverse repeatedly?
+        output = output if output else []
+        coll = coll if coll else self.coll
+        LOGGER.info('Walking tree: %s', coll)
+        x=self.session.get(f'{self.url}/api/dataverses/{coll}/contents',
+                            headers=self.headers,
+                            timeout=self.kwargs.get('timeout', 15))
+        y=x.json()
+        #dirpath, dirname, filename
+        pids = [f"{_['protocol']}:{_['authority']}/{_['identifier']}"
+                for _ in y['data'] if _['type']=='dataset']
+        coll_ids = [_['id'] for _ in y['data'] if _['type']=='dataverse']
+        subpaths = [self.get_shortname(_) for _ in coll_ids]
+
+        dvs = zip(coll_ids, subpaths)
+        path = [coll] if not path else path+[coll] if coll not in path else path
+        output.append(('/'.join(path), subpaths, pids))
+        for subp in dvs:
+            self.walk(subp[1], path, output)
+        return output
+
+    def tree(self, dvtree:list=None)->io.StringIO: #pylint:disable=too-many-locals
+        '''
+        Outputs the collection tree as StringIO object.
+        Perfect for your printing needs.
+
+        Parameters
+        ----------
+        dvtree : list
+            List of tuples from self.walk. Default of None results
+            in self.walk being called
+        '''
+        dvtree = dvtree if dvtree else self.walk()
+        outtree = io.StringIO()
+        t4 = ' ' * 4 #tab 4
+        b = chr(9474) #│ bar
+        e = chr(9492) # └ end
+        h = chr(9472) # ─ horizontal
+        t = chr(9500) # ├ tee
+        tree_info = [_[0].split('/') for _ in dvtree]
+        for num, _ in enumerate(dvtree):
+            tabs = _[0].count('/')
+            #start
+            start = ''
+            if num == 0:
+                start = ''
+            elif tabs > 1:
+                start=b
+
+            oneup = _[0].split('/')[:-1]
+            subtree = [_ for _ in tree_info if '/'.join(oneup) in '/'.join(_)]
+
+
+            middle  = b.join([t4]*(tabs -1))
+
+            #end
+            if _[0].split('/') == subtree[-1]:
+                end = e+2*h
+            else:
+                end = t+2*h
+            if num == 0:
+                end = ''
+            line = start + middle + end + _[0].split('/')[-1] + '\n'
+            outtree.write(line)
+            #breakpoint()
+            for n, dd in enumerate(_[2]):
+                # For some reason putting this in a comprehension doesn't work
+                val = _[0].split('/')[-1]
+                tmp = [_ for _ in tree_info if val in _]
+                lastcount = 0
+                if max(len(x) for x in tmp) >1:
+                    tmp2 = '/'.join(tmp[0][:-1])
+                    lastcount = max(n for n,_ in enumerate(tree_info) if tmp2 in '/'.join(_))
+                prefix_length = len(_[0].split('/'))-1
+                mid2 = (b + t4)* prefix_length
+                if num == lastcount and lastcount:
+                    where = mid2.rfind(b)
+                    mid2 = list(mid2)
+                    mid2[where] = ' '
+                    mid2 = ''.join(mid2)
+                if n+1 != len(_[2]):
+                    indicator = t
+                elif _[1]:
+                    indicator = t
+                else: indicator = e
+
+                #if 'UBC_stem_jobs' in _[0]:
+                #    breakpoint()
+                fileline = mid2 + indicator + dd + '\n'
+                outtree.write( fileline)
+        outtree.seek(0)
+        return outtree
 
     def get_studies(self, root:str=None):
         '''
