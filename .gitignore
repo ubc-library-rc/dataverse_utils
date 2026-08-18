@@ -1,3 +1,6 @@
+#REMOVE THIS ONE LATER
+tests/
+
 .DS_Store
 **/*.bak
 **/.DS_Store
