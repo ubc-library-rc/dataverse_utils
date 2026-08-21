@@ -264,26 +264,36 @@ options:
 </code></pre>
 <h2 id="dv_collection_info">dv_collection_info<a class="headerlink" href="#dv_collection_info" title="Permanent link">&para;</a></h2>
 <p>A recursive file metadata utility. You can specify the head of a tree and the harvester will harvest either the [latest] or <em>all</em> study metadata, including files. Output consists of either two text files (TSV or custom separator) or a single SQLite3 database. It is also possible to harvest the metadata of a single item. An API key currently required.</p>
-<pre><code class="language-nohighlight">usage: dv_collection_info [-h] [-u URL] [-k KEY] [-d DELIMITER] [-i] [-s] [-l LOG] [--log-level LOG_LEVEL] [--rate-limit-off] [--rate-limit-min RATE_LIMIT_MIN]
-                          [--rate-limit-max RATE_LIMIT_MAX] (-c COLLECTION | -p PID) [-v]
+<p>As of <strong>v0.25.1</strong>, you can <em>update</em> an existing database by running it as normal but setting the output to an existing SQLite3 database. Note that this will <em>not</em> work for [ct]sv files.</p>
+<p>As well, you can see things that have been updated since a particular date, using the <code>--since</code> switch. Dates are in ISO format as nature intended, ie. YYYY-MMM-DD.</p>
+<pre><code class="language-nohighlight">usage: dv_collection_info [-h] [-u URL] -k KEY [-d {    ,,}] [--since SINCE] [-i] [-s] [-l LOG] [--log-level LOG_LEVEL] [--rate-limit-off] [--rate-limit-min RATE_LIMIT_MIN]
+                          [--rate-limit-max RATE_LIMIT_MAX] [--timeout TIMEOUT] -c COLLECTION [-v]
                           output
 
  Recursively parses a dataverse collection and outputs study and file metadata
-for the latest version.  If analyzing publicly available collections, a
-dataverse API key for the target system is not required.  Study and file output
-can be joined on 'pid' (studies) and 'dataset_pid' (files).
+for the latest version.  While an API key may not necessarily be required for
+public data, this software requires a key.  Study and file output can be joined
+on 'pid' (studies) and 'dataset_pid' (files).  If a SQLite3 database already
+exists, at the stated location, data will be added to it, based either on the
+'updates' table or the --since switch.  Studies will be added if updates have
+occurred on or after the appropriate date. Note that dates are UTC and begin at
+midnight, so 2026-08-20 would be 2026-08-20T00:00:00Z.
 
 positional arguments:
-  output                 Output file name prefix. If tsv output is chosen, files will be saved as
-                        [prefix]_studies.tsv and [prefix]_files.tsv.  If SQLite output is chosen, it
-                        will be a single file file: [prefix].sqlite3.
+  output                 Output file name prefix. If output is not sqlite, files will be saved as
+                        [prefix]_studies.[ct]sv and [prefix]_files.[ct]sv  If SQLite output is chosen,
+                        it will be a single file file: [prefix].sqlite3.  Common sqlite3 extensions will
+                        be changed to .sqlite3. If you provide the wrong format, the correct extension
+                        will be appended.
 
 options:
   -h, --help            show this help message and exit
   -u, --url URL         Dataverse installation base url. defaults to &quot;https://abacus.library.ubc.ca&quot;
   -k, --key KEY         API key
-  -d, --delimiter DELIMITER
-                        Delimiter for output spreadsheet. Default: tab (\t)
+  -d, --delimiter { ,,}
+                         Delimiter for output spreadsheet. Default: tab (\ ). Choose between ',' and
+                        '\t'
+  --since SINCE         Only updates since this date. Use ISO format. eg: 2026-07-02
   -i, --include-all-versions
                         Include *all** versions, not just the current version
   -s, --sqlite          Save output as SQLite3 database
@@ -297,16 +307,10 @@ options:
                         Minimum time before requests in seconds. Default 0.25
   --rate-limit-max RATE_LIMIT_MAX
                         Maximum time between requests in seconds: Default 1
-  -v, --version         Show version number and exit
-
-Harvest options:
-  You can obtain info for *either* a recursive crawl of a collection
-  (-c, --collection) OR for a single Dataverse study (-p, --pid). These
-  arguments are mutually exclusive.
-
+  --timeout TIMEOUT     Timeout for lengthy requests, default 300s
   -c, --collection COLLECTION
                         Dataverse collection shortname or id at the top of the tree
-  -p, --pid PID         Dataverse study persistent identifier (DOI/handle)
+  -v, --version         Show version number and exit
 </code></pre>
 <h2 id="dv_del">dv_del<a class="headerlink" href="#dv_del" title="Permanent link">&para;</a></h2>
 <p>This is bulk deletion utility for unpublished studies (or even single studies). It&rsquo;s useful when your automated procedures have gone wrong, or if you don&rsquo;t feel like navigating through many menus.</p>
