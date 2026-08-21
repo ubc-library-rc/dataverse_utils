@@ -7,6 +7,7 @@ import copy
 import datetime
 import io
 import logging
+import os
 import pathlib
 import random
 import string
@@ -20,7 +21,7 @@ import warnings
 
 import bs4
 import charset_normalizer as cn
-import markdown_pdf
+#import markdown_pdf
 import markdownify
 import pyreadstat
 import pandas as pd
@@ -30,6 +31,16 @@ import tqdm #Progress meter
 from urllib3.util import Retry
 from dataverse_utils import UAHEADER
 
+#Who forces deprecation messages to the terminal insteaf of using `warnings`?
+#PyMuPDF, that's who
+#This stupidity can be removed once markdown_pdf updates, presumably past 1.13.2.
+#pylint: disable=wrong-import-position, wrong-import-order, consider-using-with, unspecified-encoding
+sys.stdout = open(os.devnull, 'w')
+import markdown_pdf
+sys.stdout = sys.__stdout__
+#pylint: enable=wrong-import-position, wrong-import-order, consider-using-with, unspecified-encoding
+
+
 LOGGER = logging.getLogger(__name__)
 RETRY = Retry(total=10,
                        status_forcelist=[429, 500, 502, 503, 504],
@@ -37,6 +48,9 @@ RETRY = Retry(total=10,
                                          'POST', 'PUT'],
                        backoff_factor=1)
 BAR_FORMAT='{l_bar}{bar}{n_fmt}/{total_fmt} : time remaining - {remaining}'
+
+
+
 
 class MetadataError(Exception):
     '''
