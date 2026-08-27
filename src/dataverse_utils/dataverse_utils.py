@@ -328,7 +328,7 @@ def uningest_file(dv_url, fid, apikey, study='n/a'):
         LOGGER.error('Uningestion error: %s', uningest.reason)
         print(uningest.reason)
 
-def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many-statements
+def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many-statements, too-many-branches
     '''
     Uploads file to Dataverse study and sets file metadata and tags.
 
@@ -388,6 +388,9 @@ def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many
 
     override : bool, optional
         Ignore NOTAB (ie, NOTAB = [])
+
+    return_json: bool
+        Returns the JSON if you need it
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -465,6 +468,9 @@ def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many
 
     restrict_file(fid=fid, dv=dvurl, apikey=kwargs.get('apikey'),
                   rest=kwargs.get('rest', False))
+    if kwargs.get('return_json'):
+        return upload.json()
+    return None
 
 def restrict_file(**kwargs):
     '''

@@ -293,18 +293,15 @@ files = [
 
 [[package]]
 name = "click"
-version = "8.4.2"
+version = "8.5.0"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "click-8.4.2-py3-none-any.whl", hash = "sha256:e6f9f66136c816745b9d65817da91d61d957fb16e02e4dcd0552553c5a197b76"},
-    {file = "click-8.4.2.tar.gz", hash = "sha256:9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6"},
+    {file = "click-8.5.0-py3-none-any.whl", hash = "sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360"},
+    {file = "click-8.5.0.tar.gz", hash = "sha256:ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34"},
 ]
-
-[package.dependencies]
-colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
 name = "colorama"
@@ -606,14 +603,14 @@ testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions", "pytest-tim
 
 [[package]]
 name = "markdown-pdf"
-version = "1.13.2"
+version = "1.13.3"
 description = "Markdown to pdf renderer"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "markdown_pdf-1.13.2-py3-none-any.whl", hash = "sha256:0d2d777d95669e559c7416c356242cdaa2634c44fec98777f78a3298d99e99d2"},
-    {file = "markdown_pdf-1.13.2.tar.gz", hash = "sha256:c9f7d8119bf1ebcab6c5276d46ca1ff24477fc61b6a37fe7f0950130d50efce3"},
+    {file = "markdown_pdf-1.13.3-py3-none-any.whl", hash = "sha256:eeeb4e3f91404f32a564a7764ee205996c5f6680c3ddbe447d25aa5fc976cca1"},
+    {file = "markdown_pdf-1.13.3.tar.gz", hash = "sha256:9800f16c597b5a8b6d62f98d141a23aadba973aceb0fb544a87fba127fdeb7b6"},
 ]
 
 [package.dependencies]
@@ -1253,14 +1250,14 @@ httplib2 = "*"
 
 [[package]]
 name = "platformdirs"
-version = "4.11.3"
+version = "4.11.4"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "platformdirs-4.11.3-py3-none-any.whl", hash = "sha256:5ed065d443751de711da036041a7a214122efc4a4de393b3f4137ba5576540e7"},
-    {file = "platformdirs-4.11.3.tar.gz", hash = "sha256:66a73d38a849810252df809a3d8bcbda8e26f6c189920e7535ad608a48dbb5ab"},
+    {file = "platformdirs-4.11.4-py3-none-any.whl", hash = "sha256:e34ff91a24bcddc6d939b878bdf3f5c437c9c46fe9e212b1bf455fdf1ee57586"},
+    {file = "platformdirs-4.11.4.tar.gz", hash = "sha256:f3373be828247211d0febabea97e238c3dfde8a60b3c90c32756fb52cb21556d"},
 ]
 
 [[package]]
@@ -1398,14 +1395,14 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pymdown-extensions"
-version = "11.0.1"
+version = "11.0.2"
 description = "Extension pack for Python Markdown."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pymdown_extensions-11.0.1-py3-none-any.whl", hash = "sha256:db3943a62bab7e03af1364f0c4083e64b91fb097675a4b6cceccfbe9a77e5eb2"},
-    {file = "pymdown_extensions-11.0.1.tar.gz", hash = "sha256:dd2905ae6fc5b75582fafb139a1266ffc754705efa902aa50067fa7ff4f94ec0"},
+    {file = "pymdown_extensions-11.0.2-py3-none-any.whl", hash = "sha256:259910762019732caa1dfd76f3faa62c59f191d46573e80bcb1d13c0f675bbe5"},
+    {file = "pymdown_extensions-11.0.2.tar.gz", hash = "sha256:9506fcbe66fa355a775b768084334238dd6805020ac4b92bea0c0dda6f8f223d"},
 ]
 
 [package.dependencies]
