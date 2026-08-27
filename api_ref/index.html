@@ -1658,6 +1658,13 @@ unzipping function.</p>
                 <p>Ignore NOTAB (ie, NOTAB = [])</p>
               </div>
             </li>
+            <li>
+              <b><code>return_json</code></b>
+              –
+              <div class="doc-md-description">
+                <p>Returns the JSON if you need it</p>
+              </div>
+            </li>
         </ul>
       </td>
     </tr>
@@ -1666,7 +1673,7 @@ unzipping function.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/dataverse_utils/dataverse_utils.py</code></summary>
-              <pre class="codehilite"><code class="language-python">def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many-statements
+              <pre class="codehilite"><code class="language-python">def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many-statements, too-many-branches
     '''
     Uploads file to Dataverse study and sets file metadata and tags.
 
@@ -1726,6 +1733,9 @@ unzipping function.</p>
 
     override : bool, optional
         Ignore NOTAB (ie, NOTAB = [])
+
+    return_json: bool
+        Returns the JSON if you need it
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -1802,7 +1812,10 @@ unzipping function.</p>
             raise Md5Error('md5sum mismatch')
 
     restrict_file(fid=fid, dv=dvurl, apikey=kwargs.get('apikey'),
-                  rest=kwargs.get('rest', False))</code></pre>
+                  rest=kwargs.get('rest', False))
+    if kwargs.get('return_json'):
+        return upload.json()
+    return None</code></pre>
             </details>
     </div>
 
