@@ -116,8 +116,12 @@ class Study(dict): #pylint:  disable=too-few-public-methods
             self.fix_licence()
         if self['source_version'] < 5.013 <= self['target_version']:
             self.fix_production_location()
-        if self['source_version'] < 5.014 <= self['target_version']:
+        if (self['source_version'] < 5.014 <= self['target_version']
+            and self['target_version'] < 6.001):
             self.fix_series()
+        if (self['source_version'] < 5.014 <= self['target_version']
+            and self['target_version'] >= 6.001):
+            self.fix_series(to_series=['series', 'alternativeTitle'])
         if self['source_version'] < 6.008 <= self['target_version']:
             self.fix_geography()
 
@@ -218,6 +222,8 @@ class Study(dict): #pylint:  disable=too-few-public-methods
         if not self['upload_json']['datasetVersion']['termsOfUse']:
             #This shouldn't happen, but UBC has datasets from the early 1970s
             self['upload_json']['datasetVersion']['termsOfUse'] = 'Not available'
+        if self['upload_json']['datasetVersion']['license'] == 'CC0':
+            self['upload_json']['datasetVersion'].update(self.fix_cc0())
 
     def fix_production_location(self)->None:
         '''
@@ -249,11 +255,10 @@ class Study(dict): #pylint:  disable=too-few-public-methods
                                                          ['metadataBlocks']['citation']\
                                                          ['fields'][indy]['value']]
 
-    def fix_series(self)->None:
+    def fix_series(self, to_series=['series'])->None:
         '''
         Turn series into a multiple (as of v5.14)
         '''
-        to_series=['series'] # typeNames which must be converted
         indices = []
         for ind, val in enumerate(self['upload_json']['datasetVersion']\
                                       ['metadataBlocks']['citation']['fields']):
@@ -290,6 +295,29 @@ class Study(dict): #pylint:  disable=too-few-public-methods
             newval['value'].append(newcoord)
             newfields.append(newval)
         self['upload_json']['datasetVersion']['metadataBlocks']['geospatial']['fields'] = newfields
+
+    def fix_cc0(self)->None:
+        '''
+        Returns CC0 licence, post v5.10
+        '''
+
+        cc0='''<p>
+        <img src="https://licensebuttons.net/p/zero/1.0/88x31.png" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " style="display:none" onload="this.style.display='inline'" />
+        <a href="http://creativecommons.org/publicdomain/zero/1.0" title="Creative Commons CC0 1.0 Universal Public Domain Dedication. " target="_blank">CC0 1.0</a>
+        </p>'''
+        #minimal, uncomment if it becomes a problem
+        ccjson = {'license':{'name': 'CC0 1.0',
+                            'uri': 'http://creativecommons.org/publicdomain/zero/1.0'#,
+                            #'iconUri':	'https://licensebuttons.net/p/zero/1.0/88x31.png',
+                            #'rightsIdentifier':	'CC0-1.0',
+                            #'rightsIdentifierScheme': 'SPDX',
+                            #'schemeUri': 'https://spdx.org/licenses/',
+                            #'languageCode':	'en'
+                             },
+                         'termsOfUse': cc0
+                        }
+        return ccjson
+
     ############
     #END FIXES
     ############

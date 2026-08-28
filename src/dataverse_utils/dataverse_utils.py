@@ -389,8 +389,11 @@ def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many
     override : bool, optional
         Ignore NOTAB (ie, NOTAB = [])
 
-    return_json: bool
+    return_json : bool
         Returns the JSON if you need it
+
+    print : bool
+        Print return JSON and file ID to console. Default = True
     '''
     #Why are SPSS files getting processed anyway?
     #Does SPSS detection happen *after* upload
@@ -434,7 +437,8 @@ def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many
                            params=params, headers=headers, data=multi,
                            timeout=kwargs.get('timeout',1000))
     try:
-        print(upload.json())
+        if kwargs.get('print', True):
+            print(upload.json())
     except json.decoder.JSONDecodeError as exc:
         #This can happend when Glassfish crashes
         LOGGER.critical(upload.text)
@@ -449,7 +453,8 @@ def upload_file(fpath, hdl, **kwargs): #pylint:disable=too-many-locals, too-many
     #SPSS files still process despite spoof, so there's
     #a forcible unlock check
     fid = upload.json()['data']['files'][0]['dataFile']['id']
-    print(f'FID: {fid}')
+    if kwargs.get('print'):
+        print(f'FID: {fid}')
     if kwargs.get('nowait') and check_lock(dvurl, hdl, kwargs['apikey']):
         force_notab_unlock(hdl, dvurl, fid, kwargs['apikey'])
     else:
