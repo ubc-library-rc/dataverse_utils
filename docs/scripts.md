@@ -594,6 +594,84 @@ options:
   -v, --version         Show version number and exit
 ```
 
+## dv_tree
+
+Create a tree view showing the collection structure, either including study PIDs or not. Similar in concept to the linux `tree` command. For example:
+```
+ubc
+├──UBC_EH
+├──UBC_HRC
+├──BMSC
+├──UBC_LFS
+│    ├──UBC_CSFS
+│    │    ├──LTPM
+│    │    ├──CANOVI
+│    │    └──SWD
+etc.
+```
+
+or
+
+```
+UBC_LFS
+├doi:10.5683/SP2/9XRRSJ
+├doi:10.5683/SP2/9CPOLE
+├doi:10.5683/SP2/Q4NL1C
+├doi:10.5683/SP2/YTZMKX
+├doi:10.5683/SP2/UHWPX9
+├doi:10.5683/SP2/HABIT2
+├doi:10.5683/SP3/Q3WGOI
+├──UBC_CSFS
+│    ├doi:10.5683/SP2/DAWYYC
+│    ├doi:10.5683/SP2/MRMCUA
+│    ├doi:10.5683/SP2/Z9NOMS
+│    ├doi:10.5683/SP2/QOP670
+│    ├doi:10.5683/SP2/SMNMGF
+│    ├doi:10.5683/SP2/Y1G0PX
+│    ├doi:10.5683/SP2/QSXH6H
+│    ├doi:10.5683/SP2/N3RGMW
+│    ├doi:10.5683/SP2/IVR7TA
+│    ├doi:10.5683/SP2/HZVXDU
+│    ├doi:10.5683/SP2/XCFR9T
+│    ├doi:10.5683/SP2/ZVU1AT
+│    ├doi:10.5683/SP2/L9VHB0
+│    ├doi:10.5683/SP2/ZIOMGM
+│    ├doi:10.5683/SP2/CZ2KFI
+│    ├doi:10.5683/SP2/TTQTSH
+│    ├──LTPM
+│    │    ├doi:10.5683/SP2/WL0DXB
+│    │    └doi:10.5683/SP2/BMIFBN
+│    ├──CANOVI
+│    │    ├doi:10.5683/SP2/OVACVN
+│    │    ├doi:10.5683/SP2/IJ7H86
+│    │    └doi:10.5683/SP2/XAJ9AJ
+│    └──SWD
+│         └doi:10.5683/SP2/HMH80N
+├──animal_welfare
+│    ├doi:10.5683/SP3/KFFOIZ
+│    └doi:10.5683/SP3/KIU3R6
+└──Animal_Microbiome_Data
+```
+
+Usage is straightforward:
+
+```nohighlight
+usage: dv_tree [-h] [-u URL] -k KEY [-n] [-v] [collection]
+
+Produce a tree view of collection, given a top-level collection. Outputs studies and collections in a view similar to that of the **tree** command. Like **tree**, prints to terminal. To
+save to a file, use a redirect, ie ">".
+
+positional arguments:
+  collection     Dataverse short name of collection to traverse
+
+options:
+  -h, --help     show this help message and exit
+  -u, --url URL  URL of Dataverse instance. Default: https://borealisdata.ca
+  -k, --key KEY  API key
+  -n, --nopids   Suppress PIDs and show only a *collection* tree
+  -v, --version  Show version number and exit
+```
+
 ## dv_upload_tsv
 
 Now that you have a tsv full of nicely described data, you can easily upload it to an existing study if you know the persistent ID and have an API key.

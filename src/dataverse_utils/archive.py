@@ -197,8 +197,6 @@ class Archive:
             Hash type. Supported hashes: 'sha1', 'sha224', 'sha256',
             'sha384','sha512', 'blake2b', 'blake2s', 'md5'.
             default='md5'
-        blocksize : int
-            Read block size in bytes
         '''
         ok_hash = {'sha1' : hashlib.sha1(),
                    'sha224' : hashlib.sha224(),
@@ -208,7 +206,7 @@ class Archive:
                    'blake2b' : hashlib.blake2b(),
                    'blake2s' : hashlib.blake2s(),
                    'md5': hashlib.md5()}
-        #blocksize: int = 2**16
+        #blocksize : int = 2**16
         #fobj.seek(0)
         try:
             _hash = ok_hash[prot]
