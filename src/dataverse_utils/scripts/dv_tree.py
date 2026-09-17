@@ -29,6 +29,9 @@ def parse()->argparse.ArgumentParser:
     parser.add_argument('-k', '--key',
                         help='API key',
                         required=True)
+    parser.add_argument('-n', '--nopids',
+                        help='Suppress PIDs and show only a *collection* tree',
+                        action='store_true')
     parser.add_argument('collection',
                         help='Dataverse short name of collection to traverse',
                         nargs='?')
@@ -46,11 +49,11 @@ def main():
     args = parse().parse_args()
     if not args.collection:
         sys.exit()
-    top = dvc.DvCollection(url=args.url, coll=args.collection, key=args.key)
     try:
-        tree = top.tree()
+        top = dvc.DvCollection(url=args.url, coll=args.collection, key=args.key)
+        tree = top.tree(show_pids=not args.nopids)
         print(tree.read(), file=sys.stdout)
-    except (KeyError, ValueError, IndexError, dvc.requests.HTTPError) as exc:
+    except (KeyError, ValueError, IndexError, dvc.requests.exceptions.HTTPError) as exc:
         print(f'Error {exc}',  file=sys.stderr)
         sys.exit()
 

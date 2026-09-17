@@ -70,7 +70,7 @@ class RateLimiter:
 
         Other parameters
         ----------------
-        rate_limit_on: bool
+        rate_limit_on : bool
             Turn on rate limit for requests
 
         rate_limit_min : int
@@ -131,7 +131,7 @@ class DvCollection:
         timeout : int
             retry timeout in seconds
 
-        rate_limit_on: bool
+        rate_limit_on : bool
             Turn on rate limit for requests
 
         rate_limit_min : int
@@ -312,7 +312,7 @@ class DvCollection:
             self.walk(subp[1], path, output)
         return output
 
-    def tree(self, dvtree:list=None)->io.StringIO: #pylint:disable=too-many-locals
+    def tree(self, dvtree:list=None, show_pids=True)->io.StringIO: #pylint:disable=too-many-locals, too-many-branches
         '''
         Outputs the collection tree as StringIO object.
         Perfect for your printing needs.
@@ -322,6 +322,9 @@ class DvCollection:
         dvtree : list
             List of tuples from self.walk. Default of None results
             in self.walk being called
+        show_pids : bool
+            Show studies in tree, ie. display the pids. If False,
+            will display a tree of collections only
         '''
         dvtree = dvtree if dvtree else self.walk()
         outtree = io.StringIO()
@@ -355,32 +358,30 @@ class DvCollection:
                 end = ''
             line = start + middle + end + _[0].split('/')[-1] + '\n'
             outtree.write(line)
-            #breakpoint()
-            for n, dd in enumerate(_[2]):
-                # For some reason putting this in a comprehension doesn't work
-                val = _[0].split('/')[-1]
-                tmp = [_ for _ in tree_info if val in _]
-                lastcount = 0
-                if max(len(x) for x in tmp) >1:
-                    tmp2 = '/'.join(tmp[0][:-1])
-                    lastcount = max(n for n,_ in enumerate(tree_info) if tmp2 in '/'.join(_))
-                prefix_length = len(_[0].split('/'))-1
-                mid2 = (b + t4)* prefix_length
-                if num == lastcount and lastcount:
-                    where = mid2.rfind(b)
-                    mid2 = list(mid2)
-                    mid2[where] = ' '
-                    mid2 = ''.join(mid2)
-                if n+1 != len(_[2]):
-                    indicator = t
-                elif _[1]:
-                    indicator = t
-                else: indicator = e
+            if show_pids:
+                for n, dd in enumerate(_[2]):
+                    # For some reason putting this in a comprehension doesn't work
+                    val = _[0].split('/')[-1]
+                    tmp = [_ for _ in tree_info if val in _]
+                    lastcount = 0
+                    if max(len(x) for x in tmp) >1:
+                        tmp2 = '/'.join(tmp[0][:-1])
+                        lastcount = max(n for n,_ in enumerate(tree_info) if tmp2 in '/'.join(_))
+                    prefix_length = len(_[0].split('/'))-1
+                    mid2 = (b + t4)* prefix_length
+                    if num == lastcount and lastcount:
+                        where = mid2.rfind(b)
+                        mid2 = list(mid2)
+                        mid2[where] = ' '
+                        mid2 = ''.join(mid2)
+                    if n+1 != len(_[2]):
+                        indicator = t
+                    elif _[1]:
+                        indicator = t
+                    else: indicator = e
 
-                #if 'UBC_stem_jobs' in _[0]:
-                #    breakpoint()
-                fileline = mid2 + indicator + dd + '\n'
-                outtree.write( fileline)
+                    fileline = mid2 + indicator + dd + '\n'
+                    outtree.write(fileline)
         outtree.seek(0)
         return outtree
 
@@ -471,7 +472,7 @@ class StudyMetadata(dict):
     #pylint: disable=too-many-instance-attributes
     def __init__(self, **kwargs):
         '''
-        Intializize a StudyMetadata object.
+        Intialize a StudyMetadata object.
 
         Parameters
         ----------
@@ -493,7 +494,7 @@ class StudyMetadata(dict):
         key : str
             Dataverse instance API key (needed for unpublished studies)
 
-        rate_limit_on: bool
+        rate_limit_on : bool
             Turn on rate limit for requests
 
         rate_limit_min : int
@@ -833,11 +834,13 @@ class StudyMetadata(dict):
         Parameters
         ----------
         filelist : list
-            List containing file level metadata. Typically ['data']['latestVersion']['files']
-            or similar
+            List containing file level metadata.
+            Typically found in: 
+            self.study_meta['data']['latestVersion']['files'] or similar
 
         Notes
-        -----
+        ----- 
+
         Will attach the study pid to the file list for easier joining
         '''
 
@@ -1366,7 +1369,7 @@ class FileAnalysis(dict):
         filesize_bytes : int
             File size in bytes
 
-        rate_limit_on: bool
+        rate_limit_on : bool
             Turn on rate limit for requests
 
         rate_limit_min : int
