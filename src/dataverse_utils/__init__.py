@@ -7,7 +7,7 @@ import pathlib
 import sys
 from dataverse_utils.dataverse_utils import *
 
-VERSION = (0, 26, 1)
+VERSION = (0, 26, 2)
 __version__ = '.'.join([str(x) for x in VERSION])
 
 USERAGENT = (f'dataverse_utils/v{__version__} ({sys.platform.capitalize()}); '
@@ -15,21 +15,21 @@ USERAGENT = (f'dataverse_utils/v{__version__} ({sys.platform.capitalize()}); '
 UAHEADER = {'User-agent' : USERAGENT}
 
 SCRIPT_VERSIONS={
-'dv_bagit' : (0, 1, 0),
-'dv_bulk_release' : (0, 1, 0),
-'dv_collection_info' : (0, 6, 0),
-'dv_del' : (0, 2, 4),
-'dv_ldc_uploader' : (0, 4, 1),
-'dv_list_files' : (0, 1, 1),
-'dv_manifest_gen' : (0, 5, 1),
-'dv_pg_facet_date' : (0, 1, 1),
-'dv_record_copy' : (0, 1, 2),
-'dv_release' : (0, 1, 3),
-'dv_replace_licence' : (0, 1, 1),
-'dv_readme_creator' : (0, 1, 1),
-'dv_study_migrator' : (0, 5, 0),
-'dv_tree' : (0, 2, 0),
-'dv_upload_tsv' : (0, 5, 0)}
+'dv_bagit' : (0, 1, 1),
+'dv_bulk_release' : (0, 1, 1),
+'dv_collection_info' : (0, 6, 1),
+'dv_del' : (0, 2, 5),
+'dv_ldc_uploader' : (0, 4, 2),
+'dv_list_files' : (0, 1, 2),
+'dv_manifest_gen' : (0, 5, 2),
+'dv_pg_facet_date' : (0, 1, 2),
+'dv_record_copy' : (0, 1, 3),
+'dv_release' : (0, 1, 4),
+'dv_replace_licence' : (0, 1, 2),
+'dv_readme_creator' : (0, 1, 2),
+'dv_study_migrator' : (0, 5, 1),
+'dv_tree' : (0, 2, 1),
+'dv_upload_tsv' : (0, 5, 1)}
 
 def script_ver_stmt(name:str)->str:
     '''

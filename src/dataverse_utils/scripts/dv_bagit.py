@@ -55,11 +55,11 @@ def parse()->argparse.ArgumentParser:
                         nargs='+')
     return parser
 
-def main():
+def main(par=None):
     '''
     Create a bag
     '''
-    args = parse().parse_args()
+    args = parse().parse_args() if not par else par().parse_args()
     for pid in tqdm.tqdm(args.pids,
                          desc='Studies',
                          unit='study',

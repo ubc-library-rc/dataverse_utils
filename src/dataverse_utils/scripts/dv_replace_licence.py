@@ -115,12 +115,11 @@ def print_stat(rjson):
     print(rjson.get('data',''))
     print(rjson.get('message',''))
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     Main script function
     '''
-    parse = parsley()
-    args = parse.parse_args()
+    args = parsley().parse_args() if not par else par().parse_args()
     args.url = args.url.strip('/ ')
     with open(args.lic, encoding='utf-8') as fil:
         newlic = fil.read()

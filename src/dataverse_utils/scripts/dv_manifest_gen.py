@@ -93,12 +93,12 @@ def quotype(quote: str)-> int:
             'none' : 3}
     return vals.get(quote.lower(), -1)
 
-def main() -> None:
+def main(par:argparse.ArgumentParser=None) -> None:
     '''
     The main function call
     '''
-    parser = parse()
-    args = parser.parse_args()
+    parser = par.parse() if par else parse()
+    args = parse().parse_args() if not par else par().parse_args()
     args.quote = quotype(args.quote)
     if  args.quote == -1:
         parser.error('Invalid quotation type')

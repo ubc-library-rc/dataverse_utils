@@ -42,11 +42,11 @@ def parse()->argparse.ArgumentParser:
 
     return parser
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     Obviously
     '''
-    args = parse().parse_args()
+    args = parse().parse_args() if not par else par().parse_args()
     if not args.collection:
         sys.exit()
     try:

@@ -206,12 +206,11 @@ def reindex(pid) -> dict:
     reind = requests.get(req, timeout=30)
     return reind.json()
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     The heart of the application
     '''
-    parser = parsely()
-    args = parser.parse_args()
+    args = parsely().parse_args() if not par else par().parse_args()
     args.url = args.url.strip(' /')
     #import sys
     #print(args)

@@ -182,11 +182,11 @@ def remove_target_files(record:dataverse_utils.dvdata.Study, timeout:int=100, lo
                   file = sys.stderr)
             sys.exit()
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     Run this, obviously
     '''
-    args = parsley().parse_args()
+    args = parsley().parse_args() if not par else par().parse_args()
     args.source_url = args.source_url.strip('/ ')
     args.target_url = args.target_url.strip('/ ')
     target_headers={'X-Dataverse-key': args.target_key}

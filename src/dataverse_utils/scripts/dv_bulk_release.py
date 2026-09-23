@@ -137,11 +137,11 @@ def make_header(key:str)->dict:
     out.update(dataverse_utils.UAHEADER)
     return out
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     Command line bulk deleter
     '''
-    args = parsley().parse_args()
+    args = parsley().parse_args() if not par else par().parse_args()
     args.majmin = args.majmin.lower()
     args.dvurl = args.dvurl.strip('/')
 

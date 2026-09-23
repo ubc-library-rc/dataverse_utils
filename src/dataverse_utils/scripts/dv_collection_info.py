@@ -641,12 +641,12 @@ def clean_filename(args):
         instr = instr[:-len(suff)]
     return instr
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     Replacement
     '''
     #pylint: disable=too-many-branches, too-many-locals, too-many-statements
-    args = parse().parse_args()
+    args = parse().parse_args() if not par else par().parse_args()
     logger = logme(args)
     args.output = clean_filename(args)
     dbase_file = pathlib.Path(args.output+extension(args)).expanduser()\

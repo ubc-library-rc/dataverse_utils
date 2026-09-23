@@ -95,12 +95,11 @@ def _output_json(injson : dict)->dict:
                                  }
               }
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     You know what this does
     '''
-    parser = parsley()
-    args = parser.parse_args()
+    args = parsley().parse_args() if not par else par().parse_args()
     args.url = args.url.strip('/ ')
     record = _download_original(args.url, args.pid, args.key)
     if args.collection:

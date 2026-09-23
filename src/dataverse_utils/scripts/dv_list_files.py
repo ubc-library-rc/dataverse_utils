@@ -50,13 +50,13 @@ def parse() -> argparse.ArgumentParser():
                         help='Show version number and exit')
     return parser
 
-def main()->None:
+def main(par:argparse.ArgumentParser=None)->None:
     '''
     The primary function
     '''
     sepchar = {'tsv' : '\t',
                'csv' : ','}
-    args = parse().parse_args()
+    args = parse().parse_args() if not par else par().parse_args()
     if not args.url.lower().startswith('http'):
         args.url = f'https://{args.url}'
     output = io.StringIO(newline='')

@@ -96,12 +96,11 @@ def upload_meta(ldccat: str, url: str, key: str,#pylint: disable = too-many-argu
     info = stud.upload_metadata(url=url, key=key, dv=dvs)
     return info['data']['persistentId']
 
-def main() -> None:
+def main(par:argparse.ArgumentParser=None) -> None:
     '''
     Uploads metadata and data to Dataverse collection/study respectively
     '''
-    parser = parse()
-    args = parser.parse_args()
+    args = parse().parse_args() if not par else par().parse_args()
     dc_config = dc.Config()
     contact_info={'dv_contact_name' : args.cname,
                   'dv_contact_email' : args.email}

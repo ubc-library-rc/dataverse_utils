@@ -75,11 +75,11 @@ def valid_outfile(infil:str)->bool:
         return False
     return whar.parent.expanduser().absolute().exists()
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     You know what this is
     '''
-    args = parse().parse_args()
+    args = parse().parse_args() if not par else par().parse_args()
 
     verify = {args.pid: (valid_pid,
                          'Invalid PID. PIDs begin with hdl: or doi: '

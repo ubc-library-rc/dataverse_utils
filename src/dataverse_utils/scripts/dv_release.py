@@ -198,13 +198,12 @@ class Study():
         if self.verbose:
             print(f'Released: {self.dvurl}/dataset.xhtml?persistentId={self.pid}')
 
-def main():
+def main(par:argparse.ArgumentParser=None):
     '''
     The primary function. Will release all unreleased studies in the
     the target Dataverse collection, or selected studies as required.
     '''
-    parser = argp()
-    args = parser.parse_args()
+    args = argp().parse_args() if not par else par().parse_args()
     if args.dv:
         the_dv = Dverse(args.url, args.key, args.dv)
         un_rel = the_dv.unreleased()
