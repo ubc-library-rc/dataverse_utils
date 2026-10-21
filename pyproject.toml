@@ -1,13 +1,13 @@
 [project]
 name = "dataverse-utils"
-version = "0.26.3"
+version = "0.26.4"
 description = "Utilities for the Dataverse data respository system"
 authors = [
     {name = "Paul Lesack",email = "paul.lesack@ubc.ca"}
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.11, <4.0"
+requires-python = ">=3.13.17,  <4.0"
 #When requests 2.33 is released, update poetry and release
 dependencies = [
     "bagit (>=1.9.0,<2.0.0)",
@@ -22,7 +22,9 @@ dependencies = [
     "requests (>=2.34.2,<3.0.0)",
     "requests-toolbelt (>=1.0.0,<2.0.0)",
     "tqdm (>=4.70.0,<5.0.0)",
-    "urllib3 (>=2.8.0)"
+    "urllib3 (>=2.8.0)",
+    "certifi (>=2026.10.19)",
+    "pip (>=26.2.2)"
 ]
 
 
